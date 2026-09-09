@@ -19,7 +19,7 @@ function Home() {
   return (
     <div>
       <h2 className="text-2xl font-bold text-campo-dark mb-2">Home</h2>
-      <p className="text-ink/70">Olá {nome}, seja bem-vindo ao painel administrativo do RJ Training!</p>
+      <p className="text-ink/70">Olá, seja bem-vindo ao painel administrativo do RJ Training!</p>
     </div>
   )
 }
