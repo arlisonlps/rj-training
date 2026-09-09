@@ -84,7 +84,7 @@ function AlunosLista() {
         {paginaDeAlunos.map((aluno) => (
           <li
             key={aluno.id}
-            className="flex items-center justify-between gap-3 bg-white border border-black/5 rounded-xl px-4 py-3 shadow-sm"
+            className="flex items-center justify-between gap-3 bg-white border border-black/5 rounded-xl px-4 py-3 shadow-sm flex-wrap"
           >
             <div className="flex items-center gap-3">
               <div className="w-9 h-9 rounded-full bg-campo-light text-campo-dark flex items-center justify-center text-xs font-bold shrink-0">

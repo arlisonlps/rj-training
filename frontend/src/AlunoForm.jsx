@@ -104,7 +104,7 @@ function AlunoForm() {
         </button>
       </div>
 
-      <form onSubmit={salvar} className="bg-white rounded-2xl shadow-sm border border-black/5 p-6 grid grid-cols-3 gap-4">
+      <form onSubmit={salvar} className="bg-white rounded-2xl shadow-sm border border-black/5 p-6 grid grid-cols-1 md:grid-cols-3 gap-4">
         <label className={rotuloBase}>
           Nome
           <input className={campoBase} type="text" value={nome} onChange={(e) => setNome(e.target.value)} required />
