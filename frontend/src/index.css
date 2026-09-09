@@ -1,12 +1,12 @@
 @import "tailwindcss";
 
 @theme {
-  --color-campo: #16833e;
-  --color-campo-dark: #0f5c2c;
-  --color-campo-light: #e8f5ec;
-  --color-cream: #f7f6f2;
-  --color-ink: #1a2420;
-  --color-brick: #c0392b;
+  --color-campo: #C1272D;
+  --color-campo-dark: #8B1D1F;
+  --color-campo-light: #E4E4E7;
+  --color-cream: #F4F4F5;
+  --color-ink: #18181B;
+  --color-brick: #C0392B;
   --color-brick-light: #fbe9e7;
   --color-amber: #b07d0a;
   --color-amber-light: #fdf3dd;
