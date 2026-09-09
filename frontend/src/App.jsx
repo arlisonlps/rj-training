@@ -12,6 +12,8 @@ import TreinoHorario from './TreinoHorario'
 import MensalidadesMeses from './MensalidadesMeses'
 import MensalidadeDetalhe from './MensalidadeDetalhe'
 import EscolherHorario from './EscolherHorario'
+import Loading from './Loading'
+
 
 function App() {
   const [session, setSession] = useState(null)
@@ -31,7 +33,7 @@ function App() {
   }, [])
 
   if (carregandoSessao) {
-    return null
+    return <Loading />
   }
 
   return (
