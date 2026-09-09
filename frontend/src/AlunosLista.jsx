@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { Search, Eye, Pencil, Trash2, Plus } from 'lucide-react'
+import { Search, Eye, Pencil, Plus, UserX, UserCheck } from 'lucide-react'
 import { supabase } from './supabaseClient'
+import Loading from './Loading'
 
 const TAMANHO_PAGINA = 5
 
@@ -18,6 +19,8 @@ function AlunosLista() {
   const [alunos, setAlunos] = useState([])
   const [busca, setBusca] = useState('')
   const [paginaAtual, setPaginaAtual] = useState(1)
+  const [carregando, setCarregando] = useState(true)
+  const [mostrarInativos, setMostrarInativos] = useState(false)
 
   useEffect(() => {
     buscarAlunos()
@@ -27,24 +30,29 @@ function AlunosLista() {
     const { data, error } = await supabase.from('aluno').select('*').order('nome')
     if (error) {
       console.error('Erro ao buscar alunos:', error)
+      setCarregando(false)
       return
     }
     setAlunos(data)
+    setCarregando(false)
   }
 
-  async function excluirAluno(id, nome) {
-    const confirmado = window.confirm(`Tem certeza que deseja excluir este aluno? (${nome})`)
+  async function alternarAtivo(id, nome, ativoAtual) {
+    const acao = ativoAtual ? 'desativar' : 'reativar'
+    const confirmado = window.confirm(`Tem certeza que deseja ${acao} este aluno? (${nome})`)
     if (!confirmado) return
 
-    const { error } = await supabase.from('aluno').delete().eq('id', id)
+    const { error } = await supabase.from('aluno').update({ ativo: !ativoAtual }).eq('id', id)
     if (error) {
-      alert('Erro ao excluir aluno: ' + error.message)
+      alert(`Erro ao ${acao} aluno: ` + error.message)
       return
     }
     buscarAlunos()
   }
 
-  const filtrados = alunos.filter((a) =>
+  const visiveis = alunos.filter((a) => (mostrarInativos ? true : a.ativo))
+
+  const filtrados = visiveis.filter((a) =>
     a.nome.toLowerCase().includes(busca.toLowerCase())
   )
 
@@ -57,11 +65,13 @@ function AlunosLista() {
     setPaginaAtual(1)
   }
 
+  if (carregando) return <Loading />
+
   return (
     <div>
       <h2 className="text-2xl font-bold text-campo-dark mb-6">Alunos</h2>
 
-      <div className="flex items-center gap-3 mb-6 flex-wrap">
+      <div className="flex items-center gap-3 mb-4 flex-wrap">
         <div className="relative flex-1 min-w-[200px]">
           <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-ink/40" />
           <input
@@ -80,17 +90,32 @@ function AlunosLista() {
         </Link>
       </div>
 
+      <label className="flex items-center gap-2 text-xs font-medium text-ink/60 mb-4">
+        <input
+          type="checkbox"
+          checked={mostrarInativos}
+          onChange={(e) => {
+            setMostrarInativos(e.target.checked)
+            setPaginaAtual(1)
+          }}
+        />
+        Mostrar alunos desativados
+      </label>
+
       <ul className="space-y-2">
         {paginaDeAlunos.map((aluno) => (
           <li
             key={aluno.id}
-            className="flex items-center justify-between gap-3 bg-white border border-black/5 rounded-xl px-4 py-3 shadow-sm flex-wrap"
+            className={`flex items-center justify-between gap-3 bg-white border border-black/5 rounded-xl px-4 py-3 shadow-sm flex-wrap ${!aluno.ativo ? 'opacity-60' : ''}`}
           >
             <div className="flex items-center gap-3">
               <div className="w-9 h-9 rounded-full bg-campo-light text-campo-dark flex items-center justify-center text-xs font-bold shrink-0">
                 {iniciais(aluno.nome)}
               </div>
-              <span className="font-medium text-sm">{aluno.nome}</span>
+              <span className="font-medium text-sm">
+                {aluno.nome}
+                {!aluno.ativo && <span className="ml-2 text-[10px] font-bold text-ink/40">(desativado)</span>}
+              </span>
             </div>
             <div className="flex items-center gap-2">
               <Link to={`/alunos/${aluno.id}`}>
@@ -103,13 +128,23 @@ function AlunosLista() {
                   <Pencil size={16} />
                 </button>
               </Link>
-              <button
-                onClick={() => excluirAluno(aluno.id, aluno.nome)}
-                className="p-2 rounded-lg bg-brick-light text-brick hover:bg-brick hover:text-white transition-colors"
-                title="Excluir"
-              >
-                <Trash2 size={16} />
-              </button>
+              {aluno.ativo ? (
+                <button
+                  onClick={() => alternarAtivo(aluno.id, aluno.nome, aluno.ativo)}
+                  className="p-2 rounded-lg bg-brick-light text-brick hover:bg-brick hover:text-white transition-colors"
+                  title="Desativar"
+                >
+                  <UserX size={16} />
+                </button>
+              ) : (
+                <button
+                  onClick={() => alternarAtivo(aluno.id, aluno.nome, aluno.ativo)}
+                  className="p-2 rounded-lg bg-campo-light text-campo-dark hover:bg-campo hover:text-white transition-colors"
+                  title="Reativar"
+                >
+                  <UserCheck size={16} />
+                </button>
+              )}
             </div>
           </li>
         ))}
@@ -125,8 +160,8 @@ function AlunosLista() {
               key={n}
               onClick={() => setPaginaAtual(n)}
               className={`w-8 h-8 rounded-lg text-sm font-medium transition-colors ${paginaAtual === n
-                ? 'bg-campo text-white'
-                : 'bg-white border border-black/10 text-ink/60 hover:bg-black/5'
+                  ? 'bg-campo text-white'
+                  : 'bg-white border border-black/10 text-ink/60 hover:bg-black/5'
                 }`}
             >
               {n}
