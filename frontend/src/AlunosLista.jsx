@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { Search, Eye, Pencil, Plus, UserX, UserCheck } from 'lucide-react'
+import { Search, Eye, Pencil, Plus, UserX, UserCheck, Trash2 } from 'lucide-react'
 import { supabase } from './supabaseClient'
 import Loading from './Loading'
 
@@ -45,6 +45,20 @@ function AlunosLista() {
     const { error } = await supabase.from('aluno').update({ ativo: !ativoAtual }).eq('id', id)
     if (error) {
       alert(`Erro ao ${acao} aluno: ` + error.message)
+      return
+    }
+    buscarAlunos()
+  }
+
+  async function excluirAluno(id, nome) {
+    const confirmado = window.confirm(
+      `Tem certeza que deseja excluir "${nome}"? Isso apaga PERMANENTEMENTE o aluno e todo o histórico dele (mensalidades, peso, horários de treino). Não tem como desfazer.`
+    )
+    if (!confirmado) return
+
+    const { error } = await supabase.from('aluno').delete().eq('id', id)
+    if (error) {
+      alert('Erro ao excluir aluno: ' + error.message)
       return
     }
     buscarAlunos()
@@ -145,6 +159,13 @@ function AlunosLista() {
                   <UserCheck size={16} />
                 </button>
               )}
+              <button
+                onClick={() => excluirAluno(aluno.id, aluno.nome)}
+                className="p-2 rounded-lg bg-black/5 text-ink/60 hover:bg-brick hover:text-white transition-colors"
+                title="Excluir permanentemente"
+              >
+                <Trash2 size={16} />
+              </button>
             </div>
           </li>
         ))}

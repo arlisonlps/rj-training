@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { AlertTriangle, Users, Cake } from 'lucide-react'
+import { AlertTriangle, Users, Cake, Trophy } from 'lucide-react'
 import { supabase } from './supabaseClient'
 import Loading from './Loading'
+
+const MEDALHAS = ['🥇', '🥈', '🥉']
 
 function Home() {
   const [nome, setNome] = useState('')
@@ -10,6 +12,7 @@ function Home() {
   const [totalAtivos, setTotalAtivos] = useState(0)
   const [totalAtrasados, setTotalAtrasados] = useState(0)
   const [aniversariantes, setAniversariantes] = useState([])
+  const [destaques, setDestaques] = useState([])
 
   useEffect(() => {
     carregarTudo()
@@ -47,7 +50,58 @@ function Home() {
     )
     setTotalAtrasados(atrasadas.length)
 
+    await calcularDestaques(ano, mes)
+
     setCarregando(false)
+  }
+
+  async function calcularDestaques(ano, mes) {
+    const inicioMesAtual = new Date(ano, mes, 1)
+    const inicioMesAnterior = new Date(ano, mes - 1, 1)
+
+    const { data: historico, error } = await supabase
+      .from('peso_historico')
+      .select('*, aluno(nome)')
+      .order('registrado_em', { ascending: true })
+
+    if (error || !historico) {
+      setDestaques([])
+      return
+    }
+
+    const porAluno = {}
+    for (const registro of historico) {
+      if (!porAluno[registro.aluno_id]) porAluno[registro.aluno_id] = []
+      porAluno[registro.aluno_id].push(registro)
+    }
+
+    const resultado = []
+
+    for (const alunoId in porAluno) {
+      const registros = porAluno[alunoId]
+
+      const doMesAnterior = registros.filter((r) => {
+        const data = new Date(r.registrado_em)
+        return data >= inicioMesAnterior && data < inicioMesAtual
+      })
+      const doMesAtual = registros.filter((r) => new Date(r.registrado_em) >= inicioMesAtual)
+
+      if (doMesAnterior.length === 0 || doMesAtual.length === 0) continue
+
+      const pesoAnterior = doMesAnterior[doMesAnterior.length - 1].peso
+      const pesoAtual = doMesAtual[doMesAtual.length - 1].peso
+      const perda = pesoAnterior - pesoAtual
+
+      if (perda > 0) {
+        resultado.push({
+          nome: registros[0].aluno?.nome || 'Aluno',
+          perda: Math.round(perda * 10) / 10,
+        })
+      }
+    }
+
+    resultado.sort((a, b) => b.perda - a.perda)
+    setDestaques(resultado.slice(0, 3))
   }
 
   if (carregando) return <Loading />
@@ -78,6 +132,26 @@ function Home() {
           </div>
         </Link>
       </div>
+
+      {destaques.length > 0 && (
+        <div className="bg-white border border-black/5 rounded-xl p-5 shadow-sm mb-6">
+          <div className="flex items-center gap-2 mb-3 text-campo-dark">
+            <Trophy size={18} />
+            <span className="text-sm font-bold">Atleta destaque — maior perda de peso do mês</span>
+          </div>
+          <ul className="space-y-2">
+            {destaques.map((d, i) => (
+              <li key={d.nome + i} className="flex items-center justify-between text-sm">
+                <span className="flex items-center gap-2">
+                  <span>{MEDALHAS[i]}</span>
+                  <span className="font-medium">{d.nome}</span>
+                </span>
+                <span className="text-campo-dark font-bold">-{d.perda} kg</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
 
       {aniversariantes.length > 0 && (
         <div className="bg-white border border-black/5 rounded-xl p-5 shadow-sm">
