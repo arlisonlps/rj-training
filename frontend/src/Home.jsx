@@ -20,7 +20,7 @@ function Home() {
 
   async function carregarTudo() {
     const { data: userData } = await supabase.auth.getUser()
-    const nomeUsuario = userData.user?.user_metadata?.nome || userData.user?.email
+    const nomeUsuario = userData.user?.user_metadata?.full_name || userData.user?.user_metadata?.nome || userData.user?.email
     setNome(nomeUsuario)
 
     const { data: alunos } = await supabase.from('aluno').select('*').eq('ativo', true)
