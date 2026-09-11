@@ -1,16 +1,15 @@
 import { NavLink, useNavigate } from 'react-router-dom'
-import { Home, Users, CalendarDays, Wallet, UserCheck, LogOut } from 'lucide-react'
+import { Home, CalendarDays, Wallet, Scale, LogOut } from 'lucide-react'
 import { supabase } from './supabaseClient'
 
 const itens = [
-  { to: '/', label: 'Home', icon: Home, end: true },
-  { to: '/alunos', label: 'Alunos', icon: Users },
-  { to: '/treinos', label: 'Treinos', icon: CalendarDays },
-  { to: '/mensalidades', label: 'Mensal.', icon: Wallet },
-  { to: '/aprovacoes', label: 'Aprovar', icon: UserCheck },
+  { to: '/', label: 'Início', icon: Home, end: true },
+  { to: '/horario', label: 'Horário', icon: CalendarDays },
+  { to: '/mensalidade', label: 'Mensal.', icon: Wallet },
+  { to: '/peso', label: 'Peso', icon: Scale },
 ]
 
-function Layout({ children }) {
+function AlunoLayout({ children }) {
   const navigate = useNavigate()
 
   async function sair() {
@@ -52,4 +51,4 @@ function Layout({ children }) {
   )
 }
 
-export default Layout
+export default AlunoLayout
