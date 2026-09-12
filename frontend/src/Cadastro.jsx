@@ -2,16 +2,19 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { supabase } from './supabaseClient'
 
+const POSICOES = ['Atacante', 'Meio-Campo', 'Zagueiro', 'Lateral', 'Goleiro']
+
 function Cadastro() {
   const [nomeCompleto, setNomeCompleto] = useState('')
   const [cpf, setCpf] = useState('')
   const [whatsapp, setWhatsapp] = useState('')
   const [nascimento, setNascimento] = useState('')
+  const [posicao, setPosicao] = useState('')
   const [erro, setErro] = useState('')
 
   function dadosBasicosValidos() {
-    if (!nomeCompleto || !cpf || !whatsapp || !nascimento) {
-      setErro('Preencha nome completo, CPF, WhatsApp e data de nascimento.')
+    if (!nomeCompleto || !cpf || !whatsapp || !nascimento || !posicao) {
+      setErro('Preencha nome completo, CPF, WhatsApp, data de nascimento e posição.')
       return false
     }
     return true
@@ -23,7 +26,7 @@ function Cadastro() {
 
     localStorage.setItem(
       'cadastro_pendente',
-      JSON.stringify({ nomeCompleto, cpf, whatsapp, nascimento })
+      JSON.stringify({ nomeCompleto, cpf, whatsapp, nascimento, posicao })
     )
     supabase.auth.signInWithOAuth({ provider: 'google' })
   }
@@ -71,6 +74,20 @@ function Cadastro() {
                 className="px-4 py-2.5 rounded-lg border border-black/10 text-base focus:outline-none focus:ring-2 focus:ring-campo/30 focus:border-campo"
                 required
               />
+            </label>
+            <label className="flex flex-col gap-1.5 text-xs font-semibold text-ink/60">
+              Posição
+              <select
+                value={posicao}
+                onChange={(e) => setPosicao(e.target.value)}
+                className="px-4 py-2.5 rounded-lg border border-black/10 text-base focus:outline-none focus:ring-2 focus:ring-campo/30 focus:border-campo"
+                required
+              >
+                <option value="">Selecione a posição</option>
+                {POSICOES.map((p) => (
+                  <option key={p} value={p}>{p}</option>
+                ))}
+              </select>
             </label>
           </div>
 

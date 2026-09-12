@@ -32,6 +32,7 @@ function extrairDadosPendentes() {
     cpf: pendente.cpf,
     whatsapp: pendente.whatsapp,
     nascimento: pendente.nascimento,
+    posicao: pendente.posicao,
   }
 }
 
@@ -88,6 +89,7 @@ function App() {
           p_cpf: pendente.cpf,
           p_whatsapp: pendente.whatsapp,
           p_nascimento: pendente.nascimento,
+          p_posicao: pendente.posicao,
         })
 
         if (error) {
