@@ -18,6 +18,10 @@ function statusCalculado(m) {
   return m.data_vencimento < hoje ? 'atrasado' : 'pendente'
 }
 
+function primeiroNome(nome) {
+  return nome?.split(' ')[0] || ''
+}
+
 function AlunoHome() {
   const [aluno, setAluno] = useState(null)
   const [horarios, setHorarios] = useState([])
@@ -81,7 +85,7 @@ function AlunoHome() {
 
   return (
     <div>
-      <h2 className="text-2xl font-bold text-campo-dark mb-2">Olá, {aluno?.nome || '...'}!</h2>
+      <h2 className="text-2xl font-bold text-campo-dark mb-2">Olá, {aluno ? primeiroNome(aluno.nome) : '...'}!</h2>
       <p className="text-ink/70 mb-6">Bem-vindo ao seu painel do RJ Training.</p>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
