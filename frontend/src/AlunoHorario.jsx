@@ -38,6 +38,31 @@ function statusAgendamento(h) {
   return 'aberto'
 }
 
+function proximaSegundaFeira(referencia) {
+  const diaSemana = referencia.getDay()
+  const diasAteSegunda = (8 - diaSemana) % 7 || 7
+  const proxima = new Date(referencia)
+  proxima.setDate(referencia.getDate() + diasAteSegunda)
+  proxima.setHours(0, 0, 0, 0)
+  return proxima
+}
+
+function formatarContagem(ms) {
+  if (ms <= 0) return '0s'
+  const totalSegundos = Math.floor(ms / 1000)
+  const dias = Math.floor(totalSegundos / 86400)
+  const horas = Math.floor((totalSegundos % 86400) / 3600)
+  const minutos = Math.floor((totalSegundos % 3600) / 60)
+  const segundos = totalSegundos % 60
+
+  const partes = []
+  if (dias > 0) partes.push(`${dias}d`)
+  if (dias > 0 || horas > 0) partes.push(`${horas}h`)
+  if (dias > 0 || horas > 0 || minutos > 0) partes.push(`${minutos}m`)
+  partes.push(`${segundos}s`)
+  return partes.join(' ')
+}
+
 function AlunoHorario() {
   const [meusHorarios, setMeusHorarios] = useState(null)
   const [consultando, setConsultando] = useState(true)
@@ -51,9 +76,19 @@ function AlunoHorario() {
 
   const [horarioRemarcar, setHorarioRemarcar] = useState({})
 
+  const [agora, setAgora] = useState(new Date())
+
   useEffect(() => {
     consultarMeusHorarios()
   }, [])
+
+  useEffect(() => {
+    const intervalo = setInterval(() => setAgora(new Date()), 1000)
+    return () => clearInterval(intervalo)
+  }, [])
+
+  const podeEscolherPrimeiraVez = agora.getDay() === 1
+  const msAteAbrirEscolha = proximaSegundaFeira(agora).getTime() - agora.getTime()
 
   async function consultarMeusHorarios() {
     setConsultando(true)
@@ -119,6 +154,8 @@ function AlunoHorario() {
 
   async function enviarPrimeiraEscolha(e) {
     e.preventDefault()
+    if (!podeEscolherPrimeiraVez) return
+
     setMensagem('')
     setErro('')
 
@@ -244,6 +281,13 @@ function AlunoHorario() {
       {aindaNaoEscolheuNada && (
         <div className="bg-white rounded-2xl shadow-sm border border-black/5 p-8">
           <h3 className="text-sm font-bold text-campo-dark mb-4">Escolher horário da semana</h3>
+
+          {!podeEscolherPrimeiraVez && (
+            <p className="text-sm text-ink/60 mb-4">
+              Aguarde <span className="font-bold text-campo-dark">{formatarContagem(msAteAbrirEscolha)}</span> para agendar seu treino!
+            </p>
+          )}
+
           <form onSubmit={enviarPrimeiraEscolha} className="flex flex-col gap-4">
             <div className="flex flex-col gap-3">
               {dias.map((d) => (
@@ -254,7 +298,8 @@ function AlunoHorario() {
                     onChange={(e) =>
                       setHorariosEscolhidos({ ...horariosEscolhidos, [d.valor]: e.target.value })
                     }
-                    className="flex-1 px-3 py-2.5 rounded-lg border border-black/10 text-base focus:outline-none focus:ring-2 focus:ring-campo/30 focus:border-campo"
+                    disabled={!podeEscolherPrimeiraVez}
+                    className="flex-1 px-3 py-2.5 rounded-lg border border-black/10 text-base focus:outline-none focus:ring-2 focus:ring-campo/30 focus:border-campo disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <option value="">Selecione o horário</option>
                     {horarios.map((h) => (
@@ -267,7 +312,7 @@ function AlunoHorario() {
 
             <button
               type="submit"
-              disabled={enviando}
+              disabled={!podeEscolherPrimeiraVez || enviando}
               className="bg-campo text-white font-semibold text-sm rounded-lg py-2.5 hover:bg-campo-dark transition-colors disabled:opacity-60"
             >
               {enviando ? 'Enviando...' : 'Confirmar os 3 dias'}
