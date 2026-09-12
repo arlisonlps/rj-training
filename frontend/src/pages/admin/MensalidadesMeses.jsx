@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { Calendar, Search, MessageCircle, Check } from 'lucide-react'
-import { supabase } from './supabaseClient'
-import { gerarMensalidadesDoMesAtual } from './mensalidade'
-import Loading from './Loading'
+import { supabase } from '../../lib/supabaseClient'
+import { gerarMensalidadesDoMesAtual } from '../../lib/mensalidade'
+import Loading from '../../components/Loading'
 
 const NOMES_MESES = [
   'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',

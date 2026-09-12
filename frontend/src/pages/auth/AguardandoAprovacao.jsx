@@ -1,6 +1,6 @@
-import { supabase } from './supabaseClient'
-import logo from './assets/logo.png'
-import SeletorTema from './SeletorTema'
+import { supabase } from '../../lib/supabaseClient'
+import logo from '../../assets/logo.png'
+import SeletorTema from '../../components/SeletorTema'
 
 function AguardandoAprovacao({ tipo, erro, onTentarNovamente }) {
   async function sair() {

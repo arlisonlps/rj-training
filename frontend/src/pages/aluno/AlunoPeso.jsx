@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Scale } from 'lucide-react'
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
-import { supabase } from './supabaseClient'
+import { supabase } from '../../lib/supabaseClient'
 
 function formatarDataCurta(dataIso) {
   const data = new Date(dataIso)

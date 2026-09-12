@@ -1,9 +1,9 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { supabase } from './supabaseClient'
-import { POSICOES } from './posicoes'
-import logo from './assets/logo.png'
-import SeletorTema from './SeletorTema'
+import { supabase } from '../../lib/supabaseClient'
+import { POSICOES } from '../../lib/posicoes'
+import logo from '../../assets/logo.png'
+import SeletorTema from '../../components/SeletorTema'
 
 function Cadastro() {
   const [nomeCompleto, setNomeCompleto] = useState('')

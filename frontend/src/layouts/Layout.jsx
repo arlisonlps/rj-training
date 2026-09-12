@@ -1,8 +1,8 @@
 import { NavLink, useNavigate } from 'react-router-dom'
 import { Home, Users, CalendarDays, Wallet, UserCheck, LogOut } from 'lucide-react'
-import { supabase } from './supabaseClient'
-import logo from './assets/logo.png'
-import SeletorTema from './SeletorTema'
+import { supabase } from '../lib/supabaseClient'
+import logo from '../assets/logo.png'
+import SeletorTema from '../components/SeletorTema'
 
 const itens = [
   { to: '/', label: 'Home', icon: Home, end: true },

@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom'
-import { supabase } from './supabaseClient'
-import logo from './assets/logo.png'
-import SeletorTema from './SeletorTema'
+import { supabase } from '../../lib/supabaseClient'
+import logo from '../../assets/logo.png'
+import SeletorTema from '../../components/SeletorTema'
 
 function Login() {
   async function entrarComGoogle() {

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { supabase } from './supabaseClient'
+import { supabase } from '../../lib/supabaseClient'
 
 function selo(status) {
   if (status === 'pago') return 'bg-campo-light text-campo-dark'

@@ -1,5 +1,5 @@
 import { Sun, Moon, Monitor } from 'lucide-react'
-import { useTema } from './tema'
+import { useTema } from '../lib/tema'
 
 const OPCOES = [
   { valor: 'claro', label: 'Claro', Icon: Sun },

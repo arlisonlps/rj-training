@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Check, X, User } from 'lucide-react'
-import { supabase } from './supabaseClient'
+import { supabase } from '../../lib/supabaseClient'
 
 function Aprovacoes() {
   const [pendentes, setPendentes] = useState([])

@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { AlertTriangle, Users, Cake, Trophy } from 'lucide-react'
-import { supabase } from './supabaseClient'
-import Loading from './Loading'
+import { supabase } from '../../lib/supabaseClient'
+import Loading from '../../components/Loading'
 
 const MEDALHAS = ['🥇', '🥈', '🥉']
 

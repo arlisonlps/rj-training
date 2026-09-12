@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import { ArrowLeft, Save } from 'lucide-react'
-import { supabase } from './supabaseClient'
-import { POSICOES } from './posicoes'
-import Loading from './Loading'
+import { supabase } from '../../lib/supabaseClient'
+import { POSICOES } from '../../lib/posicoes'
+import Loading from '../../components/Loading'
 
 const campoBase =
   'px-3.5 py-2.5 rounded-lg border border-border-strong text-sm focus:outline-none focus:ring-2 focus:ring-campo/30 focus:border-campo'

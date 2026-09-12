@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { ArrowLeft, CheckCircle2 } from 'lucide-react'
-import { supabase } from './supabaseClient'
-import Loading from './Loading'
+import { supabase } from '../../lib/supabaseClient'
+import Loading from '../../components/Loading'
 
 const OFFSET_DIA = { terca: 1, quarta: 2, quinta: 3 }
 

@@ -2,8 +2,8 @@ import { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { ArrowLeft, Scale } from 'lucide-react'
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
-import { supabase } from './supabaseClient'
-import Loading from './Loading'
+import { supabase } from '../../lib/supabaseClient'
+import Loading from '../../components/Loading'
 
 function iniciais(nome) {
   return nome

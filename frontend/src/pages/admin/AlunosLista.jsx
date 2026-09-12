@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { Search, Eye, Pencil, Plus, UserX, UserCheck, Trash2 } from 'lucide-react'
-import { supabase } from './supabaseClient'
-import Loading from './Loading'
+import { supabase } from '../../lib/supabaseClient'
+import Loading from '../../components/Loading'
 
 const TAMANHO_PAGINA = 5
 

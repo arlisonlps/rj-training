@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { CalendarDays, Wallet, Scale } from 'lucide-react'
-import { supabase } from './supabaseClient'
+import { supabase } from '../../lib/supabaseClient'
 
 const NOMES_DIAS = { terca: 'Terça', quarta: 'Quarta', quinta: 'Quinta' }
 const ORDEM_DIAS = { terca: 1, quarta: 2, quinta: 3 }
