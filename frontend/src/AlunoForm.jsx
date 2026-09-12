@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import { ArrowLeft, Save } from 'lucide-react'
 import { supabase } from './supabaseClient'
+import { POSICOES } from './posicoes'
 import Loading from './Loading'
 
 const campoBase =
@@ -119,7 +120,12 @@ function AlunoForm() {
         </label>
         <label className={rotuloBase}>
           Posição
-          <input className={campoBase} type="text" value={posicao} onChange={(e) => setPosicao(e.target.value)} placeholder="Ex: Atacante" />
+          <select className={campoBase} value={posicao} onChange={(e) => setPosicao(e.target.value)}>
+            <option value="">Selecione a posição</option>
+            {POSICOES.map((p) => (
+              <option key={p} value={p}>{p}</option>
+            ))}
+          </select>
         </label>
         <label className={rotuloBase}>
           Peso (kg)

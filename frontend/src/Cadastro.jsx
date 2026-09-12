@@ -1,8 +1,7 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { supabase } from './supabaseClient'
-
-const POSICOES = ['Atacante', 'Meio-Campo', 'Zagueiro', 'Lateral', 'Goleiro']
+import { POSICOES } from './posicoes'
 
 function Cadastro() {
   const [nomeCompleto, setNomeCompleto] = useState('')
