@@ -22,11 +22,37 @@ import AlunoHorario from './AlunoHorario'
 import AlunoMensalidade from './AlunoMensalidade'
 import AlunoPeso from './AlunoPeso'
 
+function extrairDadosPendentes(user) {
+  const meta = user.user_metadata || {}
+  if (meta.cpf && meta.nome_completo) {
+    return {
+      nome: meta.nome_completo,
+      cpf: meta.cpf,
+      whatsapp: meta.whatsapp,
+      nascimento: meta.nascimento,
+    }
+  }
+
+  const pendenteStr = localStorage.getItem('cadastro_pendente')
+  if (pendenteStr) {
+    const pendente = JSON.parse(pendenteStr)
+    return {
+      nome: pendente.nomeCompleto,
+      cpf: pendente.cpf,
+      whatsapp: pendente.whatsapp,
+      nascimento: pendente.nascimento,
+    }
+  }
+
+  return null
+}
+
 function App() {
   const [session, setSession] = useState(null)
   const [carregandoSessao, setCarregandoSessao] = useState(true)
   const [perfil, setPerfil] = useState(null)
   const [carregandoPerfil, setCarregandoPerfil] = useState(false)
+  const [erroCadastro, setErroCadastro] = useState('')
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -57,43 +83,46 @@ function App() {
 
   async function carregarPerfil() {
     setCarregandoPerfil(true)
+    setErroCadastro('')
 
-    const pendenteStr = localStorage.getItem('cadastro_pendente')
-    if (pendenteStr) {
-      const { data: perfilExistente } = await supabase
-        .from('perfil_usuario')
-        .select('user_id')
-        .eq('user_id', session.user.id)
-        .maybeSingle()
+    const { data: perfilExistente } = await supabase
+      .from('perfil_usuario')
+      .select('papel, status')
+      .eq('user_id', session.user.id)
+      .maybeSingle()
 
-      if (!perfilExistente) {
-        const pendente = JSON.parse(pendenteStr)
+    if (!perfilExistente) {
+      const pendente = extrairDadosPendentes(session.user)
+
+      if (pendente) {
         const { data: resultado, error } = await supabase.rpc('cadastrar_aluno_pendente', {
-          p_nome: pendente.nomeCompleto,
+          p_nome: pendente.nome,
           p_cpf: pendente.cpf,
           p_whatsapp: pendente.whatsapp,
           p_nascimento: pendente.nascimento,
         })
 
         if (error) {
-          console.error('Erro ao criar cadastro pendente:', error)
+          setErroCadastro(error.message)
         } else if (resultado && resultado.startsWith('ERRO')) {
-          console.error('Erro ao criar cadastro pendente:', resultado)
+          setErroCadastro(resultado.replace('ERRO: ', ''))
         } else {
           localStorage.removeItem('cadastro_pendente')
         }
-      } else {
-        localStorage.removeItem('cadastro_pendente')
+
+        const { data: perfilNovo } = await supabase
+          .from('perfil_usuario')
+          .select('papel, status')
+          .eq('user_id', session.user.id)
+          .maybeSingle()
+
+        setPerfil(perfilNovo)
+        setCarregandoPerfil(false)
+        return
       }
     }
 
-    const { data } = await supabase
-      .from('perfil_usuario')
-      .select('papel, status')
-      .eq('user_id', session.user.id)
-      .maybeSingle()
-
-    setPerfil(data)
+    setPerfil(perfilExistente)
     setCarregandoPerfil(false)
   }
 
@@ -117,7 +146,13 @@ function App() {
       <Routes>
         <Route
           path="*"
-          element={<AguardandoAprovacao tipo={perfil ? 'aluno' : 'sem-perfil'} />}
+          element={
+            <AguardandoAprovacao
+              tipo={perfil ? 'aluno' : 'sem-perfil'}
+              erro={erroCadastro}
+              onTentarNovamente={carregarPerfil}
+            />
+          }
         />
       </Routes>
     )

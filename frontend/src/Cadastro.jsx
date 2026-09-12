@@ -1,10 +1,8 @@
 import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { supabase } from './supabaseClient'
 
 function Cadastro() {
-  const navigate = useNavigate()
-
   const [nomeCompleto, setNomeCompleto] = useState('')
   const [cpf, setCpf] = useState('')
   const [whatsapp, setWhatsapp] = useState('')
@@ -21,22 +19,6 @@ function Cadastro() {
       return false
     }
     return true
-  }
-
-  async function criarRegistroAluno() {
-    const { data: resultado, error } = await supabase.rpc('cadastrar_aluno_pendente', {
-      p_nome: nomeCompleto,
-      p_cpf: cpf,
-      p_whatsapp: whatsapp,
-      p_nascimento: nascimento,
-    })
-
-    if (error) {
-      throw new Error('Erro ao finalizar cadastro: ' + error.message)
-    }
-    if (resultado && resultado.startsWith('ERRO')) {
-      throw new Error(resultado.replace('ERRO: ', ''))
-    }
   }
 
   async function cadastrarComEmail(e) {
@@ -56,29 +38,26 @@ function Cadastro() {
 
     setCarregando(true)
 
-    localStorage.setItem(
-      'cadastro_pendente',
-      JSON.stringify({ nomeCompleto, cpf, whatsapp, nascimento })
-    )
-
-    const { data, error } = await supabase.auth.signUp({ email, password: senha })
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password: senha,
+      options: {
+        data: {
+          nome_completo: nomeCompleto,
+          cpf,
+          whatsapp,
+          nascimento,
+        },
+      },
+    })
 
     if (error) {
       setErro(error.message)
-      localStorage.removeItem('cadastro_pendente')
       setCarregando(false)
       return
     }
 
-    if (data.session) {
-      try {
-        await criarRegistroAluno()
-        localStorage.removeItem('cadastro_pendente')
-        navigate('/')
-      } catch (err) {
-        setErro(err.message)
-      }
-    } else {
+    if (!data.session) {
       setMensagem('Conta criada! Enviamos um link de confirmação para o seu email. Confirme e depois volte para fazer login.')
     }
 
