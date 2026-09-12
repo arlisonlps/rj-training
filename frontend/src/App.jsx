@@ -22,29 +22,17 @@ import AlunoHorario from './AlunoHorario'
 import AlunoMensalidade from './AlunoMensalidade'
 import AlunoPeso from './AlunoPeso'
 
-function extrairDadosPendentes(user) {
-  const meta = user.user_metadata || {}
-  if (meta.cpf && meta.nome_completo) {
-    return {
-      nome: meta.nome_completo,
-      cpf: meta.cpf,
-      whatsapp: meta.whatsapp,
-      nascimento: meta.nascimento,
-    }
-  }
-
+function extrairDadosPendentes() {
   const pendenteStr = localStorage.getItem('cadastro_pendente')
-  if (pendenteStr) {
-    const pendente = JSON.parse(pendenteStr)
-    return {
-      nome: pendente.nomeCompleto,
-      cpf: pendente.cpf,
-      whatsapp: pendente.whatsapp,
-      nascimento: pendente.nascimento,
-    }
-  }
+  if (!pendenteStr) return null
 
-  return null
+  const pendente = JSON.parse(pendenteStr)
+  return {
+    nome: pendente.nomeCompleto,
+    cpf: pendente.cpf,
+    whatsapp: pendente.whatsapp,
+    nascimento: pendente.nascimento,
+  }
 }
 
 function App() {
@@ -92,7 +80,7 @@ function App() {
       .maybeSingle()
 
     if (!perfilExistente) {
-      const pendente = extrairDadosPendentes(session.user)
+      const pendente = extrairDadosPendentes()
 
       if (pendente) {
         const { data: resultado, error } = await supabase.rpc('cadastrar_aluno_pendente', {

@@ -7,11 +7,7 @@ function Cadastro() {
   const [cpf, setCpf] = useState('')
   const [whatsapp, setWhatsapp] = useState('')
   const [nascimento, setNascimento] = useState('')
-  const [email, setEmail] = useState('')
-  const [senha, setSenha] = useState('')
   const [erro, setErro] = useState('')
-  const [mensagem, setMensagem] = useState('')
-  const [carregando, setCarregando] = useState(false)
 
   function dadosBasicosValidos() {
     if (!nomeCompleto || !cpf || !whatsapp || !nascimento) {
@@ -21,52 +17,8 @@ function Cadastro() {
     return true
   }
 
-  async function cadastrarComEmail(e) {
-    e.preventDefault()
-    setErro('')
-    setMensagem('')
-
-    if (!dadosBasicosValidos()) return
-    if (!email || !senha) {
-      setErro('Preencha email e senha.')
-      return
-    }
-    if (senha.length < 6) {
-      setErro('A senha precisa ter pelo menos 6 caracteres.')
-      return
-    }
-
-    setCarregando(true)
-
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password: senha,
-      options: {
-        data: {
-          nome_completo: nomeCompleto,
-          cpf,
-          whatsapp,
-          nascimento,
-        },
-      },
-    })
-
-    if (error) {
-      setErro(error.message)
-      setCarregando(false)
-      return
-    }
-
-    if (!data.session) {
-      setMensagem('Conta criada! Enviamos um link de confirmação para o seu email. Confirme e depois volte para fazer login.')
-    }
-
-    setCarregando(false)
-  }
-
   function cadastrarComGoogle() {
     setErro('')
-    setMensagem('')
     if (!dadosBasicosValidos()) return
 
     localStorage.setItem(
@@ -122,38 +74,7 @@ function Cadastro() {
             </label>
           </div>
 
-          <form onSubmit={cadastrarComEmail} className="flex flex-col gap-3">
-            <input
-              type="email"
-              placeholder="Email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="px-4 py-2.5 rounded-lg border border-black/10 text-base focus:outline-none focus:ring-2 focus:ring-campo/30 focus:border-campo"
-            />
-            <input
-              type="password"
-              placeholder="Senha (mín. 6 caracteres)"
-              value={senha}
-              onChange={(e) => setSenha(e.target.value)}
-              className="px-4 py-2.5 rounded-lg border border-black/10 text-base focus:outline-none focus:ring-2 focus:ring-campo/30 focus:border-campo"
-            />
-            <button
-              type="submit"
-              disabled={carregando}
-              className="bg-campo text-white font-semibold text-sm rounded-lg py-2.5 hover:bg-campo-dark transition-colors disabled:opacity-60"
-            >
-              {carregando ? 'Criando conta...' : 'Criar conta com email'}
-            </button>
-          </form>
-
-          {erro && <p className="text-brick text-sm mt-3">{erro}</p>}
-          {mensagem && <p className="text-campo-dark text-sm mt-3">{mensagem}</p>}
-
-          <div className="flex items-center gap-3 my-5">
-            <div className="h-px bg-black/10 flex-1" />
-            <span className="text-xs text-ink/40">ou</span>
-            <div className="h-px bg-black/10 flex-1" />
-          </div>
+          {erro && <p className="text-brick text-sm mb-4">{erro}</p>}
 
           <button
             onClick={cadastrarComGoogle}
