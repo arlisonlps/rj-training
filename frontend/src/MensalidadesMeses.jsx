@@ -125,14 +125,14 @@ function MensalidadesMeses() {
             placeholder="Pesquisar aluno..."
             value={busca}
             onChange={(e) => setBusca(e.target.value)}
-            className="w-full pl-9 pr-4 py-2.5 rounded-lg border border-black/10 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-campo/30 focus:border-campo"
+            className="w-full pl-9 pr-4 py-2.5 rounded-lg border border-border-strong bg-surface text-sm focus:outline-none focus:ring-2 focus:ring-campo/30 focus:border-campo"
           />
         </div>
 
         <select
           value={filtroMes}
           onChange={(e) => setFiltroMes(e.target.value)}
-          className="px-3 py-2.5 rounded-lg border border-black/10 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-campo/30 focus:border-campo"
+          className="px-3 py-2.5 rounded-lg border border-border-strong bg-surface text-sm focus:outline-none focus:ring-2 focus:ring-campo/30 focus:border-campo"
         >
           <option value="todos">Todos os meses</option>
           {NOMES_MESES.map((nome, i) => (
@@ -143,7 +143,7 @@ function MensalidadesMeses() {
         <select
           value={filtroAno}
           onChange={(e) => setFiltroAno(e.target.value)}
-          className="px-3 py-2.5 rounded-lg border border-black/10 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-campo/30 focus:border-campo"
+          className="px-3 py-2.5 rounded-lg border border-border-strong bg-surface text-sm focus:outline-none focus:ring-2 focus:ring-campo/30 focus:border-campo"
         >
           <option value="todos">Todos os anos</option>
           {anosDisponiveis.map((ano) => (
@@ -159,7 +159,7 @@ function MensalidadesMeses() {
             return (
               <li
                 key={m.id}
-                className={`flex items-center justify-between gap-3 bg-white border border-black/5 border-l-4 ${borda(status)} rounded-xl px-4 py-3 shadow-sm flex-wrap`}
+                className={`flex items-center justify-between gap-3 bg-surface border border-border border-l-4 ${borda(status)} rounded-xl px-4 py-3 shadow-sm flex-wrap`}
               >
                 <div>
                   <div className="font-semibold text-sm">{m.aluno?.nome}</div>
@@ -200,7 +200,7 @@ function MensalidadesMeses() {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {listaMeses.map((m) => (
             <Link key={m.mesReferencia} to={`/mensalidades/${m.mesReferencia}`}>
-              <div className="bg-white border border-black/5 rounded-xl p-5 shadow-sm hover:shadow-md transition-shadow cursor-pointer">
+              <div className="bg-surface border border-border rounded-xl p-5 shadow-sm hover:shadow-md transition-shadow cursor-pointer">
                 <div className="flex items-center gap-2 mb-3">
                   <Calendar size={16} className="text-campo" />
                   <span className="font-bold text-campo-dark">{nomeDoMes(m.mesReferencia)}</span>

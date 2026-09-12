@@ -78,7 +78,7 @@ function MensalidadeDetalhe() {
   return (
     <div>
       <div className="flex items-center gap-3 mb-6">
-        <Link to="/mensalidades" className="p-2 rounded-lg hover:bg-black/5 text-ink/60">
+        <Link to="/mensalidades" className="p-2 rounded-lg hover:bg-hover text-ink/60">
           <ArrowLeft size={18} />
         </Link>
         <h2 className="text-2xl font-bold text-campo-dark">{nomeDoMes(mes)}</h2>
@@ -90,7 +90,7 @@ function MensalidadeDetalhe() {
           return (
             <li
               key={m.id}
-              className={`flex items-center justify-between gap-3 bg-white border border-black/5 border-l-4 ${borda(status)} rounded-xl px-4 py-3 shadow-sm flex-wrap`}
+              className={`flex items-center justify-between gap-3 bg-surface border border-border border-l-4 ${borda(status)} rounded-xl px-4 py-3 shadow-sm flex-wrap`}
             >
               <div>
                 <div className="font-semibold text-sm">{m.aluno?.nome}</div>

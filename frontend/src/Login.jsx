@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import { supabase } from './supabaseClient'
 import logo from './assets/logo.png'
+import SeletorTema from './SeletorTema'
 
 function Login() {
   async function entrarComGoogle() {
@@ -9,16 +10,17 @@ function Login() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-cream px-4">
+      <SeletorTema className="fixed top-4 right-4" />
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
           <img src={logo} alt="RJ Training" className="h-28 w-auto mx-auto" />
           <p className="text-sm text-ink/60 mt-1">Painel administrativo</p>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-sm border border-black/5 p-8">
+        <div className="bg-surface rounded-2xl shadow-sm border border-border p-8">
           <button
             onClick={entrarComGoogle}
-            className="w-full flex items-center justify-center gap-3 bg-white border border-black/10 text-ink font-semibold text-sm rounded-lg py-3 hover:bg-black/5 transition-colors"
+            className="w-full flex items-center justify-center gap-3 bg-surface border border-border-strong text-ink font-semibold text-sm rounded-lg py-3 hover:bg-hover transition-colors"
           >
             <svg width="18" height="18" viewBox="0 0 48 48">
               <path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3c-1.6 4.6-6 8-11.3 8-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34.6 6 29.6 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.7-.4-3.5z" />

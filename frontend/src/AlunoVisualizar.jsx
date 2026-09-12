@@ -16,7 +16,7 @@ function iniciais(nome) {
 
 function Campo({ rotulo, valor }) {
   return (
-    <div className="bg-cream rounded-lg px-4 py-3 border border-black/5 min-w-0">
+    <div className="bg-cream rounded-lg px-4 py-3 border border-border min-w-0">
       <div className="text-xs font-semibold text-ink/50 mb-0.5">{rotulo}</div>
       <div className="text-sm font-medium break-words">{valor || '-'}</div>
     </div>
@@ -95,13 +95,13 @@ function AlunoVisualizar() {
   return (
     <div>
       <div className="flex items-center gap-3 mb-6">
-        <Link to="/alunos" className="p-2 rounded-lg hover:bg-black/5 text-ink/60">
+        <Link to="/alunos" className="p-2 rounded-lg hover:bg-hover text-ink/60">
           <ArrowLeft size={18} />
         </Link>
         <h2 className="text-2xl font-bold text-campo-dark">Visualizar Aluno</h2>
       </div>
 
-      <div className="bg-white rounded-2xl shadow-sm border border-black/5 p-6 mb-6">
+      <div className="bg-surface rounded-2xl shadow-sm border border-border p-6 mb-6">
         <div className="flex items-center gap-4 mb-6">
           <div className="w-14 h-14 rounded-full bg-campo-light text-campo-dark flex items-center justify-center text-lg font-bold">
             {iniciais(aluno.nome)}
@@ -124,7 +124,7 @@ function AlunoVisualizar() {
         </div>
       </div>
 
-      <div className="bg-white rounded-2xl shadow-sm border border-black/5 p-6">
+      <div className="bg-surface rounded-2xl shadow-sm border border-border p-6">
         <h3 className="flex items-center gap-2 text-sm font-bold text-campo-dark mb-4">
           <Scale size={16} />
           Evolução do peso
@@ -137,7 +137,7 @@ function AlunoVisualizar() {
             placeholder="Novo peso (kg)"
             value={novoPeso}
             onChange={(e) => setNovoPeso(e.target.value)}
-            className="px-3.5 py-2 rounded-lg border border-black/10 text-base focus:outline-none focus:ring-2 focus:ring-campo/30 focus:border-campo"
+            className="px-3.5 py-2 rounded-lg border border-border-strong text-base focus:outline-none focus:ring-2 focus:ring-campo/30 focus:border-campo"
           />
           <button type="submit" className="bg-campo text-white text-sm font-semibold px-4 py-2 rounded-lg hover:bg-campo-dark transition-colors">
             Registrar
@@ -171,14 +171,14 @@ function AlunoVisualizar() {
         {historicoPeso.length > 0 && (
           <table className="w-full text-sm">
             <thead>
-              <tr className="text-left text-xs font-semibold text-ink/50 border-b border-black/5">
+              <tr className="text-left text-xs font-semibold text-ink/50 border-b border-border">
                 <th className="pb-2">Data</th>
                 <th className="pb-2">Peso</th>
               </tr>
             </thead>
             <tbody>
               {historicoDecrescente.map((h) => (
-                <tr key={h.id} className="border-b border-black/5">
+                <tr key={h.id} className="border-b border-border">
                   <td className="py-2">{h.registrado_em}</td>
                   <td className="py-2 font-medium">{h.peso} kg</td>
                 </tr>

@@ -110,7 +110,7 @@ function Home() {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
         <Link to="/alunos">
-          <div className="bg-white border border-black/5 rounded-xl p-5 shadow-sm hover:shadow-md transition-shadow cursor-pointer">
+          <div className="bg-surface border border-border rounded-xl p-5 shadow-sm hover:shadow-md transition-shadow cursor-pointer">
             <div className="flex items-center gap-2 mb-2 text-campo">
               <Users size={18} />
               <span className="text-xs font-semibold uppercase tracking-wide">Alunos ativos</span>
@@ -120,7 +120,7 @@ function Home() {
         </Link>
 
         <Link to="/mensalidades">
-          <div className="bg-white border border-black/5 rounded-xl p-5 shadow-sm hover:shadow-md transition-shadow cursor-pointer">
+          <div className="bg-surface border border-border rounded-xl p-5 shadow-sm hover:shadow-md transition-shadow cursor-pointer">
             <div className="flex items-center gap-2 mb-2 text-brick">
               <AlertTriangle size={18} />
               <span className="text-xs font-semibold uppercase tracking-wide">Mensalidades atrasadas</span>
@@ -131,7 +131,7 @@ function Home() {
       </div>
 
       {destaques.length > 0 && (
-        <div className="bg-white border border-black/5 rounded-xl p-5 shadow-sm mb-6">
+        <div className="bg-surface border border-border rounded-xl p-5 shadow-sm mb-6">
           <div className="flex items-center gap-2 mb-3 text-campo-dark">
             <Trophy size={18} />
             <span className="text-sm font-bold">Atleta destaque — maior perda de peso do mês</span>
@@ -151,7 +151,7 @@ function Home() {
       )}
 
       {aniversariantes.length > 0 && (
-        <div className="bg-white border border-black/5 rounded-xl p-5 shadow-sm">
+        <div className="bg-surface border border-border rounded-xl p-5 shadow-sm">
           <div className="flex items-center gap-2 mb-3 text-campo-dark">
             <Cake size={18} />
             <span className="text-sm font-bold">Aniversariantes do mês</span>

@@ -6,7 +6,7 @@ import { POSICOES } from './posicoes'
 import Loading from './Loading'
 
 const campoBase =
-  'px-3.5 py-2.5 rounded-lg border border-black/10 text-sm focus:outline-none focus:ring-2 focus:ring-campo/30 focus:border-campo'
+  'px-3.5 py-2.5 rounded-lg border border-border-strong text-sm focus:outline-none focus:ring-2 focus:ring-campo/30 focus:border-campo'
 const rotuloBase = 'flex flex-col gap-1.5 text-xs font-semibold text-ink/60'
 
 function AlunoForm() {
@@ -89,7 +89,7 @@ function AlunoForm() {
     <div>
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
-          <Link to="/alunos" className="p-2 rounded-lg hover:bg-black/5 text-ink/60">
+          <Link to="/alunos" className="p-2 rounded-lg hover:bg-hover text-ink/60">
             <ArrowLeft size={18} />
           </Link>
           <h2 className="text-2xl font-bold text-campo-dark">
@@ -105,7 +105,7 @@ function AlunoForm() {
         </button>
       </div>
 
-      <form onSubmit={salvar} className="bg-white rounded-2xl shadow-sm border border-black/5 p-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+      <form onSubmit={salvar} className="bg-surface rounded-2xl shadow-sm border border-border p-6 grid grid-cols-1 md:grid-cols-3 gap-4">
         <label className={rotuloBase}>
           Nome
           <input className={campoBase} type="text" value={nome} onChange={(e) => setNome(e.target.value)} required />

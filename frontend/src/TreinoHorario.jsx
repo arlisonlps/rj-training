@@ -88,7 +88,7 @@ function TreinoHorario() {
   return (
     <div>
       <div className="flex items-center gap-3 mb-6">
-        <Link to="/treinos" className="p-2 rounded-lg hover:bg-black/5 text-ink/60">
+        <Link to="/treinos" className="p-2 rounded-lg hover:bg-hover text-ink/60">
           <ArrowLeft size={18} />
         </Link>
         <div>
@@ -111,7 +111,7 @@ function TreinoHorario() {
             onClick={() => setHorarioSelecionado(h)}
             className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors ${horarioSelecionado === h
               ? 'bg-campo text-white'
-              : 'bg-white border border-black/10 text-ink/60 hover:bg-black/5'
+              : 'bg-surface border border-border-strong text-ink/60 hover:bg-hover'
               }`}
           >
             {h}
@@ -121,7 +121,7 @@ function TreinoHorario() {
 
       <ul className="space-y-2">
         {alunos.map((item) => (
-          <li key={item.id} className="bg-white border border-black/5 rounded-xl px-4 py-3 shadow-sm font-medium text-sm">
+          <li key={item.id} className="bg-surface border border-border rounded-xl px-4 py-3 shadow-sm font-medium text-sm">
             {item.aluno?.nome}
           </li>
         ))}

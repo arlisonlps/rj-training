@@ -49,7 +49,7 @@ function AlunoPeso() {
     <div>
       <h2 className="text-2xl font-bold text-campo-dark mb-6">Meu peso</h2>
 
-      <div className="bg-white rounded-2xl shadow-sm border border-black/5 p-6">
+      <div className="bg-surface rounded-2xl shadow-sm border border-border p-6">
         <h3 className="flex items-center gap-2 text-sm font-bold text-campo-dark mb-4">
           <Scale size={16} />
           Evolução do peso
@@ -82,14 +82,14 @@ function AlunoPeso() {
         {historico.length > 0 && (
           <table className="w-full text-sm">
             <thead>
-              <tr className="text-left text-xs font-semibold text-ink/50 border-b border-black/5">
+              <tr className="text-left text-xs font-semibold text-ink/50 border-b border-border">
                 <th className="pb-2">Data</th>
                 <th className="pb-2">Peso</th>
               </tr>
             </thead>
             <tbody>
               {historicoDecrescente.map((h) => (
-                <tr key={h.id} className="border-b border-black/5">
+                <tr key={h.id} className="border-b border-border">
                   <td className="py-2">{formatarDataCurta(h.registrado_em)}</td>
                   <td className="py-2 font-medium">{h.peso} kg</td>
                 </tr>

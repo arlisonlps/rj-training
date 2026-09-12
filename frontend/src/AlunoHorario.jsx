@@ -207,7 +207,7 @@ function AlunoHorario() {
       </div>
 
       {meusHorarios && meusHorarios.length > 0 && (
-        <div className="bg-white rounded-2xl shadow-sm border border-black/5 p-6 mb-4">
+        <div className="bg-surface rounded-2xl shadow-sm border border-border p-6 mb-4">
           <h3 className="text-sm font-bold text-campo-dark mb-4">Meus horários desta semana</h3>
 
           {mensagem && <p className="text-campo-dark text-sm mb-3">{mensagem}</p>}
@@ -250,14 +250,14 @@ function AlunoHorario() {
           </ul>
 
           {diasFaltando.length > 0 && (
-            <div className="flex flex-col gap-3 mt-4 pt-4 border-t border-black/5">
+            <div className="flex flex-col gap-3 mt-4 pt-4 border-t border-border">
               {diasFaltando.map((dia) => (
                 <div key={dia} className="flex items-center gap-2">
                   <span className="w-16 text-sm font-semibold text-ink/70 shrink-0">{NOMES_DIAS[dia]}</span>
                   <select
                     value={horarioRemarcar[dia] || ''}
                     onChange={(e) => setHorarioRemarcar({ ...horarioRemarcar, [dia]: e.target.value })}
-                    className="flex-1 px-3 py-2 rounded-lg border border-black/10 text-sm focus:outline-none focus:ring-2 focus:ring-campo/30 focus:border-campo"
+                    className="flex-1 px-3 py-2 rounded-lg border border-border-strong text-sm focus:outline-none focus:ring-2 focus:ring-campo/30 focus:border-campo"
                   >
                     <option value="">Marcar novo horário</option>
                     {horarios.map((h) => (
@@ -279,7 +279,7 @@ function AlunoHorario() {
       )}
 
       {aindaNaoEscolheuNada && (
-        <div className="bg-white rounded-2xl shadow-sm border border-black/5 p-8">
+        <div className="bg-surface rounded-2xl shadow-sm border border-border p-8">
           <h3 className="text-sm font-bold text-campo-dark mb-4">Escolher horário da semana</h3>
 
           {!podeEscolherPrimeiraVez && (
@@ -299,7 +299,7 @@ function AlunoHorario() {
                       setHorariosEscolhidos({ ...horariosEscolhidos, [d.valor]: e.target.value })
                     }
                     disabled={!podeEscolherPrimeiraVez}
-                    className="flex-1 px-3 py-2.5 rounded-lg border border-black/10 text-base focus:outline-none focus:ring-2 focus:ring-campo/30 focus:border-campo disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="flex-1 px-3 py-2.5 rounded-lg border border-border-strong text-base focus:outline-none focus:ring-2 focus:ring-campo/30 focus:border-campo disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <option value="">Selecione o horário</option>
                     {horarios.map((h) => (

@@ -56,7 +56,7 @@ function AlunoMensalidade() {
       )}
 
       {mensalidade && (
-        <div className="bg-white rounded-2xl shadow-sm border border-black/5 p-6">
+        <div className="bg-surface rounded-2xl shadow-sm border border-border p-6">
           <div className="text-sm text-ink/50 mb-1">Vencimento: {mensalidade.data_vencimento}</div>
           <div className="text-lg font-bold mb-3">R$ {mensalidade.valor}</div>
           <span className={`inline-block text-xs font-bold px-2.5 py-1 rounded ${selo(statusCalculado(mensalidade))}`}>

@@ -1,5 +1,6 @@
 import { supabase } from './supabaseClient'
 import logo from './assets/logo.png'
+import SeletorTema from './SeletorTema'
 
 function AguardandoAprovacao({ tipo, erro, onTentarNovamente }) {
   async function sair() {
@@ -15,9 +16,10 @@ function AguardandoAprovacao({ tipo, erro, onTentarNovamente }) {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-cream px-4">
+      <SeletorTema className="fixed top-4 right-4" />
       <div className="w-full max-w-sm text-center">
         <img src={logo} alt="RJ Training" className="h-28 w-auto mx-auto mb-6" />
-        <div className="bg-white rounded-2xl shadow-sm border border-black/5 p-8">
+        <div className="bg-surface rounded-2xl shadow-sm border border-border p-8">
           <p className="text-ink text-sm leading-relaxed">{mensagem}</p>
           <div className="flex flex-col items-center gap-2 mt-6">
             {erro && onTentarNovamente && (

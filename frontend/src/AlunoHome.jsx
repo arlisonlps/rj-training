@@ -90,7 +90,7 @@ function AlunoHome() {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
         <Link to="/horario">
-          <div className="bg-white border border-black/5 rounded-xl p-5 shadow-sm hover:shadow-md transition-shadow cursor-pointer h-full">
+          <div className="bg-surface border border-border rounded-xl p-5 shadow-sm hover:shadow-md transition-shadow cursor-pointer h-full">
             <div className="flex items-center gap-2 mb-3 text-campo">
               <CalendarDays size={18} />
               <span className="text-xs font-semibold uppercase tracking-wide">Meus treinos da semana</span>
@@ -110,7 +110,7 @@ function AlunoHome() {
         </Link>
 
         <Link to="/mensalidade">
-          <div className="bg-white border border-black/5 rounded-xl p-5 shadow-sm hover:shadow-md transition-shadow cursor-pointer h-full">
+          <div className="bg-surface border border-border rounded-xl p-5 shadow-sm hover:shadow-md transition-shadow cursor-pointer h-full">
             <div className="flex items-center gap-2 mb-3 text-campo">
               <Wallet size={18} />
               <span className="text-xs font-semibold uppercase tracking-wide">Mensalidade do mês</span>
@@ -130,7 +130,7 @@ function AlunoHome() {
       </div>
 
       <Link to="/peso">
-        <div className="bg-white border border-black/5 rounded-xl p-5 shadow-sm hover:shadow-md transition-shadow cursor-pointer">
+        <div className="bg-surface border border-border rounded-xl p-5 shadow-sm hover:shadow-md transition-shadow cursor-pointer">
           <div className="flex items-center gap-2 mb-2 text-campo">
             <Scale size={18} />
             <span className="text-xs font-semibold uppercase tracking-wide">Meu peso</span>

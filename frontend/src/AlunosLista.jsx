@@ -93,7 +93,7 @@ function AlunosLista() {
             placeholder="Pesquisar aluno..."
             value={busca}
             onChange={(e) => mudarBusca(e.target.value)}
-            className="w-full pl-9 pr-4 py-2.5 rounded-lg border border-black/10 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-campo/30 focus:border-campo"
+            className="w-full pl-9 pr-4 py-2.5 rounded-lg border border-border-strong bg-surface text-sm focus:outline-none focus:ring-2 focus:ring-campo/30 focus:border-campo"
           />
         </div>
         <Link to="/alunos/novo">
@@ -120,7 +120,7 @@ function AlunosLista() {
         {paginaDeAlunos.map((aluno) => (
           <li
             key={aluno.id}
-            className={`flex items-center justify-between gap-3 bg-white border border-black/5 rounded-xl px-4 py-3 shadow-sm flex-wrap ${!aluno.ativo ? 'opacity-60' : ''}`}
+            className={`flex items-center justify-between gap-3 bg-surface border border-border rounded-xl px-4 py-3 shadow-sm flex-wrap ${!aluno.ativo ? 'opacity-60' : ''}`}
           >
             <div className="flex items-center gap-3">
               <div className="w-9 h-9 rounded-full bg-campo-light text-campo-dark flex items-center justify-center text-xs font-bold shrink-0">
@@ -133,7 +133,7 @@ function AlunosLista() {
             </div>
             <div className="flex items-center gap-2">
               <Link to={`/alunos/${aluno.id}`}>
-                <button className="p-2 rounded-lg border border-black/10 text-ink/60 hover:bg-black/5" title="Visualizar">
+                <button className="p-2 rounded-lg border border-border-strong text-ink/60 hover:bg-hover" title="Visualizar">
                   <Eye size={16} />
                 </button>
               </Link>
@@ -161,7 +161,7 @@ function AlunosLista() {
               )}
               <button
                 onClick={() => excluirAluno(aluno.id, aluno.nome)}
-                className="p-2 rounded-lg bg-black/5 text-ink/60 hover:bg-brick hover:text-white transition-colors"
+                className="p-2 rounded-lg bg-hover text-ink/60 hover:bg-brick hover:text-white transition-colors"
                 title="Excluir permanentemente"
               >
                 <Trash2 size={16} />
@@ -182,7 +182,7 @@ function AlunosLista() {
               onClick={() => setPaginaAtual(n)}
               className={`w-8 h-8 rounded-lg text-sm font-medium transition-colors ${paginaAtual === n
                   ? 'bg-campo text-white'
-                  : 'bg-white border border-black/10 text-ink/60 hover:bg-black/5'
+                  : 'bg-surface border border-border-strong text-ink/60 hover:bg-hover'
                 }`}
             >
               {n}
