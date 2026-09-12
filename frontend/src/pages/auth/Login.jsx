@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import { supabase } from '../../lib/supabaseClient'
 import logo from '../../assets/logo.png'
 import SeletorTema from '../../components/SeletorTema'
+import Rodape from '../../components/Rodape'
 
 function Login() {
   async function entrarComGoogle() {
@@ -38,6 +39,8 @@ function Login() {
             </Link>
           </p>
         </div>
+
+        <Rodape className="mt-6" />
       </div>
     </div>
   )

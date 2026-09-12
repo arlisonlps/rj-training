@@ -1,6 +1,7 @@
 import { supabase } from '../../lib/supabaseClient'
 import logo from '../../assets/logo.png'
 import SeletorTema from '../../components/SeletorTema'
+import Rodape from '../../components/Rodape'
 
 function AguardandoAprovacao({ tipo, erro, onTentarNovamente }) {
   async function sair() {
@@ -35,6 +36,8 @@ function AguardandoAprovacao({ tipo, erro, onTentarNovamente }) {
             </button>
           </div>
         </div>
+
+        <Rodape className="mt-6" />
       </div>
     </div>
   )

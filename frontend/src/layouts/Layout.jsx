@@ -3,6 +3,7 @@ import { Home, Users, CalendarDays, Wallet, UserCheck, LogOut } from 'lucide-rea
 import { supabase } from '../lib/supabaseClient'
 import logo from '../assets/logo.png'
 import SeletorTema from '../components/SeletorTema'
+import Rodape from '../components/Rodape'
 
 const itens = [
   { to: '/', label: 'Home', icon: Home, end: true },
@@ -33,7 +34,10 @@ function Layout({ children }) {
         </div>
       </div>
 
-      <main className="flex-1 w-full max-w-5xl mx-auto px-4 py-6 md:px-10 md:py-10 pb-24">{children}</main>
+      <main className="flex-1 w-full max-w-5xl mx-auto px-4 py-6 md:px-10 md:py-10 pb-24">
+        {children}
+        <Rodape className="mt-10 pt-6 border-t border-border" />
+      </main>
 
       <nav className="fixed bottom-0 left-0 right-0 bg-surface border-t border-border-strong z-20">
         <div className="max-w-md mx-auto flex justify-around py-2">

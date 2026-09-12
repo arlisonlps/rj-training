@@ -4,6 +4,7 @@ import { supabase } from '../../lib/supabaseClient'
 import { POSICOES } from '../../lib/posicoes'
 import logo from '../../assets/logo.png'
 import SeletorTema from '../../components/SeletorTema'
+import Rodape from '../../components/Rodape'
 
 function Cadastro() {
   const [nomeCompleto, setNomeCompleto] = useState('')
@@ -115,6 +116,8 @@ function Cadastro() {
             </Link>
           </p>
         </div>
+
+        <Rodape className="mt-6" />
       </div>
     </div>
   )
