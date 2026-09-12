@@ -1,31 +1,9 @@
-import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { supabase } from './supabaseClient'
 
 function Login() {
-  const [email, setEmail] = useState('')
-  const [senha, setSenha] = useState('')
-  const [erro, setErro] = useState('')
-  const [carregando, setCarregando] = useState(false)
-
   async function entrarComGoogle() {
     await supabase.auth.signInWithOAuth({ provider: 'google' })
-  }
-
-  async function entrarComEmail(e) {
-    e.preventDefault()
-    setErro('')
-    setCarregando(true)
-
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password: senha,
-    })
-
-    if (error) {
-      setErro('Email ou senha inválidos')
-    }
-    setCarregando(false)
   }
 
   return (
@@ -37,39 +15,6 @@ function Login() {
         </div>
 
         <div className="bg-white rounded-2xl shadow-sm border border-black/5 p-8">
-          <form onSubmit={entrarComEmail} className="flex flex-col gap-3">
-            <input
-              type="email"
-              placeholder="Email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="px-4 py-2.5 rounded-lg border border-black/10 text-base focus:outline-none focus:ring-2 focus:ring-campo/30 focus:border-campo"
-              required
-            />
-            <input
-              type="password"
-              placeholder="Senha"
-              value={senha}
-              onChange={(e) => setSenha(e.target.value)}
-              className="px-4 py-2.5 rounded-lg border border-black/10 text-base focus:outline-none focus:ring-2 focus:ring-campo/30 focus:border-campo"
-              required
-            />
-            {erro && <p className="text-brick text-sm">{erro}</p>}
-            <button
-              type="submit"
-              disabled={carregando}
-              className="bg-campo text-white font-semibold text-sm rounded-lg py-2.5 hover:bg-campo-dark transition-colors disabled:opacity-60"
-            >
-              {carregando ? 'Entrando...' : 'Entrar'}
-            </button>
-          </form>
-
-          <div className="flex items-center gap-3 my-5">
-            <div className="h-px bg-black/10 flex-1" />
-            <span className="text-xs text-ink/40">ou</span>
-            <div className="h-px bg-black/10 flex-1" />
-          </div>
-
           <button
             onClick={entrarComGoogle}
             className="w-full flex items-center justify-center gap-3 bg-white border border-black/10 text-ink font-semibold text-sm rounded-lg py-3 hover:bg-black/5 transition-colors"
