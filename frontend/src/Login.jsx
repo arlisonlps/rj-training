@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import { supabase } from './supabaseClient'
+import logo from './assets/logo.png'
 
 function Login() {
   async function entrarComGoogle() {
@@ -10,7 +11,7 @@ function Login() {
     <div className="min-h-screen flex items-center justify-center bg-cream px-4">
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
-          <h1 className="text-2xl font-bold text-campo-dark tracking-tight">RJ Training</h1>
+          <img src={logo} alt="RJ Training" className="h-28 w-auto mx-auto" />
           <p className="text-sm text-ink/60 mt-1">Painel administrativo</p>
         </div>
 

@@ -1,6 +1,7 @@
 import { NavLink, useNavigate } from 'react-router-dom'
 import { Home, Users, CalendarDays, Wallet, UserCheck, LogOut } from 'lucide-react'
 import { supabase } from './supabaseClient'
+import logo from './assets/logo.png'
 
 const itens = [
   { to: '/', label: 'Home', icon: Home, end: true },
@@ -21,7 +22,7 @@ function Layout({ children }) {
   return (
     <div className="min-h-screen flex flex-col">
       <div className="flex items-center justify-between bg-campo-dark text-white px-4 md:px-8 py-3 sticky top-0 z-20">
-        <h1 className="text-base md:text-lg font-bold tracking-tight">RJ Training</h1>
+        <img src={logo} alt="RJ Training" className="h-10 w-auto" />
         <button onClick={sair} className="flex items-center gap-2 p-2 rounded-lg hover:bg-white/10 text-sm font-medium">
           <LogOut size={18} />
           <span className="hidden sm:inline">Sair</span>
