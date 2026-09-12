@@ -13,8 +13,8 @@ import Treinos from './Treinos'
 import TreinoHorario from './TreinoHorario'
 import MensalidadesMeses from './MensalidadesMeses'
 import MensalidadeDetalhe from './MensalidadeDetalhe'
-import EscolherHorario from './EscolherHorario'
 import Loading from './Loading'
+import { gerarMensalidadesDoMesAtual } from './mensalidade'
 import Aprovacoes from './Aprovacoes'
 import AlunoLayout from './AlunoLayout'
 import AlunoHome from './AlunoHome'
@@ -48,6 +48,12 @@ function App() {
     }
     carregarPerfil()
   }, [session])
+
+  useEffect(() => {
+    if (perfil?.papel === 'admin') {
+      gerarMensalidadesDoMesAtual()
+    }
+  }, [perfil])
 
   async function carregarPerfil() {
     setCarregandoPerfil(true)
@@ -100,7 +106,6 @@ function App() {
     return (
       <Routes>
         <Route path="/cadastro" element={<Cadastro />} />
-        <Route path="/escolher-horario" element={<EscolherHorario />} />
         <Route path="*" element={<Login />} />
       </Routes>
     )
@@ -110,7 +115,6 @@ function App() {
   if (!perfil || perfil.status === 'pendente') {
     return (
       <Routes>
-        <Route path="/escolher-horario" element={<EscolherHorario />} />
         <Route
           path="*"
           element={<AguardandoAprovacao tipo={perfil ? 'aluno' : 'sem-perfil'} />}
@@ -123,7 +127,6 @@ function App() {
   if (perfil.papel !== 'admin') {
     return (
       <Routes>
-        <Route path="/escolher-horario" element={<EscolherHorario />} />
         <Route
           path="/*"
           element={
@@ -145,7 +148,6 @@ function App() {
   // Admin aprovado: painel completo
   return (
     <Routes>
-      <Route path="/escolher-horario" element={<EscolherHorario />} />
       <Route
         path="/*"
         element={

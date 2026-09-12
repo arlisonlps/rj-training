@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
-import { ArrowLeft } from 'lucide-react'
+import { ArrowLeft, CheckCircle2 } from 'lucide-react'
 import { supabase } from './supabaseClient'
 import Loading from './Loading'
 
@@ -31,6 +31,16 @@ function diaJaPassou(dia) {
   return dataDoDia.getTime() < hoje.getTime()
 }
 
+function formatarData(dia) {
+  const base = inicioDaSemanaDate()
+  const data = new Date(base)
+  data.setDate(base.getDate() + OFFSET_DIA[dia])
+  const d = String(data.getDate()).padStart(2, '0')
+  const m = String(data.getMonth() + 1).padStart(2, '0')
+  const a = data.getFullYear()
+  return `${d}/${m}/${a}`
+}
+
 const horarios = ['06h', '07h', '17h', '18h']
 
 const nomesDias = {
@@ -48,16 +58,11 @@ function TreinoHorario() {
   const jaPassou = diaJaPassou(dia)
 
   useEffect(() => {
-    if (jaPassou) {
-      setCarregando(false)
-      return
-    }
     setCarregando(true)
     buscarAlunos()
   }, [dia])
 
   useEffect(() => {
-    if (jaPassou) return
     buscarAlunos()
   }, [horarioSelecionado])
 
@@ -86,42 +91,44 @@ function TreinoHorario() {
         <Link to="/treinos" className="p-2 rounded-lg hover:bg-black/5 text-ink/60">
           <ArrowLeft size={18} />
         </Link>
-        <h2 className="text-2xl font-bold text-campo-dark">{nomesDias[dia] || dia}</h2>
+        <div>
+          <h2 className="text-2xl font-bold text-campo-dark">{nomesDias[dia] || dia}</h2>
+          <p className="text-sm text-ink/50">{formatarData(dia)}</p>
+        </div>
       </div>
 
-      {jaPassou ? (
-        <p className="text-sm text-ink/50 py-6 text-center">
-          Esse dia já passou. A lista volta a aparecer quando alunos escolherem horários pra próxima semana.
-        </p>
-      ) : (
-        <>
-          <div className="flex gap-2 mb-6">
-            {horarios.map((h) => (
-              <button
-                key={h}
-                onClick={() => setHorarioSelecionado(h)}
-                className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors ${horarioSelecionado === h
-                  ? 'bg-campo text-white'
-                  : 'bg-white border border-black/10 text-ink/60 hover:bg-black/5'
-                  }`}
-              >
-                {h}
-              </button>
-            ))}
-          </div>
-
-          <ul className="space-y-2">
-            {alunos.map((item) => (
-              <li key={item.id} className="bg-white border border-black/5 rounded-xl px-4 py-3 shadow-sm font-medium text-sm">
-                {item.aluno?.nome}
-              </li>
-            ))}
-            {alunos.length === 0 && (
-              <p className="text-sm text-ink/50 py-6 text-center">Nenhum aluno nesse horário ainda.</p>
-            )}
-          </ul>
-        </>
+      {jaPassou && (
+        <div className="flex items-center gap-2 bg-campo-light text-campo-dark text-sm font-medium rounded-lg px-4 py-3 mb-6">
+          <CheckCircle2 size={18} />
+          Treino concluído, aguarde o agendamento dos alunos para a próxima semana.
+        </div>
       )}
+
+      <div className="flex gap-2 mb-6">
+        {horarios.map((h) => (
+          <button
+            key={h}
+            onClick={() => setHorarioSelecionado(h)}
+            className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors ${horarioSelecionado === h
+              ? 'bg-campo text-white'
+              : 'bg-white border border-black/10 text-ink/60 hover:bg-black/5'
+              }`}
+          >
+            {h}
+          </button>
+        ))}
+      </div>
+
+      <ul className="space-y-2">
+        {alunos.map((item) => (
+          <li key={item.id} className="bg-white border border-black/5 rounded-xl px-4 py-3 shadow-sm font-medium text-sm">
+            {item.aluno?.nome}
+          </li>
+        ))}
+        {alunos.length === 0 && (
+          <p className="text-sm text-ink/50 py-6 text-center">Nenhum aluno nesse horário.</p>
+        )}
+      </ul>
     </div>
   )
 }

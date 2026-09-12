@@ -37,18 +37,15 @@ function Home() {
     const hoje = new Date()
     const ano = hoje.getFullYear()
     const mes = hoje.getMonth()
-    const mesReferencia = `${ano}-${String(mes + 1).padStart(2, '0')}-01`
     const hojeStr = hoje.toISOString().split('T')[0]
 
-    const { data: mensalidadesMes } = await supabase
+    const { data: mensalidadesAtrasadas } = await supabase
       .from('mensalidade')
-      .select('status, data_vencimento')
-      .eq('mes_referencia', mesReferencia)
+      .select('id')
+      .neq('status', 'pago')
+      .lt('data_vencimento', hojeStr)
 
-    const atrasadas = (mensalidadesMes || []).filter(
-      (m) => m.status !== 'pago' && m.data_vencimento < hojeStr
-    )
-    setTotalAtrasados(atrasadas.length)
+    setTotalAtrasados(mensalidadesAtrasadas?.length || 0)
 
     await calcularDestaques(ano, mes)
 

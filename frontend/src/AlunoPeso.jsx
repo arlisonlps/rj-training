@@ -1,10 +1,17 @@
 import { useState, useEffect } from 'react'
+import { Scale } from 'lucide-react'
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
 import { supabase } from './supabaseClient'
 
+function formatarDataCurta(dataIso) {
+  const data = new Date(dataIso)
+  const dia = String(data.getDate()).padStart(2, '0')
+  const mes = String(data.getMonth() + 1).padStart(2, '0')
+  return `${dia}/${mes}`
+}
+
 function AlunoPeso() {
-  const [alunoId, setAlunoId] = useState(null)
   const [historico, setHistorico] = useState([])
-  const [novoPeso, setNovoPeso] = useState('')
   const [carregando, setCarregando] = useState(true)
 
   useEffect(() => {
@@ -20,81 +27,76 @@ function AlunoPeso() {
       .single()
 
     if (perfil?.aluno_id) {
-      setAlunoId(perfil.aluno_id)
-      await carregarHistorico(perfil.aluno_id)
+      const { data } = await supabase
+        .from('peso_historico')
+        .select('*')
+        .eq('aluno_id', perfil.aluno_id)
+        .order('registrado_em', { ascending: true })
+      setHistorico(data || [])
     }
     setCarregando(false)
   }
 
-  async function carregarHistorico(id) {
-    const { data } = await supabase
-      .from('peso_historico')
-      .select('*')
-      .eq('aluno_id', id)
-      .order('registrado_em', { ascending: false })
-    setHistorico(data || [])
-  }
-
-  async function registrarPeso(e) {
-    e.preventDefault()
-    if (!novoPeso || !alunoId) return
-
-    const { error } = await supabase.from('peso_historico').insert({
-      aluno_id: alunoId,
-      peso: Number(novoPeso),
-    })
-
-    if (error) {
-      alert('Erro ao registrar peso: ' + error.message)
-      return
-    }
-
-    setNovoPeso('')
-    carregarHistorico(alunoId)
-  }
-
   if (carregando) return null
+
+  const dadosGrafico = historico.map((h) => ({
+    data: formatarDataCurta(h.registrado_em),
+    peso: h.peso,
+  }))
+  const historicoDecrescente = [...historico].reverse()
 
   return (
     <div>
       <h2 className="text-2xl font-bold text-campo-dark mb-6">Meu peso</h2>
 
       <div className="bg-white rounded-2xl shadow-sm border border-black/5 p-6">
-        <form onSubmit={registrarPeso} className="flex gap-2 mb-5">
-          <input
-            type="number"
-            step="0.1"
-            placeholder="Novo peso (kg)"
-            value={novoPeso}
-            onChange={(e) => setNovoPeso(e.target.value)}
-            className="px-3.5 py-2 rounded-lg border border-black/10 text-sm focus:outline-none focus:ring-2 focus:ring-campo/30 focus:border-campo"
-          />
-          <button type="submit" className="bg-campo text-white text-sm font-semibold px-4 py-2 rounded-lg hover:bg-campo-dark transition-colors">
-            Registrar
-          </button>
-        </form>
+        <h3 className="flex items-center gap-2 text-sm font-bold text-campo-dark mb-4">
+          <Scale size={16} />
+          Evolução do peso
+        </h3>
 
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="text-left text-xs font-semibold text-ink/50 border-b border-black/5">
-              <th className="pb-2">Data</th>
-              <th className="pb-2">Peso</th>
-            </tr>
-          </thead>
-          <tbody>
-            {historico.map((h) => (
-              <tr key={h.id} className="border-b border-black/5">
-                <td className="py-2">{h.registrado_em}</td>
-                <td className="py-2 font-medium">{h.peso} kg</td>
+        {dadosGrafico.length === 0 && (
+          <p className="text-sm text-ink/50 py-6 text-center">Nenhum registro ainda. Fale com o professor para registrar seu peso.</p>
+        )}
+
+        {dadosGrafico.length === 1 && (
+          <p className="text-sm text-ink/50 pb-6 text-center">
+            Só tem um registro ainda — o gráfico aparece a partir do segundo peso registrado.
+          </p>
+        )}
+
+        {dadosGrafico.length >= 2 && (
+          <div style={{ width: '100%', height: 240 }} className="mb-6">
+            <ResponsiveContainer>
+              <LineChart data={dadosGrafico} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#E4E4E7" />
+                <XAxis dataKey="data" tick={{ fontSize: 12 }} stroke="#8A8A8E" />
+                <YAxis tick={{ fontSize: 12 }} stroke="#8A8A8E" unit="kg" width={50} />
+                <Tooltip formatter={(valor) => [`${valor} kg`, 'Peso']} />
+                <Line type="monotone" dataKey="peso" stroke="#C1272D" strokeWidth={2} dot={{ r: 4, fill: '#C1272D' }} />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        )}
+
+        {historico.length > 0 && (
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="text-left text-xs font-semibold text-ink/50 border-b border-black/5">
+                <th className="pb-2">Data</th>
+                <th className="pb-2">Peso</th>
               </tr>
-            ))}
-            {historico.length === 0 && (
-              <tr>
-                <td colSpan={2} className="py-4 text-ink/50 text-center">Nenhum registro ainda.</td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {historicoDecrescente.map((h) => (
+                <tr key={h.id} className="border-b border-black/5">
+                  <td className="py-2">{formatarDataCurta(h.registrado_em)}</td>
+                  <td className="py-2 font-medium">{h.peso} kg</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
       </div>
     </div>
   )
