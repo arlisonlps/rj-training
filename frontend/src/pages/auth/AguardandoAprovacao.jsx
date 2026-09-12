@@ -12,7 +12,7 @@ function AguardandoAprovacao({ tipo, erro, onTentarNovamente }) {
       ? 'Seu cadastro está pendente de aprovação pela equipe RJ Training. Aguarde para fazer login!'
       : erro
         ? `Não foi possível finalizar seu cadastro: ${erro}`
-        : 'Você ainda não tem uma conta criada com esse G-mail.'
+        : 'Você não possui uma conta cadastrada com esse G-mail. Favor, verifique se seu endereço de e-mail está correto e tente novamente.'
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-cream px-4">
