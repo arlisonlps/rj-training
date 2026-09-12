@@ -28,7 +28,7 @@ function Aprovacoes() {
     setCarregando(false)
   }
 
-  async function aprovar(userId) {
+  async function aprovar(userId, alunoId) {
     const { error } = await supabase
       .from('perfil_usuario')
       .update({ status: 'aprovado' })
@@ -38,6 +38,18 @@ function Aprovacoes() {
       alert('Erro ao aprovar: ' + error.message)
       return
     }
+
+    if (alunoId) {
+      const { error: erroAtivar } = await supabase
+        .from('aluno')
+        .update({ ativo: true })
+        .eq('id', alunoId)
+
+      if (erroAtivar) {
+        alert('Aprovado, mas houve erro ao ativar o aluno: ' + erroAtivar.message)
+      }
+    }
+
     buscarPendentes()
   }
 
@@ -79,7 +91,7 @@ function Aprovacoes() {
             </div>
             <div className="flex items-center gap-2">
               <button
-                onClick={() => aprovar(p.user_id)}
+                onClick={() => aprovar(p.user_id, p.aluno?.id)}
                 className="flex items-center gap-1.5 bg-campo text-white text-xs font-semibold px-3 py-2 rounded-lg hover:bg-campo-dark transition-colors"
               >
                 <Check size={14} />
