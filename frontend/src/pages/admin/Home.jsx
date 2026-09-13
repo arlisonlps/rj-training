@@ -115,7 +115,7 @@ function Home() {
               <Users size={18} />
               <span className="text-xs font-semibold uppercase tracking-wide">Alunos ativos</span>
             </div>
-            <div className="text-3xl font-bold text-campo-dark">{totalAtivos}</div>
+            <div className="text-3xl font-bold text-campo">{totalAtivos}</div>
           </div>
         </Link>
 

@@ -4,8 +4,9 @@
 
 @theme {
   --color-campo: #C1272D;
-  --color-campo-dark: #8B1D1F;
+  --color-campo-dark: #A61D24;
   --color-campo-light: #E4E4E7;
+  --color-header: #8B1D1F;
   --color-cream: #F4F4F5;
   --color-ink: #18181B;
   --color-brick: #C0392B;
@@ -19,10 +20,14 @@
 }
 
 :root.dark {
+  --color-campo: #E5484D;
+  --color-campo-dark: #FF6B6B;
   --color-campo-light: #3a1f20;
   --color-cream: #0b0b0d;
   --color-ink: #f4f4f5;
+  --color-brick: #FF6A55;
   --color-brick-light: rgb(192 57 43 / 0.18);
+  --color-amber: #FBBF24;
   --color-amber-light: rgb(176 125 10 / 0.18);
   --color-surface: #18181b;
   --color-border: rgb(255 255 255 / 0.08);
