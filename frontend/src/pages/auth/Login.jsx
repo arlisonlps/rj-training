@@ -6,7 +6,10 @@ import Rodape from '../../components/Rodape'
 
 function Login() {
   async function entrarComGoogle() {
-    await supabase.auth.signInWithOAuth({ provider: 'google' })
+    await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: { queryParams: { prompt: 'select_account' } },
+    })
   }
 
   return (

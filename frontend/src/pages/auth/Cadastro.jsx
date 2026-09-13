@@ -30,7 +30,10 @@ function Cadastro() {
       'cadastro_pendente',
       JSON.stringify({ nomeCompleto, cpf, whatsapp, nascimento, posicao })
     )
-    supabase.auth.signInWithOAuth({ provider: 'google' })
+    supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: { queryParams: { prompt: 'select_account' } },
+    })
   }
 
   return (
