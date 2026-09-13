@@ -121,11 +121,11 @@ function Home() {
 
         <Link to="/mensalidades">
           <div className="bg-surface border border-border rounded-xl p-5 shadow-sm hover:shadow-md transition-shadow cursor-pointer">
-            <div className="flex items-center gap-2 mb-2 text-brick">
+            <div className="flex items-center gap-2 mb-2 text-campo">
               <AlertTriangle size={18} />
               <span className="text-xs font-semibold uppercase tracking-wide">Mensalidades atrasadas</span>
             </div>
-            <div className="text-3xl font-bold text-brick">{totalAtrasados}</div>
+            <div className="text-3xl font-bold text-campo">{totalAtrasados}</div>
           </div>
         </Link>
       </div>
