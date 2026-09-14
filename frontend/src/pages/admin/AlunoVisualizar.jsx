@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
-import { useParams, Link } from 'react-router-dom'
-import { ArrowLeft, Scale } from 'lucide-react'
+import { useParams, useNavigate, Link } from 'react-router-dom'
+import { ArrowLeft, Scale, Pencil, UserX, UserCheck, Trash2 } from 'lucide-react'
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
 import { supabase } from '../../lib/supabaseClient'
 import Loading from '../../components/Loading'
@@ -30,6 +30,7 @@ function formatarDataCurta(dataIso) {
 
 function AlunoVisualizar() {
   const { id } = useParams()
+  const navigate = useNavigate()
   const [aluno, setAluno] = useState(null)
   const [historicoPeso, setHistoricoPeso] = useState([])
   const [novoPeso, setNovoPeso] = useState('')
@@ -84,6 +85,33 @@ function AlunoVisualizar() {
     carregarAluno()
   }
 
+  async function alternarAtivo() {
+    const acao = aluno.ativo ? 'desativar' : 'reativar'
+    const confirmado = window.confirm(`Tem certeza que deseja ${acao} este aluno? (${aluno.nome})`)
+    if (!confirmado) return
+
+    const { error } = await supabase.from('aluno').update({ ativo: !aluno.ativo }).eq('id', id)
+    if (error) {
+      alert(`Erro ao ${acao} aluno: ` + error.message)
+      return
+    }
+    carregarAluno()
+  }
+
+  async function excluirAluno() {
+    const confirmado = window.confirm(
+      `Tem certeza que deseja excluir "${aluno.nome}"? Isso apaga PERMANENTEMENTE o aluno e todo o histórico dele (mensalidades, peso, horários de treino). Não tem como desfazer.`
+    )
+    if (!confirmado) return
+
+    const { error } = await supabase.from('aluno').delete().eq('id', id)
+    if (error) {
+      alert('Erro ao excluir aluno: ' + error.message)
+      return
+    }
+    navigate('/alunos')
+  }
+
   if (!aluno) return <Loading />
 
   const dadosGrafico = historicoPeso.map((h) => ({
@@ -95,11 +123,19 @@ function AlunoVisualizar() {
 
   return (
     <div>
-      <div className="flex items-center gap-3 mb-6">
-        <Link to="/alunos" className="p-2 rounded-lg hover:bg-hover text-ink/60">
-          <ArrowLeft size={18} />
+      <div className="flex items-center justify-between gap-3 mb-6">
+        <div className="flex items-center gap-3">
+          <Link to="/alunos" className="p-2 rounded-lg hover:bg-hover text-ink/60">
+            <ArrowLeft size={18} />
+          </Link>
+          <h2 className="text-2xl font-bold text-campo-dark">Visualizar Aluno</h2>
+        </div>
+        <Link to={`/alunos/${id}/editar`}>
+          <button className="flex items-center gap-2 bg-campo text-white text-sm font-semibold px-4 py-2.5 rounded-lg hover:bg-campo-dark transition-colors">
+            <Pencil size={16} />
+            Editar
+          </button>
         </Link>
-        <h2 className="text-2xl font-bold text-campo-dark">Visualizar Aluno</h2>
       </div>
 
       <div className="bg-surface rounded-2xl shadow-sm border border-border p-6 mb-6">
@@ -187,6 +223,33 @@ function AlunoVisualizar() {
             </tbody>
           </table>
         )}
+      </div>
+
+      <div className="flex items-center gap-3 mt-6">
+        {aluno.ativo ? (
+          <button
+            onClick={alternarAtivo}
+            className="flex items-center gap-2 bg-brick-light text-brick text-sm font-semibold px-4 py-2.5 rounded-lg hover:bg-brick hover:text-white transition-colors"
+          >
+            <UserX size={16} />
+            Desativar aluno
+          </button>
+        ) : (
+          <button
+            onClick={alternarAtivo}
+            className="flex items-center gap-2 bg-campo-light text-campo-dark text-sm font-semibold px-4 py-2.5 rounded-lg hover:bg-campo hover:text-white transition-colors"
+          >
+            <UserCheck size={16} />
+            Reativar aluno
+          </button>
+        )}
+        <button
+          onClick={excluirAluno}
+          className="flex items-center gap-2 bg-hover text-ink/60 text-sm font-semibold px-4 py-2.5 rounded-lg hover:bg-brick hover:text-white transition-colors"
+        >
+          <Trash2 size={16} />
+          Excluir permanentemente
+        </button>
       </div>
     </div>
   )
