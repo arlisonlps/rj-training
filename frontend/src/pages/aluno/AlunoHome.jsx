@@ -7,7 +7,7 @@ const NOMES_DIAS = { terca: 'Terça', quarta: 'Quarta', quinta: 'Quinta' }
 const ORDEM_DIAS = { terca: 1, quarta: 2, quinta: 3 }
 
 function selo(status) {
-  if (status === 'pago') return 'bg-campo-light text-campo-dark'
+  if (status === 'pago') return 'bg-sucesso-light text-sucesso'
   if (status === 'atrasado') return 'bg-brick-light text-brick'
   return 'bg-amber-light text-amber'
 }
