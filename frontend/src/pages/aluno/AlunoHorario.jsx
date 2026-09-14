@@ -257,7 +257,7 @@ function AlunoHorario() {
                   <select
                     value={horarioRemarcar[dia] || ''}
                     onChange={(e) => setHorarioRemarcar({ ...horarioRemarcar, [dia]: e.target.value })}
-                    className="flex-1 px-3 py-2 rounded-lg border border-border-strong text-sm focus:outline-none focus:ring-2 focus:ring-campo/30 focus:border-campo"
+                    className="flex-1 min-w-0 px-3 py-2 rounded-lg border border-border-strong text-sm focus:outline-none focus:ring-2 focus:ring-campo/30 focus:border-campo"
                   >
                     <option value="">Marcar novo horário</option>
                     {horarios.map((h) => (
@@ -267,7 +267,7 @@ function AlunoHorario() {
                   <button
                     type="button"
                     onClick={() => confirmarNovoHorario(dia)}
-                    className="bg-campo text-white text-xs font-semibold px-3 py-2 rounded-lg hover:bg-campo-dark transition-colors"
+                    className="shrink-0 bg-campo text-white text-xs font-semibold px-3 py-2 rounded-lg hover:bg-campo-dark transition-colors"
                   >
                     Confirmar
                   </button>
