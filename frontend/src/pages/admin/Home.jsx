@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { AlertTriangle, Users, Cake, Trophy } from 'lucide-react'
+import { AlertTriangle, Users, Cake, Trophy, CalendarCheck } from 'lucide-react'
 import { supabase } from '../../lib/supabaseClient'
 import Loading from '../../components/Loading'
 
@@ -13,6 +13,7 @@ function Home() {
   const [totalAtrasados, setTotalAtrasados] = useState(0)
   const [aniversariantes, setAniversariantes] = useState([])
   const [destaques, setDestaques] = useState([])
+  const [rankingFrequencia, setRankingFrequencia] = useState([])
 
   useEffect(() => {
     carregarTudo()
@@ -48,6 +49,7 @@ function Home() {
     setTotalAtrasados(mensalidadesAtrasadas?.length || 0)
 
     await calcularDestaques(ano, mes)
+    await calcularFrequencia(ano, mes)
 
     setCarregando(false)
   }
@@ -101,6 +103,37 @@ function Home() {
     setDestaques(resultado.slice(0, 3))
   }
 
+  async function calcularFrequencia(ano, mes) {
+    const inicioMes = new Date(ano, mes, 1)
+    const inicioProximoMes = new Date(ano, mes + 1, 1)
+
+    const { data: registros, error } = await supabase
+      .from('presenca')
+      .select('aluno_id, presente, registrado_em, aluno(nome)')
+      .gte('registrado_em', inicioMes.toISOString())
+      .lt('registrado_em', inicioProximoMes.toISOString())
+
+    if (error || !registros) {
+      setRankingFrequencia([])
+      return
+    }
+
+    const porAluno = {}
+    for (const r of registros) {
+      if (!porAluno[r.aluno_id]) {
+        porAluno[r.aluno_id] = { nome: r.aluno?.nome || 'Aluno', total: 0, presentes: 0 }
+      }
+      porAluno[r.aluno_id].total++
+      if (r.presente) porAluno[r.aluno_id].presentes++
+    }
+
+    const resultado = Object.values(porAluno)
+      .map((a) => ({ nome: a.nome, percentual: Math.round((a.presentes / a.total) * 100) }))
+      .sort((a, b) => b.percentual - a.percentual)
+
+    setRankingFrequencia(resultado.slice(0, 3))
+  }
+
   if (carregando) return <Loading />
 
   return (
@@ -144,6 +177,26 @@ function Home() {
                   <span className="font-medium">{d.nome}</span>
                 </span>
                 <span className="text-campo-dark font-bold">-{d.perda} kg</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {rankingFrequencia.length > 0 && (
+        <div className="bg-surface border border-border rounded-xl p-5 shadow-sm mb-6">
+          <div className="flex items-center gap-2 mb-3 text-campo-dark">
+            <CalendarCheck size={18} />
+            <span className="text-sm font-bold">Ranking de frequência — mês atual</span>
+          </div>
+          <ul className="space-y-2">
+            {rankingFrequencia.map((r, i) => (
+              <li key={r.nome + i} className="flex items-center justify-between text-sm">
+                <span className="flex items-center gap-2">
+                  <span>{MEDALHAS[i]}</span>
+                  <span className="font-medium">{r.nome}</span>
+                </span>
+                <span className="text-campo-dark font-bold">{r.percentual}%</span>
               </li>
             ))}
           </ul>

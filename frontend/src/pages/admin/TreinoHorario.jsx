@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
-import { ArrowLeft, CheckCircle2 } from 'lucide-react'
+import { ArrowLeft, CheckCircle2, XCircle } from 'lucide-react'
 import { supabase } from '../../lib/supabaseClient'
 import Loading from '../../components/Loading'
 
@@ -31,6 +31,19 @@ function diaJaPassou(dia) {
   return dataDoDia.getTime() < hoje.getTime()
 }
 
+function dataDoHorario(dia, horario) {
+  const base = inicioDaSemanaDate()
+  const data = new Date(base)
+  data.setDate(base.getDate() + OFFSET_DIA[dia])
+  const hora = Number(horario.slice(0, 2))
+  data.setHours(hora, 0, 0, 0)
+  return data
+}
+
+function horarioJaPassou(dia, horario) {
+  return dataDoHorario(dia, horario).getTime() < Date.now()
+}
+
 function formatarData(dia) {
   const base = inicioDaSemanaDate()
   const data = new Date(base)
@@ -53,9 +66,11 @@ function TreinoHorario() {
   const { dia } = useParams()
   const [horarioSelecionado, setHorarioSelecionado] = useState('06h')
   const [alunos, setAlunos] = useState([])
+  const [presencas, setPresencas] = useState({})
   const [carregando, setCarregando] = useState(true)
 
   const jaPassou = diaJaPassou(dia)
+  const podeMarcarPresenca = horarioJaPassou(dia, horarioSelecionado)
 
   useEffect(() => {
     setCarregando(true)
@@ -80,7 +95,43 @@ function TreinoHorario() {
       return
     }
     setAlunos(data)
+
+    const { data: presencasData, error: erroPresencas } = await supabase
+      .from('presenca')
+      .select('aluno_id, presente')
+      .eq('dia_semana', dia)
+      .eq('horario', horarioSelecionado)
+      .eq('semana_referencia', inicioDaSemanaStr())
+
+    if (!erroPresencas) {
+      const mapa = {}
+      for (const p of presencasData || []) {
+        mapa[p.aluno_id] = p.presente
+      }
+      setPresencas(mapa)
+    }
+
     setCarregando(false)
+  }
+
+  async function marcarPresenca(alunoId, presente) {
+    setPresencas((atual) => ({ ...atual, [alunoId]: presente }))
+
+    const { error } = await supabase.from('presenca').upsert(
+      {
+        aluno_id: alunoId,
+        dia_semana: dia,
+        horario: horarioSelecionado,
+        semana_referencia: inicioDaSemanaStr(),
+        presente,
+      },
+      { onConflict: 'aluno_id,dia_semana,horario,semana_referencia' }
+    )
+
+    if (error) {
+      alert('Erro ao registrar presença: ' + error.message)
+      buscarAlunos()
+    }
   }
 
   if (carregando) return <Loading />
@@ -119,12 +170,48 @@ function TreinoHorario() {
         ))}
       </div>
 
+      {!podeMarcarPresenca && (
+        <p className="text-xs text-ink/50 mb-3">A marcação de presença libera depois que esse horário começar.</p>
+      )}
+
       <ul className="space-y-2">
-        {alunos.map((item) => (
-          <li key={item.id} className="bg-surface border border-border rounded-xl px-4 py-3 shadow-sm font-medium text-sm">
-            {item.aluno?.nome}
-          </li>
-        ))}
+        {alunos.map((item) => {
+          const presente = presencas[item.aluno_id]
+          return (
+            <li
+              key={item.id}
+              className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 bg-surface border border-border rounded-xl px-4 py-3 shadow-sm"
+            >
+              <span className="font-medium text-sm">{item.aluno?.nome}</span>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  disabled={!podeMarcarPresenca}
+                  onClick={() => marcarPresenca(item.aluno_id, true)}
+                  className={`flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors disabled:opacity-40 disabled:cursor-not-allowed ${presente === true
+                    ? 'bg-sucesso text-white'
+                    : 'bg-hover text-ink/60'
+                    }`}
+                >
+                  <CheckCircle2 size={14} />
+                  Presente
+                </button>
+                <button
+                  type="button"
+                  disabled={!podeMarcarPresenca}
+                  onClick={() => marcarPresenca(item.aluno_id, false)}
+                  className={`flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors disabled:opacity-40 disabled:cursor-not-allowed ${presente === false
+                    ? 'bg-brick text-white'
+                    : 'bg-hover text-ink/60'
+                    }`}
+                >
+                  <XCircle size={14} />
+                  Faltou
+                </button>
+              </div>
+            </li>
+          )
+        })}
         {alunos.length === 0 && (
           <p className="text-sm text-ink/50 py-6 text-center">Nenhum aluno nesse horário.</p>
         )}
