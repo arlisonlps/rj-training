@@ -76,7 +76,7 @@ function Aprovacoes() {
         {pendentes.map((p) => (
           <li
             key={p.user_id}
-            className="flex items-center justify-between gap-3 bg-surface border border-border rounded-xl px-4 py-3 shadow-sm flex-wrap"
+            className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 bg-surface border border-border rounded-xl px-4 py-3 shadow-sm"
           >
             <div className="flex items-center gap-3">
               <div className="w-9 h-9 rounded-full bg-campo-light text-campo-dark flex items-center justify-center shrink-0">

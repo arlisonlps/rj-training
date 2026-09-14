@@ -90,7 +90,7 @@ function MensalidadeDetalhe() {
           return (
             <li
               key={m.id}
-              className={`flex items-center justify-between gap-3 bg-surface border border-border border-l-4 ${borda(status)} rounded-xl px-4 py-3 shadow-sm flex-wrap`}
+              className={`flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 bg-surface border border-border border-l-4 ${borda(status)} rounded-xl px-4 py-3 shadow-sm`}
             >
               <div>
                 <div className="font-semibold text-sm">{m.aluno?.nome}</div>
