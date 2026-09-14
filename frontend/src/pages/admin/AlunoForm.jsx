@@ -62,8 +62,11 @@ function AlunoForm() {
       peso: peso ? Number(peso) : null,
       altura: altura ? Number(altura) : null,
       telefone,
-      dia_vencimento: diaVencimento ? Number(diaVencimento) : null,
-      valor_mensalidade: valorMensalidade ? Number(valorMensalidade) : null,
+    }
+
+    if (!mensalidadeBloqueada) {
+      dados.dia_vencimento = diaVencimento ? Number(diaVencimento) : null
+      dados.valor_mensalidade = valorMensalidade ? Number(valorMensalidade) : null
     }
 
     let error
