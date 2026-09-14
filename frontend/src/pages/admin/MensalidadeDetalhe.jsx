@@ -23,9 +23,16 @@ function borda(status) {
   return 'border-l-amber'
 }
 
+const OPCOES_STATUS = [
+  { valor: 'pendente', label: 'Pendente' },
+  { valor: 'pago', label: 'Pago' },
+  { valor: 'atrasado', label: 'Atrasado' },
+]
+
 function MensalidadeDetalhe() {
   const { mes } = useParams()
   const [mensalidades, setMensalidades] = useState([])
+  const [filtroStatus, setFiltroStatus] = useState('pendente')
   const [carregando, setCarregando] = useState(true)
 
   useEffect(() => {
@@ -75,6 +82,8 @@ function MensalidadeDetalhe() {
 
   if (carregando) return <Loading />
 
+  const mensalidadesFiltradas = mensalidades.filter((m) => statusCalculado(m) === filtroStatus)
+
   return (
     <div>
       <div className="flex items-center gap-3 mb-6">
@@ -84,8 +93,22 @@ function MensalidadeDetalhe() {
         <h2 className="text-2xl font-bold text-campo-dark">{nomeDoMes(mes)}</h2>
       </div>
 
+      <div className="inline-flex rounded-lg border border-border bg-surface p-1 mb-6">
+        {OPCOES_STATUS.map(({ valor, label }) => (
+          <button
+            key={valor}
+            type="button"
+            onClick={() => setFiltroStatus(valor)}
+            className={`px-3.5 py-1.5 rounded-md text-xs font-semibold transition-colors ${filtroStatus === valor ? 'bg-campo text-white' : 'text-ink/60 hover:bg-hover'
+              }`}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+
       <ul className="space-y-2">
-        {mensalidades.map((m) => {
+        {mensalidadesFiltradas.map((m) => {
           const status = statusCalculado(m)
           return (
             <li
@@ -121,8 +144,12 @@ function MensalidadeDetalhe() {
             </li>
           )
         })}
-        {mensalidades.length === 0 && (
-          <p className="text-sm text-ink/50 py-6 text-center">Nenhuma mensalidade nesse mês.</p>
+        {mensalidadesFiltradas.length === 0 && (
+          <p className="text-sm text-ink/50 py-6 text-center">
+            {mensalidades.length === 0
+              ? 'Nenhuma mensalidade nesse mês.'
+              : `Nenhum aluno com status "${OPCOES_STATUS.find((o) => o.valor === filtroStatus)?.label}".`}
+          </p>
         )}
       </ul>
     </div>
