@@ -62,8 +62,8 @@ function AlunoForm() {
       peso: peso ? Number(peso) : null,
       altura: altura ? Number(altura) : null,
       telefone,
-      dia_vencimento: Number(diaVencimento),
-      valor_mensalidade: Number(valorMensalidade),
+      dia_vencimento: diaVencimento ? Number(diaVencimento) : null,
+      valor_mensalidade: valorMensalidade ? Number(valorMensalidade) : null,
     }
 
     let error
