@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import { Calendar, Search, MessageCircle, Check } from 'lucide-react'
 import { supabase } from '../../lib/supabaseClient'
@@ -38,21 +38,37 @@ function linkWhatsapp(m) {
   return `https://wa.me/${m.aluno.telefone}?text=${encodeURIComponent(mensagem)}`
 }
 
+const ANO_ATUAL = new Date().getFullYear()
+const ANOS_PARA_FILTRO = Array.from({ length: 5 }, (_, i) => String(ANO_ATUAL - i))
+
 function MensalidadesMeses() {
   const [todasMensalidades, setTodasMensalidades] = useState([])
   const [carregando, setCarregando] = useState(true)
   const [busca, setBusca] = useState('')
-  const [filtroAno, setFiltroAno] = useState('todos')
+  const [filtroAno, setFiltroAno] = useState(String(ANO_ATUAL))
   const [filtroMes, setFiltroMes] = useState('todos')
+  const primeiraRenderizacao = useRef(true)
 
   useEffect(() => {
     gerarMensalidadesDoMesAtual().then(carregarTudo)
   }, [])
 
+  useEffect(() => {
+    if (primeiraRenderizacao.current) {
+      primeiraRenderizacao.current = false
+      return
+    }
+    carregarTudo()
+  }, [filtroAno])
+
   async function carregarTudo() {
+    setCarregando(true)
+
     const { data, error } = await supabase
       .from('mensalidade')
       .select('*, aluno(nome, telefone)')
+      .gte('mes_referencia', `${filtroAno}-01-01`)
+      .lt('mes_referencia', `${Number(filtroAno) + 1}-01-01`)
       .order('data_vencimento', { ascending: false })
 
     if (error) {
@@ -81,11 +97,8 @@ function MensalidadesMeses() {
 
   if (carregando) return <Loading />
 
-  const anosDisponiveis = [...new Set(todasMensalidades.map((m) => m.mes_referencia.slice(0, 4)))].sort((a, b) => b.localeCompare(a))
-
   const filtradasPorData = todasMensalidades.filter((m) => {
-    const [ano, mes] = m.mes_referencia.split('-')
-    if (filtroAno !== 'todos' && ano !== filtroAno) return false
+    const [, mes] = m.mes_referencia.split('-')
     if (filtroMes !== 'todos' && mes !== filtroMes) return false
     return true
   })
@@ -145,8 +158,7 @@ function MensalidadesMeses() {
           onChange={(e) => setFiltroAno(e.target.value)}
           className="px-3 py-2.5 rounded-lg border border-border-strong bg-surface text-sm focus:outline-none focus:ring-2 focus:ring-campo/30 focus:border-campo"
         >
-          <option value="todos">Todos os anos</option>
-          {anosDisponiveis.map((ano) => (
+          {ANOS_PARA_FILTRO.map((ano) => (
             <option key={ano} value={ano}>{ano}</option>
           ))}
         </select>
