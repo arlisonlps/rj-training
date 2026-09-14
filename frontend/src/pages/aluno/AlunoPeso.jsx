@@ -31,8 +31,9 @@ function AlunoPeso() {
         .from('peso_historico')
         .select('*')
         .eq('aluno_id', perfil.aluno_id)
-        .order('registrado_em', { ascending: true })
-      setHistorico(data || [])
+        .order('registrado_em', { ascending: false })
+        .limit(12)
+      setHistorico((data || []).reverse())
     }
     setCarregando(false)
   }

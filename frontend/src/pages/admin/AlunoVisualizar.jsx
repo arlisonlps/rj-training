@@ -53,13 +53,14 @@ function AlunoVisualizar() {
       .from('peso_historico')
       .select('*')
       .eq('aluno_id', id)
-      .order('registrado_em', { ascending: true })
+      .order('registrado_em', { ascending: false })
+      .limit(12)
 
     if (error) {
       console.error('Erro ao carregar histórico:', error)
       return
     }
-    setHistoricoPeso(data)
+    setHistoricoPeso((data || []).reverse())
   }
 
   async function registrarPeso(e) {
