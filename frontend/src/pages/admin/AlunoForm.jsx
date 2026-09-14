@@ -23,6 +23,7 @@ function AlunoForm() {
   const [telefone, setTelefone] = useState('')
   const [diaVencimento, setDiaVencimento] = useState('')
   const [valorMensalidade, setValorMensalidade] = useState('')
+  const [mensalidadeBloqueada, setMensalidadeBloqueada] = useState(false)
   const [carregando, setCarregando] = useState(editando)
 
   useEffect(() => {
@@ -46,6 +47,7 @@ function AlunoForm() {
     setTelefone(data.telefone || '')
     setDiaVencimento(data.dia_vencimento || '')
     setValorMensalidade(data.valor_mensalidade || '')
+    setMensalidadeBloqueada(Boolean(data.mensalidade_bloqueada))
     setCarregando(false)
   }
 
@@ -141,11 +143,34 @@ function AlunoForm() {
         </label>
         <label className={rotuloBase}>
           Vencimento (dia)
-          <input className={campoBase} type="number" min="1" max="28" value={diaVencimento} onChange={(e) => setDiaVencimento(e.target.value)} required />
+          <input
+            className={`${campoBase} disabled:opacity-50 disabled:cursor-not-allowed`}
+            type="number"
+            min="1"
+            max="28"
+            value={diaVencimento}
+            onChange={(e) => setDiaVencimento(e.target.value)}
+            disabled={mensalidadeBloqueada}
+            required
+          />
+          {mensalidadeBloqueada && (
+            <span className="text-[10px] font-normal text-ink/50 normal-case">Bloqueado por contrato</span>
+          )}
         </label>
         <label className={rotuloBase}>
           Valor
-          <input className={campoBase} type="number" step="0.01" value={valorMensalidade} onChange={(e) => setValorMensalidade(e.target.value)} required />
+          <input
+            className={`${campoBase} disabled:opacity-50 disabled:cursor-not-allowed`}
+            type="number"
+            step="0.01"
+            value={valorMensalidade}
+            onChange={(e) => setValorMensalidade(e.target.value)}
+            disabled={mensalidadeBloqueada}
+            required
+          />
+          {mensalidadeBloqueada && (
+            <span className="text-[10px] font-normal text-ink/50 normal-case">Bloqueado por contrato</span>
+          )}
         </label>
       </form>
     </div>
