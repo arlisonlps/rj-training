@@ -93,7 +93,7 @@ function AlunosLista() {
         {paginaDeAlunos.map((aluno) => (
           <Link key={aluno.id} to={`/alunos/${aluno.id}`}>
             <li
-              className={`flex items-center justify-between gap-3 bg-surface border border-border rounded-xl px-4 py-4 shadow-sm hover:shadow-md transition-shadow ${!aluno.ativo ? 'opacity-60' : ''}`}
+              className={`flex items-center justify-between gap-3 bg-surface border border-border-strong rounded-xl px-4 py-4 shadow-md hover:shadow-lg transition-shadow ${!aluno.ativo ? 'opacity-60' : ''}`}
             >
               <div className="flex items-center gap-3 min-w-0">
                 <div className="w-9 h-9 rounded-full bg-campo-light text-campo-dark flex items-center justify-center text-xs font-bold shrink-0">
