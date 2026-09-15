@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { Calendar, Search, MessageCircle, Check } from 'lucide-react'
 import { supabase } from '../../lib/supabaseClient'
 import { gerarMensalidadesDoMesAtual } from '../../lib/mensalidade'
+import { formatarData } from '../../lib/data'
 import Loading from '../../components/Loading'
 
 const NOMES_MESES = [
@@ -176,7 +177,7 @@ function MensalidadesMeses() {
                 <div>
                   <div className="font-semibold text-sm">{m.aluno?.nome}</div>
                   <div className="text-xs text-ink/50 mt-0.5">
-                    {nomeDoMes(m.mes_referencia)} — R$ {m.valor} — vence {m.data_vencimento}
+                    {nomeDoMes(m.mes_referencia)} — R$ {m.valor} — vence {formatarData(m.data_vencimento)}
                   </div>
                   <span className={`inline-block text-[10px] font-bold px-2 py-0.5 rounded mt-1.5 ${selo(status)}`}>
                     {status.toUpperCase()}

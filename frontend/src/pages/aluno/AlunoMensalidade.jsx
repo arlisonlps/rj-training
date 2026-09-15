@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../../lib/supabaseClient'
+import { formatarData } from '../../lib/data'
 
 function selo(status) {
   if (status === 'pago') return 'bg-sucesso-light text-sucesso'
@@ -75,7 +76,7 @@ function AlunoMensalidade() {
             <div className="text-xs font-semibold text-ink/50 uppercase tracking-wide mb-2">
               {nomeDoMes(m.mes_referencia)}
             </div>
-            <div className="text-sm text-ink/50 mb-1">Vencimento: {m.data_vencimento}</div>
+            <div className="text-sm text-ink/50 mb-1">Vencimento: {formatarData(m.data_vencimento)}</div>
             <div className="text-lg font-bold mb-3">R$ {m.valor}</div>
             <span className={`inline-block text-xs font-bold px-2.5 py-1 rounded ${selo(statusCalculado(m))}`}>
               {statusCalculado(m).toUpperCase()}

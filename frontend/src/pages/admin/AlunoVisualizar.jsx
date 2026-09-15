@@ -3,6 +3,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom'
 import { ArrowLeft, Scale, Pencil, UserX, UserCheck, Trash2 } from 'lucide-react'
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
 import { supabase } from '../../lib/supabaseClient'
+import { formatarData } from '../../lib/data'
 import Loading from '../../components/Loading'
 
 function iniciais(nome) {
@@ -151,7 +152,7 @@ function AlunoVisualizar() {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
           <Campo rotulo="CPF" valor={aluno.cpf} />
-          <Campo rotulo="Nascimento" valor={aluno.nascimento} />
+          <Campo rotulo="Nascimento" valor={aluno.nascimento ? formatarData(aluno.nascimento) : null} />
           <Campo rotulo="Posição" valor={aluno.posicao} />
           <Campo rotulo="Peso" valor={aluno.peso ? `${aluno.peso} kg` : null} />
           <Campo rotulo="Altura" valor={aluno.altura ? `${aluno.altura} m` : null} />
@@ -216,7 +217,7 @@ function AlunoVisualizar() {
             <tbody>
               {historicoDecrescente.map((h) => (
                 <tr key={h.id} className="border-b border-border">
-                  <td className="py-2">{h.registrado_em}</td>
+                  <td className="py-2">{formatarData(h.registrado_em)}</td>
                   <td className="py-2 font-medium">{h.peso} kg</td>
                 </tr>
               ))}
