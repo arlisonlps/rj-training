@@ -4,7 +4,11 @@ import { AlertTriangle, Users, Cake, Trophy, CalendarCheck } from 'lucide-react'
 import { supabase } from '../../lib/supabaseClient'
 import Loading from '../../components/Loading'
 
-const MEDALHAS = ['🥇', '🥈', '🥉']
+const CORES_POSICAO = [
+  'bg-amber-light text-amber',
+  'bg-gray-300 text-gray-700',
+  'bg-orange-200 text-orange-800',
+]
 
 function Home() {
   const [nome, setNome] = useState('')
@@ -131,7 +135,7 @@ function Home() {
       .map((a) => ({ nome: a.nome, percentual: Math.round((a.presentes / a.total) * 100) }))
       .sort((a, b) => b.percentual - a.percentual)
 
-    setRankingFrequencia(resultado.slice(0, 3))
+    setRankingFrequencia(resultado.slice(0, 5))
   }
 
   if (carregando) return <Loading />
@@ -167,13 +171,18 @@ function Home() {
         <div className="bg-surface border border-border rounded-xl p-5 shadow-sm mb-6">
           <div className="flex items-center gap-2 mb-3 text-campo-dark">
             <Trophy size={18} />
-            <span className="text-sm font-bold">Atleta destaque — maior perda de peso do mês</span>
+            <span className="text-sm font-bold">Ranking de pesagem</span>
           </div>
           <ul className="space-y-2">
             {destaques.map((d, i) => (
               <li key={d.nome + i} className="flex items-center justify-between text-sm">
                 <span className="flex items-center gap-2">
-                  <span>{MEDALHAS[i]}</span>
+                  <span
+                    className={`w-5 h-5 flex items-center justify-center rounded-full text-[10px] font-bold ${CORES_POSICAO[i] || 'bg-hover text-ink/50'
+                      }`}
+                  >
+                    {i + 1}
+                  </span>
                   <span className="font-medium">{d.nome}</span>
                 </span>
                 <span className="text-campo-dark font-bold">-{d.perda} kg</span>
@@ -193,7 +202,12 @@ function Home() {
             {rankingFrequencia.map((r, i) => (
               <li key={r.nome + i} className="flex items-center justify-between text-sm">
                 <span className="flex items-center gap-2">
-                  <span>{MEDALHAS[i]}</span>
+                  <span
+                    className={`w-5 h-5 flex items-center justify-center rounded-full text-[10px] font-bold ${CORES_POSICAO[i] || 'bg-hover text-ink/50'
+                      }`}
+                  >
+                    {i + 1}
+                  </span>
                   <span className="font-medium">{r.nome}</span>
                 </span>
                 <span className="text-campo-dark font-bold">{r.percentual}%</span>
