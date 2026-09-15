@@ -47,6 +47,17 @@ function proximaSegundaFeira(referencia) {
   return proxima
 }
 
+// Janela de escolha fica fechada de quinta às 19h10 até a virada de domingo para segunda.
+function escolhaFechada(referencia) {
+  const diaSemana = referencia.getDay()
+  if (diaSemana === 5 || diaSemana === 6 || diaSemana === 0) return true
+  if (diaSemana === 4) {
+    const minutosAtuais = referencia.getHours() * 60 + referencia.getMinutes()
+    return minutosAtuais >= 19 * 60 + 10
+  }
+  return false
+}
+
 function formatarContagem(ms) {
   if (ms <= 0) return '0s'
   const totalSegundos = Math.floor(ms / 1000)
@@ -87,7 +98,7 @@ function AlunoHorario() {
     return () => clearInterval(intervalo)
   }, [])
 
-  const podeEscolherPrimeiraVez = agora.getDay() === 1
+  const podeEscolherPrimeiraVez = !escolhaFechada(agora)
   const msAteAbrirEscolha = proximaSegundaFeira(agora).getTime() - agora.getTime()
 
   async function consultarMeusHorarios() {
