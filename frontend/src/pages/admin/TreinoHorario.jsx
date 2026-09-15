@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
-import { ArrowLeft, CheckCircle2, XCircle } from 'lucide-react'
+import { ArrowLeft, CheckCircle2, XCircle, UserPlus } from 'lucide-react'
 import { supabase } from '../../lib/supabaseClient'
 import Loading from '../../components/Loading'
 
@@ -69,17 +69,76 @@ function TreinoHorario() {
   const [presencas, setPresencas] = useState({})
   const [carregando, setCarregando] = useState(true)
 
+  const [alunosDisponiveis, setAlunosDisponiveis] = useState([])
+  const [alunoParaAdicionar, setAlunoParaAdicionar] = useState('')
+  const [adicionando, setAdicionando] = useState(false)
+  const [erroAdicionar, setErroAdicionar] = useState('')
+
   const jaPassou = diaJaPassou(dia)
   const podeMarcarPresenca = horarioJaPassou(dia, horarioSelecionado)
 
   useEffect(() => {
     setCarregando(true)
     buscarAlunos()
+    buscarAlunosDisponiveis()
   }, [dia])
 
   useEffect(() => {
     buscarAlunos()
   }, [horarioSelecionado])
+
+  async function buscarAlunosDisponiveis() {
+    const { data: agendadosNoDia, error: erroAgendados } = await supabase
+      .from('horario_treino')
+      .select('aluno_id')
+      .eq('dia_semana', dia)
+      .eq('semana_referencia', inicioDaSemanaStr())
+
+    if (erroAgendados) {
+      console.error('Erro ao buscar agendados do dia:', erroAgendados)
+      return
+    }
+
+    const idsJaAgendados = new Set((agendadosNoDia || []).map((a) => a.aluno_id))
+
+    const { data: todosAlunos, error: erroAlunos } = await supabase
+      .from('aluno')
+      .select('id, nome')
+      .eq('ativo', true)
+      .order('nome')
+
+    if (erroAlunos) {
+      console.error('Erro ao buscar alunos:', erroAlunos)
+      return
+    }
+
+    setAlunosDisponiveis((todosAlunos || []).filter((a) => !idsJaAgendados.has(a.id)))
+  }
+
+  async function adicionarAluno() {
+    if (!alunoParaAdicionar) return
+
+    setAdicionando(true)
+    setErroAdicionar('')
+
+    const { error } = await supabase.from('horario_treino').insert({
+      aluno_id: alunoParaAdicionar,
+      dia_semana: dia,
+      horario: horarioSelecionado,
+      semana_referencia: inicioDaSemanaStr(),
+    })
+
+    setAdicionando(false)
+
+    if (error) {
+      setErroAdicionar('Erro ao adicionar aluno: ' + error.message)
+      return
+    }
+
+    setAlunoParaAdicionar('')
+    buscarAlunos()
+    buscarAlunosDisponiveis()
+  }
 
   async function buscarAlunos() {
     const { data, error } = await supabase
@@ -173,6 +232,29 @@ function TreinoHorario() {
       {!podeMarcarPresenca && (
         <p className="text-xs text-ink/50 mb-3">A marcação de presença libera depois que esse horário começar.</p>
       )}
+
+      <div className="flex flex-col sm:flex-row gap-2 mb-4">
+        <select
+          value={alunoParaAdicionar}
+          onChange={(e) => setAlunoParaAdicionar(e.target.value)}
+          className="flex-1 min-w-0 px-3 py-2 rounded-lg border border-border-strong text-sm focus:outline-none focus:ring-2 focus:ring-campo/30 focus:border-campo"
+        >
+          <option value="">Adicionar aluno avulso neste horário...</option>
+          {alunosDisponiveis.map((a) => (
+            <option key={a.id} value={a.id}>{a.nome}</option>
+          ))}
+        </select>
+        <button
+          type="button"
+          onClick={adicionarAluno}
+          disabled={!alunoParaAdicionar || adicionando}
+          className="shrink-0 flex items-center justify-center gap-1.5 bg-campo text-white text-xs font-semibold px-3 py-2 rounded-lg hover:bg-campo-dark transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          <UserPlus size={14} />
+          {adicionando ? 'Adicionando...' : 'Adicionar'}
+        </button>
+      </div>
+      {erroAdicionar && <p className="text-brick text-xs mb-3">{erroAdicionar}</p>}
 
       <ul className="space-y-2">
         {alunos.map((item) => {
