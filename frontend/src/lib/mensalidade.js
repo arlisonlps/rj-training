@@ -14,6 +14,8 @@ export async function gerarMensalidadesDoMesAtual() {
   const mesReferencia = `${ano}-${String(mes + 1).padStart(2, '0')}-01`
 
   for (const aluno of alunosAtivos) {
+    if (!aluno.dia_vencimento || !aluno.valor_mensalidade) continue
+
     const dataVencimento = new Date(ano, mes, aluno.dia_vencimento)
     const dataVencimentoStr = dataVencimento.toISOString().split('T')[0]
 
