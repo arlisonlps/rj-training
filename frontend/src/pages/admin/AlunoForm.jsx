@@ -54,13 +54,23 @@ function AlunoForm() {
   async function salvar(e) {
     e.preventDefault()
 
+    let alturaNumero = null
+    if (altura) {
+      const alturaNormalizada = String(altura).trim().replace(',', '.')
+      if (!/^[1-2](\.\d{1,2})?$/.test(alturaNormalizada)) {
+        alert('Altura inválida. Use o formato em metros, ex: 1.90 ou 1,90.')
+        return
+      }
+      alturaNumero = Number(alturaNormalizada)
+    }
+
     const dados = {
       nome,
       cpf,
       nascimento: nascimento || null,
       posicao,
       peso: peso ? Number(peso) : null,
-      altura: altura ? Number(altura) : null,
+      altura: alturaNumero,
       telefone,
     }
 
@@ -79,6 +89,8 @@ function AlunoForm() {
     if (error) {
       if (error.code === '23505') {
         alert('Já existe um aluno cadastrado com esse CPF.')
+      } else if (error.code === '22003') {
+        alert('Peso ou altura fora do intervalo permitido. Confira se a altura está em metros (ex: 1.90) e o peso em kg.')
       } else {
         alert('Erro ao salvar aluno: ' + error.message)
       }
