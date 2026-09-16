@@ -171,7 +171,7 @@ function Home() {
         <div className="bg-surface border border-border rounded-xl p-5 shadow-sm mb-6">
           <div className="flex items-center gap-2 mb-3 text-campo-dark">
             <Trophy size={18} />
-            <span className="text-sm font-bold">Ranking de pesagem</span>
+            <span className="text-sm font-bold">Ranking de pesagem do mês atual</span>
           </div>
           <ul className="space-y-2">
             {destaques.map((d, i) => (
@@ -196,7 +196,7 @@ function Home() {
         <div className="bg-surface border border-border rounded-xl p-5 shadow-sm mb-6">
           <div className="flex items-center gap-2 mb-3 text-campo-dark">
             <CalendarCheck size={18} />
-            <span className="text-sm font-bold">Ranking de frequência — mês atual</span>
+            <span className="text-sm font-bold">Ranking de frequência do mês atual</span>
           </div>
           <ul className="space-y-2">
             {rankingFrequencia.map((r, i) => (
@@ -226,7 +226,7 @@ function Home() {
           <ul className="space-y-1">
             {aniversariantes.map((a) => (
               <li key={a.id} className="text-sm text-ink/70">
-                {a.nome} — dia {a.nascimento.split('-')[2]}
+                {a.nome} --- dia {a.nascimento.split('-')[2]}
               </li>
             ))}
           </ul>
