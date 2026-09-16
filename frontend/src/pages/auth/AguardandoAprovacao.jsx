@@ -9,7 +9,9 @@ function AguardandoAprovacao({ tipo, erro, onTentarNovamente }) {
   }
 
   const mensagem =
-    tipo === 'aluno'
+    tipo === 'desativado'
+      ? 'Seu acesso está desativado. Favor, entre em contato com seu professor.'
+      : tipo === 'aluno'
       ? 'Seu cadastro está pendente de aprovação pela equipe RJ Training. Aguarde para fazer login!'
       : erro
         ? `Não foi possível finalizar seu cadastro: ${erro}`

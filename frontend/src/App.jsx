@@ -76,7 +76,7 @@ function App() {
 
     const { data: perfilExistente } = await supabase
       .from('perfil_usuario')
-      .select('papel, status')
+      .select('papel, status, aluno_id')
       .eq('user_id', session.user.id)
       .maybeSingle()
 
@@ -102,7 +102,7 @@ function App() {
 
         const { data: perfilNovo } = await supabase
           .from('perfil_usuario')
-          .select('papel, status')
+          .select('papel, status, aluno_id')
           .eq('user_id', session.user.id)
           .maybeSingle()
 
@@ -112,7 +112,17 @@ function App() {
       }
     }
 
-    setPerfil(perfilExistente)
+    if (perfilExistente?.papel !== 'admin' && perfilExistente?.aluno_id) {
+      const { data: aluno } = await supabase
+        .from('aluno')
+        .select('ativo')
+        .eq('id', perfilExistente.aluno_id)
+        .maybeSingle()
+
+      setPerfil({ ...perfilExistente, ativo: aluno?.ativo })
+    } else {
+      setPerfil(perfilExistente)
+    }
     setCarregandoPerfil(false)
   }
 
@@ -126,6 +136,14 @@ function App() {
       <Routes>
         <Route path="/cadastro" element={<Cadastro />} />
         <Route path="*" element={<Login />} />
+      </Routes>
+    )
+  }
+
+  if (perfil?.ativo === false) {
+    return (
+      <Routes>
+        <Route path="*" element={<AguardandoAprovacao tipo="desativado" />} />
       </Routes>
     )
   }
