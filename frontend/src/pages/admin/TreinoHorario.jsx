@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
-import { ArrowLeft, CheckCircle2, XCircle, UserPlus } from 'lucide-react'
+import { ArrowLeft, CheckCircle2, XCircle, UserPlus, UserMinus } from 'lucide-react'
 import { supabase } from '../../lib/supabaseClient'
 import Loading from '../../components/Loading'
 
@@ -73,6 +73,7 @@ function TreinoHorario() {
   const [alunoParaAdicionar, setAlunoParaAdicionar] = useState('')
   const [adicionando, setAdicionando] = useState(false)
   const [erroAdicionar, setErroAdicionar] = useState('')
+  const [removendoId, setRemovendoId] = useState(null)
 
   const jaPassou = diaJaPassou(dia)
   const podeMarcarPresenca = horarioJaPassou(dia, horarioSelecionado)
@@ -136,6 +137,25 @@ function TreinoHorario() {
     }
 
     setAlunoParaAdicionar('')
+    buscarAlunos()
+    buscarAlunosDisponiveis()
+  }
+
+  async function removerAluno(horarioId, nome) {
+    const confirmado = window.confirm(`Remover ${nome} deste horário?`)
+    if (!confirmado) return
+
+    setRemovendoId(horarioId)
+
+    const { error } = await supabase.from('horario_treino').delete().eq('id', horarioId)
+
+    setRemovendoId(null)
+
+    if (error) {
+      alert('Erro ao remover aluno: ' + error.message)
+      return
+    }
+
     buscarAlunos()
     buscarAlunosDisponiveis()
   }
@@ -289,6 +309,16 @@ function TreinoHorario() {
                 >
                   <XCircle size={14} />
                   Faltou
+                </button>
+                <button
+                  type="button"
+                  disabled={podeMarcarPresenca || removendoId === item.id}
+                  onClick={() => removerAluno(item.id, item.aluno?.nome)}
+                  title={podeMarcarPresenca ? 'Treino já começou, não é possível remover' : 'Remover deste horário'}
+                  className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg bg-hover text-ink/60 hover:bg-brick-light hover:text-brick transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                >
+                  <UserMinus size={14} />
+                  {removendoId === item.id ? 'Removendo...' : 'Remover'}
                 </button>
               </div>
             </li>
