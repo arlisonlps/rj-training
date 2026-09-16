@@ -77,7 +77,7 @@ function MensalidadeDetalhe() {
   }
 
   function linkWhatsapp(m) {
-    const mensagem = `Olá ${m.aluno.nome}, sua mensalidade está em atraso. Poderia regularizar o pagamento?`
+    const mensagem = `Fala ${m.aluno.nome}, Verifiquei que sua mensalidade está em atraso. Vamos regulzarizar o pagamento?`
     return `https://wa.me/${m.aluno.telefone}?text=${encodeURIComponent(mensagem)}`
   }
 
