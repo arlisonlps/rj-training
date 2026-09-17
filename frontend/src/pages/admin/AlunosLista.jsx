@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
+import { useAutoAnimate } from '@formkit/auto-animate/react'
 import { Search, Eye, Plus } from 'lucide-react'
 import { supabase } from '../../lib/supabaseClient'
 import Loading from '../../components/Loading'
@@ -21,6 +22,7 @@ function AlunosLista() {
   const [paginaAtual, setPaginaAtual] = useState(1)
   const [carregando, setCarregando] = useState(true)
   const [mostrarInativos, setMostrarInativos] = useState(false)
+  const [listaRef] = useAutoAnimate()
 
   useEffect(() => {
     buscarAlunos()
@@ -89,11 +91,11 @@ function AlunosLista() {
         Mostrar alunos desativados
       </label>
 
-      <ul className="space-y-4">
+      <ul ref={listaRef} className="space-y-4">
         {paginaDeAlunos.map((aluno) => (
           <Link key={aluno.id} to={`/alunos/${aluno.id}`}>
             <li
-              className={`flex items-center justify-between gap-3 bg-surface border border-border-strong rounded-xl px-4 py-4 shadow-md hover:shadow-lg transition-shadow ${!aluno.ativo ? 'opacity-60' : ''}`}
+              className={`flex items-center justify-between gap-3 bg-surface border border-border-strong rounded-xl px-4 py-4 shadow-md hover:shadow-lg transition-all active:scale-[0.98] ${!aluno.ativo ? 'opacity-60' : ''}`}
             >
               <div className="flex items-center gap-3 min-w-0">
                 <div className="w-9 h-9 rounded-full bg-campo-light text-campo-dark flex items-center justify-center text-xs font-bold shrink-0">

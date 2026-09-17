@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { useAutoAnimate } from '@formkit/auto-animate/react'
 import { CalendarDays, Wallet, Scale, Copy, Check } from 'lucide-react'
 import { supabase } from '../../lib/supabaseClient'
 import { PIX_CHAVE, PIX_NOME, PIX_BANCO } from '../../lib/pix'
@@ -63,6 +64,7 @@ function AlunoHome() {
   const [frequenciaMes, setFrequenciaMes] = useState(null)
   const [carregando, setCarregando] = useState(true)
   const [pixCopiado, setPixCopiado] = useState(false)
+  const [pixBotaoRef] = useAutoAnimate()
 
   useEffect(() => {
     carregar()
@@ -160,7 +162,7 @@ function AlunoHome() {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
         <Link to="/horario">
-          <div className="bg-surface border border-border rounded-xl p-5 shadow-sm hover:shadow-md transition-shadow cursor-pointer h-full">
+          <div className="bg-surface border border-border rounded-xl p-5 shadow-sm hover:shadow-md transition-all active:scale-[0.98] cursor-pointer h-full">
             <div className="flex items-center gap-2 mb-3 text-campo">
               <CalendarDays size={18} />
               <span className="text-xs font-semibold uppercase tracking-wide">Meus treinos da semana</span>
@@ -185,7 +187,7 @@ function AlunoHome() {
         </Link>
 
         <Link to="/mensalidade">
-          <div className="bg-surface border border-border rounded-xl p-5 shadow-sm hover:shadow-md transition-shadow cursor-pointer h-full">
+          <div className="bg-surface border border-border rounded-xl p-5 shadow-sm hover:shadow-md transition-all active:scale-[0.98] cursor-pointer h-full">
             <div className="flex items-center gap-2 mb-3 text-campo">
               <Wallet size={18} />
               <span className="text-xs font-semibold uppercase tracking-wide">Mensalidade do mês</span>
@@ -193,7 +195,7 @@ function AlunoHome() {
             {mensalidade ? (
               <>
                 <div className="text-lg font-bold mb-1">R$ {mensalidade.valor}</div>
-                <span className={`inline-block text-[10px] font-bold px-2 py-0.5 rounded ${selo(statusMensalidade)}`}>
+                <span className={`inline-block text-[10px] font-bold px-2 py-0.5 rounded transition-all duration-300 ${selo(statusMensalidade)}`}>
                   {statusMensalidade.toUpperCase()}
                 </span>
                 {statusMensalidade !== 'pago' && (
@@ -205,10 +207,14 @@ function AlunoHome() {
                         e.stopPropagation()
                         copiarPix()
                       }}
-                      className="mt-3 w-full flex items-center justify-center gap-1.5 bg-campo text-white text-xs font-semibold px-3 py-2 rounded-lg hover:bg-campo-dark transition-colors"
+                      className="mt-3 w-full flex items-center justify-center gap-1.5 bg-campo text-white text-xs font-semibold px-3 py-2 rounded-lg hover:bg-campo-dark active:scale-95 transition-all"
                     >
-                      {pixCopiado ? <Check size={14} /> : <Copy size={14} />}
-                      {pixCopiado ? 'Chave copiada!' : `Copiar PIX (${PIX_BANCO})`}
+                      <span ref={pixBotaoRef} className="flex items-center gap-1.5">
+                        {pixCopiado ? <Check size={14} key="check" /> : <Copy size={14} key="copy" />}
+                        <span key={pixCopiado ? 'copiado' : 'copiar'}>
+                          {pixCopiado ? 'Chave copiada!' : `Copiar PIX (${PIX_BANCO})`}
+                        </span>
+                      </span>
                     </button>
                     <p className="text-[10px] text-ink/40 mt-1.5">Recebedor: {PIX_NOME}</p>
                   </>
@@ -222,7 +228,7 @@ function AlunoHome() {
       </div>
 
       <Link to="/peso">
-        <div className="bg-surface border border-border rounded-xl p-5 shadow-sm hover:shadow-md transition-shadow cursor-pointer">
+        <div className="bg-surface border border-border rounded-xl p-5 shadow-sm hover:shadow-md transition-all active:scale-[0.98] cursor-pointer">
           <div className="flex items-center gap-2 mb-2 text-campo">
             <Scale size={18} />
             <span className="text-xs font-semibold uppercase tracking-wide">Meu peso</span>

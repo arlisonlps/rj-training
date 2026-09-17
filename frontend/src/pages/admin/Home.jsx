@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { useAutoAnimate } from '@formkit/auto-animate/react'
 import { AlertTriangle, Users, Cake, Trophy, CalendarCheck } from 'lucide-react'
 import { supabase } from '../../lib/supabaseClient'
 import Loading from '../../components/Loading'
@@ -18,6 +19,8 @@ function Home() {
   const [aniversariantes, setAniversariantes] = useState([])
   const [destaques, setDestaques] = useState([])
   const [rankingFrequencia, setRankingFrequencia] = useState([])
+  const [listaPesagemRef] = useAutoAnimate()
+  const [listaFrequenciaRef] = useAutoAnimate()
 
   useEffect(() => {
     carregarTudo()
@@ -147,7 +150,7 @@ function Home() {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
         <Link to="/alunos">
-          <div className="bg-surface border border-border rounded-xl p-5 shadow-sm hover:shadow-md transition-shadow cursor-pointer">
+          <div className="bg-surface border border-border rounded-xl p-5 shadow-sm hover:shadow-md transition-all active:scale-95 cursor-pointer">
             <div className="flex items-center gap-2 mb-2 text-campo">
               <Users size={18} />
               <span className="text-xs font-semibold uppercase tracking-wide">Alunos ativos</span>
@@ -157,7 +160,7 @@ function Home() {
         </Link>
 
         <Link to="/mensalidades">
-          <div className="bg-surface border border-border rounded-xl p-5 shadow-sm hover:shadow-md transition-shadow cursor-pointer">
+          <div className="bg-surface border border-border rounded-xl p-5 shadow-sm hover:shadow-md transition-all active:scale-95 cursor-pointer">
             <div className="flex items-center gap-2 mb-2 text-campo">
               <AlertTriangle size={18} />
               <span className="text-xs font-semibold uppercase tracking-wide">Mensalidades atrasadas</span>
@@ -173,7 +176,7 @@ function Home() {
             <Trophy size={18} />
             <span className="text-sm font-bold">Ranking de pesagem do mês atual</span>
           </div>
-          <ul className="space-y-2">
+          <ul ref={listaPesagemRef} className="space-y-2">
             {destaques.map((d, i) => (
               <li key={d.nome + i} className="flex items-center justify-between text-sm">
                 <span className="flex items-center gap-2">
@@ -198,7 +201,7 @@ function Home() {
             <CalendarCheck size={18} />
             <span className="text-sm font-bold">Ranking de frequência do mês atual</span>
           </div>
-          <ul className="space-y-2">
+          <ul ref={listaFrequenciaRef} className="space-y-2">
             {rankingFrequencia.map((r, i) => (
               <li key={r.nome + i} className="flex items-center justify-between text-sm">
                 <span className="flex items-center gap-2">

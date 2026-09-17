@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
+import { useAutoAnimate } from '@formkit/auto-animate/react'
 import { ArrowLeft, CheckCircle2, XCircle, UserPlus, UserMinus } from 'lucide-react'
 import { supabase } from '../../lib/supabaseClient'
 import Loading from '../../components/Loading'
@@ -74,6 +75,7 @@ function TreinoHorario() {
   const [adicionando, setAdicionando] = useState(false)
   const [erroAdicionar, setErroAdicionar] = useState('')
   const [removendoId, setRemovendoId] = useState(null)
+  const [listaRef] = useAutoAnimate()
 
   const jaPassou = diaJaPassou(dia)
   const podeMarcarPresenca = horarioJaPassou(dia, horarioSelecionado)
@@ -239,7 +241,7 @@ function TreinoHorario() {
           <button
             key={h}
             onClick={() => setHorarioSelecionado(h)}
-            className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors ${horarioSelecionado === h
+            className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all active:scale-95 ${horarioSelecionado === h
               ? 'bg-campo text-white'
               : 'bg-surface border border-border-strong text-ink/60 hover:bg-hover'
               }`}
@@ -276,7 +278,7 @@ function TreinoHorario() {
       </div>
       {erroAdicionar && <p className="text-brick text-xs mb-3">{erroAdicionar}</p>}
 
-      <ul className="space-y-2">
+      <ul ref={listaRef} className="space-y-2">
         {alunos.map((item) => {
           const presente = presencas[item.aluno_id]
           return (

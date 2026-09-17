@@ -295,7 +295,7 @@ function AlunoHorario() {
 
           {!podeEscolherPrimeiraVez && (
             <p className="text-sm text-ink/60 mb-4">
-              Aguarde <span className="font-bold text-campo-dark">{formatarContagem(msAteAbrirEscolha)}</span> para agendar seu treino!
+              Aguarde <span className="font-bold text-campo-dark tabular-nums">{formatarContagem(msAteAbrirEscolha)}</span> para agendar seu treino!
             </p>
           )}
 

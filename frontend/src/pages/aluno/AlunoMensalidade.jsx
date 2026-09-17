@@ -1,8 +1,28 @@
 import { useState, useEffect } from 'react'
+import { useAutoAnimate } from '@formkit/auto-animate/react'
 import { Copy, Check } from 'lucide-react'
 import { supabase } from '../../lib/supabaseClient'
 import { formatarData } from '../../lib/data'
 import { PIX_CHAVE, PIX_NOME, PIX_BANCO } from '../../lib/pix'
+
+function BotaoPix({ copiado, onClick }) {
+  const [ref] = useAutoAnimate()
+
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="w-full flex items-center justify-center gap-1.5 bg-campo text-white text-xs font-semibold px-3 py-2.5 rounded-lg hover:bg-campo-dark active:scale-95 transition-all"
+    >
+      <span ref={ref} className="flex items-center gap-1.5">
+        {copiado ? <Check size={14} key="check" /> : <Copy size={14} key="copy" />}
+        <span key={copiado ? 'copiado' : 'copiar'}>
+          {copiado ? 'Chave copiada!' : `Copiar PIX (${PIX_BANCO})`}
+        </span>
+      </span>
+    </button>
+  )
+}
 
 function selo(status) {
   if (status === 'pago') return 'bg-sucesso-light text-sucesso'
@@ -35,6 +55,7 @@ function AlunoMensalidade() {
   const [mensalidades, setMensalidades] = useState([])
   const [carregando, setCarregando] = useState(true)
   const [pixCopiadoId, setPixCopiadoId] = useState(null)
+  const [listaRef] = useAutoAnimate()
 
   useEffect(() => {
     carregar()
@@ -83,7 +104,7 @@ function AlunoMensalidade() {
         <p className="text-sm text-ink/50">Nenhuma mensalidade encontrada nos últimos meses.</p>
       )}
 
-      <div className="flex flex-col gap-3">
+      <div ref={listaRef} className="flex flex-col gap-3">
         {mensalidades.map((m) => {
           const status = statusCalculado(m)
           return (
@@ -93,20 +114,13 @@ function AlunoMensalidade() {
               </div>
               <div className="text-sm text-ink/50 mb-1">Vencimento: {formatarData(m.data_vencimento)}</div>
               <div className="text-lg font-bold mb-3">R$ {m.valor}</div>
-              <span className={`inline-block text-xs font-bold px-2.5 py-1 rounded ${selo(status)}`}>
+              <span className={`inline-block text-xs font-bold px-2.5 py-1 rounded transition-all duration-300 ${selo(status)}`}>
                 {status.toUpperCase()}
               </span>
 
               {status !== 'pago' && (
                 <div className="mt-4 pt-4 border-t border-border">
-                  <button
-                    type="button"
-                    onClick={() => copiarPix(m.id)}
-                    className="w-full flex items-center justify-center gap-1.5 bg-campo text-white text-xs font-semibold px-3 py-2.5 rounded-lg hover:bg-campo-dark transition-colors"
-                  >
-                    {pixCopiadoId === m.id ? <Check size={14} /> : <Copy size={14} />}
-                    {pixCopiadoId === m.id ? 'Chave copiada!' : `Copiar PIX (${PIX_BANCO})`}
-                  </button>
+                  <BotaoPix copiado={pixCopiadoId === m.id} onClick={() => copiarPix(m.id)} />
                   <p className="text-[10px] text-ink/40 mt-1.5 text-center">Recebedor: {PIX_NOME}</p>
                 </div>
               )}

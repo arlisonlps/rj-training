@@ -14,7 +14,7 @@ function Treinos() {
       <div className="grid grid-cols-3 gap-3 sm:gap-4">
         {dias.map((dia) => (
           <Link key={dia.valor} to={`/treinos/${dia.valor}`}>
-            <div className="bg-surface border border-border border-t-4 border-t-campo rounded-xl px-4 py-6 shadow-sm flex flex-col items-center gap-2 hover:shadow-md transition-shadow cursor-pointer">
+            <div className="bg-surface border border-border border-t-4 border-t-campo rounded-xl px-4 py-6 shadow-sm flex flex-col items-center gap-2 hover:shadow-md transition-all active:scale-95 cursor-pointer">
               <CalendarDays size={20} className="text-campo" />
               <span className="font-bold text-campo-dark">{dia.label}</span>
             </div>
