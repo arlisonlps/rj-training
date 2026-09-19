@@ -112,7 +112,7 @@ function MensalidadeDetalhe() {
 
   function linkWhatsapp(m, status) {
     const mensagem = status === 'vencendo'
-      ? `Olá ${m.aluno.nome}, sua mensalidade vence dia ${formatarData(m.data_vencimento)}, faça o pagamento para evitar atrasos!`
+      ? `Fala ${m.aluno.nome}, sua mensalidade vence dia ${formatarData(m.data_vencimento)}, faça o pagamento para evitar atrasos!`
       : `Fala ${m.aluno.nome}, Verifiquei que sua mensalidade está em atraso. Vamos regulzarizar o pagamento?`
     return `https://wa.me/${m.aluno.telefone}?text=${encodeURIComponent(mensagem)}`
   }
