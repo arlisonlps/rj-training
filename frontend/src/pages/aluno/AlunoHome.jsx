@@ -137,11 +137,25 @@ function AlunoHome() {
       <h2 className="text-2xl font-bold text-campo-dark mb-2">Olá, {aluno ? primeiroNome(aluno.nome) : '...'}!</h2>
       <p className="text-ink/70 mb-6">Bem-vindo ao seu painel do RJ Training.</p>
 
+      <Link to="/horario">
+        <div className="flex items-center gap-2 bg-campo-light text-campo-dark text-sm font-semibold rounded-xl px-4 py-3 mb-4 hover:brightness-95 active:scale-[0.99] transition-all cursor-pointer">
+          <CalendarDays size={18} className="shrink-0" />
+          {proximo
+            ? proximo.hoje
+              ? `Seu treino é hoje às ${proximo.horario}!`
+              : `Seu próximo treino é ${NOMES_DIAS[proximo.dia_semana]} às ${proximo.horario}`
+            : 'Você não tem um treino agendado, clique aqui para agendar!'}
+        </div>
+      </Link>
+
       {statusMensalidade === 'atrasado' && (
         <Link to="/mensalidade">
-          <div className="flex items-center gap-2 bg-brick text-white text-sm font-semibold rounded-xl px-4 py-3 mb-4 hover:brightness-95 active:scale-[0.99] transition-all cursor-pointer">
-            <AlertTriangle size={18} className="shrink-0" />
-            Sua mensalidade está atrasada. Toque aqui para regularizar.
+          <div className="flex items-center gap-3 bg-brick text-white rounded-2xl px-5 py-5 mb-4 shadow-sm hover:brightness-95 active:scale-[0.99] transition-all cursor-pointer">
+            <AlertTriangle size={28} className="shrink-0" />
+            <div>
+              <div className="text-base font-bold">Sua mensalidade está atrasada!</div>
+              <div className="text-sm opacity-90">Toque aqui para regularizar o pagamento.</div>
+            </div>
           </div>
         </Link>
       )}
@@ -154,17 +168,6 @@ function AlunoHome() {
           </div>
         </Link>
       )}
-
-      <Link to="/horario">
-        <div className="flex items-center gap-2 bg-campo-light text-campo-dark text-sm font-semibold rounded-xl px-4 py-3 mb-4 hover:brightness-95 active:scale-[0.99] transition-all cursor-pointer">
-          <CalendarDays size={18} className="shrink-0" />
-          {proximo
-            ? proximo.hoje
-              ? `Seu treino é hoje às ${proximo.horario}!`
-              : `Seu próximo treino é ${NOMES_DIAS[proximo.dia_semana]} às ${proximo.horario}`
-            : 'Você não tem um treino agendado, clique aqui para agendar!'}
-        </div>
-      </Link>
 
       <div className="mb-4">
         <Link to="/mensalidade">

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
-import { Timer } from 'lucide-react'
+import { Link } from 'react-router-dom'
+import { Timer, AlertTriangle } from 'lucide-react'
 import { supabase } from '../../lib/supabaseClient'
 
 const dias = [
@@ -89,9 +90,11 @@ function AlunoHorario() {
   const [horarioRemarcar, setHorarioRemarcar] = useState({})
 
   const [agora, setAgora] = useState(new Date())
+  const [mensalidadeAtrasada, setMensalidadeAtrasada] = useState(false)
 
   useEffect(() => {
     consultarMeusHorarios()
+    consultarMensalidade()
   }, [])
 
   useEffect(() => {
@@ -101,6 +104,31 @@ function AlunoHorario() {
 
   const podeEscolherPrimeiraVez = !escolhaFechada(agora)
   const msAteAbrirEscolha = proximaSegundaFeira(agora).getTime() - agora.getTime()
+
+  async function consultarMensalidade() {
+    const { data: userData } = await supabase.auth.getUser()
+    const { data: perfil } = await supabase
+      .from('perfil_usuario')
+      .select('aluno_id')
+      .eq('user_id', userData.user.id)
+      .single()
+
+    if (!perfil?.aluno_id) return
+
+    const hoje = new Date()
+    const mesReferencia = `${hoje.getFullYear()}-${String(hoje.getMonth() + 1).padStart(2, '0')}-01`
+    const { data: mensalidade } = await supabase
+      .from('mensalidade')
+      .select('status, data_vencimento')
+      .eq('aluno_id', perfil.aluno_id)
+      .eq('mes_referencia', mesReferencia)
+      .maybeSingle()
+
+    if (!mensalidade) return
+
+    const hojeStr = hoje.toISOString().split('T')[0]
+    setMensalidadeAtrasada(mensalidade.status !== 'pago' && mensalidade.data_vencimento < hojeStr)
+  }
 
   async function consultarMeusHorarios() {
     setConsultando(true)
@@ -212,22 +240,35 @@ function AlunoHorario() {
     <div>
       <h2 className="text-2xl font-bold text-campo-dark mb-4">Meu horário de treino</h2>
 
-      <div className="bg-amber-light text-amber text-sm rounded-xl px-4 py-3 mb-6">
-        Você só poderá agendar seu treino referente à semana atual, toda virada de domingo para segunda! Caso
-        agende seu treino e aconteça algum imprevisto, você tem até 1 hora antes do treino agendado para cancelar
-        e marcar outro horário posterior, em até 1 hora antes desse horário iniciar.
-      </div>
+      {mensalidadeAtrasada ? (
+        <Link to="/mensalidade">
+          <div className="bg-brick text-white rounded-2xl px-6 py-6 mb-6 flex flex-col items-center text-center gap-1.5 shadow-sm hover:brightness-95 active:scale-[0.99] transition-all cursor-pointer">
+            <AlertTriangle size={22} className="opacity-90 mb-1" />
+            <span className="text-xs font-semibold uppercase tracking-wide opacity-80">Atenção</span>
+            <span className="text-xl font-bold">Mensalidade atrasada</span>
+            <span className="text-sm font-medium opacity-90">Regularize o pagamento para agendar seu treino.</span>
+          </div>
+        </Link>
+      ) : (
+        <>
+          <div className="bg-amber-light text-amber text-sm rounded-xl px-4 py-3 mb-6">
+            Você só poderá agendar seu treino referente à semana atual, toda virada de domingo para segunda! Caso
+            agende seu treino e aconteça algum imprevisto, você tem até 1 hora antes do treino agendado para cancelar
+            e marcar outro horário posterior, em até 1 hora antes desse horário iniciar.
+          </div>
 
-      {!podeEscolherPrimeiraVez && (
-        <div className="bg-campo text-white rounded-2xl px-6 py-6 mb-6 flex flex-col items-center text-center gap-1.5 shadow-sm">
-          <Timer size={22} className="opacity-90 mb-1" />
-          <span className="text-xs font-semibold uppercase tracking-wide opacity-80">Faltam</span>
-          <span className="text-3xl font-bold tabular-nums">{formatarContagem(msAteAbrirEscolha)}</span>
-          <span className="text-sm font-medium opacity-90">para agendar seu treino!</span>
-        </div>
+          {!podeEscolherPrimeiraVez && (
+            <div className="bg-campo text-white rounded-2xl px-6 py-6 mb-6 flex flex-col items-center text-center gap-1.5 shadow-sm">
+              <Timer size={22} className="opacity-90 mb-1" />
+              <span className="text-xs font-semibold uppercase tracking-wide opacity-80">Faltam</span>
+              <span className="text-3xl font-bold tabular-nums">{formatarContagem(msAteAbrirEscolha)}</span>
+              <span className="text-sm font-medium opacity-90">para agendar seu treino!</span>
+            </div>
+          )}
+        </>
       )}
 
-      {meusHorarios && meusHorarios.length > 0 && (
+      {!mensalidadeAtrasada && meusHorarios && meusHorarios.length > 0 && (
         <div className="bg-surface rounded-2xl shadow-sm border border-border p-6 mb-4">
           <h3 className="text-sm font-bold text-campo-dark mb-4">Meus horários desta semana</h3>
 
@@ -299,7 +340,7 @@ function AlunoHorario() {
         </div>
       )}
 
-      {aindaNaoEscolheuNada && (
+      {!mensalidadeAtrasada && aindaNaoEscolheuNada && (
         <div className="bg-surface rounded-2xl shadow-sm border border-border p-8">
           <h3 className="text-sm font-bold text-campo-dark mb-4">Escolher horário da semana</h3>
 
