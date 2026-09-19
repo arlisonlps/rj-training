@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { Timer } from 'lucide-react'
 import { supabase } from '../../lib/supabaseClient'
 
 const dias = [
@@ -217,6 +218,15 @@ function AlunoHorario() {
         e marcar outro horário posterior, em até 1 hora antes desse horário iniciar.
       </div>
 
+      {!podeEscolherPrimeiraVez && (
+        <div className="bg-campo text-white rounded-2xl px-6 py-6 mb-6 flex flex-col items-center text-center gap-1.5 shadow-sm">
+          <Timer size={22} className="opacity-90 mb-1" />
+          <span className="text-xs font-semibold uppercase tracking-wide opacity-80">Faltam</span>
+          <span className="text-3xl font-bold tabular-nums">{formatarContagem(msAteAbrirEscolha)}</span>
+          <span className="text-sm font-medium opacity-90">para agendar seu treino!</span>
+        </div>
+      )}
+
       {meusHorarios && meusHorarios.length > 0 && (
         <div className="bg-surface rounded-2xl shadow-sm border border-border p-6 mb-4">
           <h3 className="text-sm font-bold text-campo-dark mb-4">Meus horários desta semana</h3>
@@ -292,12 +302,6 @@ function AlunoHorario() {
       {aindaNaoEscolheuNada && (
         <div className="bg-surface rounded-2xl shadow-sm border border-border p-8">
           <h3 className="text-sm font-bold text-campo-dark mb-4">Escolher horário da semana</h3>
-
-          {!podeEscolherPrimeiraVez && (
-            <p className="text-sm text-ink/60 mb-4">
-              Aguarde <span className="font-bold text-campo-dark tabular-nums">{formatarContagem(msAteAbrirEscolha)}</span> para agendar seu treino!
-            </p>
-          )}
 
           <form onSubmit={enviarPrimeiraEscolha} className="flex flex-col gap-4">
             <div className="flex flex-col gap-3">

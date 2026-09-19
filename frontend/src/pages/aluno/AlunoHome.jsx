@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useAutoAnimate } from '@formkit/auto-animate/react'
-import { CalendarDays, Wallet, Scale, Copy, Check } from 'lucide-react'
+import { CalendarDays, Wallet, Scale, Copy, Check, AlertTriangle } from 'lucide-react'
 import { supabase } from '../../lib/supabaseClient'
 import { PIX_CHAVE, PIX_NOME, PIX_BANCO } from '../../lib/pix'
 
@@ -61,7 +61,6 @@ function AlunoHome() {
   const [horarios, setHorarios] = useState([])
   const [mensalidade, setMensalidade] = useState(null)
   const [historicoPesoRecente, setHistoricoPesoRecente] = useState([])
-  const [frequenciaMes, setFrequenciaMes] = useState(null)
   const [carregando, setCarregando] = useState(true)
   const [pixCopiado, setPixCopiado] = useState(false)
   const [pixBotaoRef] = useAutoAnimate()
@@ -106,20 +105,6 @@ function AlunoHome() {
         .order('registrado_em', { ascending: false })
         .limit(2)
       setHistoricoPesoRecente(pesoData || [])
-
-      const inicioMes = new Date(hoje.getFullYear(), hoje.getMonth(), 1)
-      const inicioProximoMes = new Date(hoje.getFullYear(), hoje.getMonth() + 1, 1)
-      const { data: presencaData } = await supabase
-        .from('presenca')
-        .select('presente')
-        .eq('aluno_id', perfil.aluno_id)
-        .gte('registrado_em', inicioMes.toISOString())
-        .lt('registrado_em', inicioProximoMes.toISOString())
-
-      if (presencaData && presencaData.length > 0) {
-        const presentes = presencaData.filter((p) => p.presente).length
-        setFrequenciaMes({ presentes, total: presencaData.length })
-      }
     }
 
     setCarregando(false)
@@ -137,10 +122,6 @@ function AlunoHome() {
 
   if (carregando) return null
 
-  const horariosOrdenados = [...horarios].sort(
-    (a, b) => ORDEM_DIAS[a.dia_semana] - ORDEM_DIAS[b.dia_semana]
-  )
-
   const [ultimoPeso, pesoAnterior] = historicoPesoRecente
   const variacaoPeso = ultimoPeso && pesoAnterior ? ultimoPeso.peso - pesoAnterior.peso : null
   const proximo = proximoTreino(horarios)
@@ -151,43 +132,29 @@ function AlunoHome() {
       <h2 className="text-2xl font-bold text-campo-dark mb-2">Olá, {aluno ? primeiroNome(aluno.nome) : '...'}!</h2>
       <p className="text-ink/70 mb-6">Bem-vindo ao seu painel do RJ Training.</p>
 
-      {proximo && (
-        <div className="flex items-center gap-2 bg-campo-light text-campo-dark text-sm font-semibold rounded-xl px-4 py-3 mb-4">
-          <CalendarDays size={18} />
-          {proximo.hoje
-            ? `Seu treino é hoje às ${proximo.horario}!`
-            : `Próximo treino: ${NOMES_DIAS[proximo.dia_semana]} às ${proximo.horario}`}
-        </div>
-      )}
-
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-        <Link to="/horario">
-          <div className="bg-surface border border-border rounded-xl p-5 shadow-sm hover:shadow-md transition-all active:scale-[0.98] cursor-pointer h-full">
-            <div className="flex items-center gap-2 mb-3 text-campo">
-              <CalendarDays size={18} />
-              <span className="text-xs font-semibold uppercase tracking-wide">Meus treinos da semana</span>
-            </div>
-            {horariosOrdenados.length === 0 ? (
-              <p className="text-sm text-ink/50">Nenhum horário marcado ainda.</p>
-            ) : (
-              <ul className="space-y-1">
-                {horariosOrdenados.map((h) => (
-                  <li key={h.id} className="text-sm font-medium">
-                    {NOMES_DIAS[h.dia_semana]} — {h.horario}
-                  </li>
-                ))}
-              </ul>
-            )}
-            {frequenciaMes && (
-              <p className="text-xs text-ink/50 mt-3 pt-3 border-t border-border">
-                Frequência do mês: <span className="font-semibold text-campo-dark">{frequenciaMes.presentes}/{frequenciaMes.total}</span>
-              </p>
-            )}
+      {statusMensalidade === 'atrasado' && (
+        <Link to="/mensalidade">
+          <div className="flex items-center gap-2 bg-brick text-white text-sm font-semibold rounded-xl px-4 py-3 mb-4 hover:brightness-95 active:scale-[0.99] transition-all cursor-pointer">
+            <AlertTriangle size={18} className="shrink-0" />
+            Sua mensalidade está atrasada. Toque aqui para regularizar.
           </div>
         </Link>
+      )}
 
+      <Link to="/horario">
+        <div className="flex items-center gap-2 bg-campo-light text-campo-dark text-sm font-semibold rounded-xl px-4 py-3 mb-4 hover:brightness-95 active:scale-[0.99] transition-all cursor-pointer">
+          <CalendarDays size={18} className="shrink-0" />
+          {proximo
+            ? proximo.hoje
+              ? `Seu treino é hoje às ${proximo.horario}!`
+              : `Seu próximo treino é ${NOMES_DIAS[proximo.dia_semana]} às ${proximo.horario}`
+            : 'Você não tem um treino agendado, clique aqui para agendar!'}
+        </div>
+      </Link>
+
+      <div className="mb-4">
         <Link to="/mensalidade">
-          <div className="bg-surface border border-border rounded-xl p-5 shadow-sm hover:shadow-md transition-all active:scale-[0.98] cursor-pointer h-full">
+          <div className="bg-surface border border-border rounded-xl p-5 shadow-sm hover:shadow-md transition-all active:scale-[0.98] cursor-pointer">
             <div className="flex items-center gap-2 mb-3 text-campo">
               <Wallet size={18} />
               <span className="text-xs font-semibold uppercase tracking-wide">Mensalidade do mês</span>
