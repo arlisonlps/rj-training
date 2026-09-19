@@ -49,7 +49,12 @@ function selo(status) {
 function statusCalculado(m) {
   if (m.status === 'pago') return 'pago'
   const hoje = new Date().toISOString().split('T')[0]
-  return m.data_vencimento < hoje ? 'atrasado' : 'pendente'
+  if (m.data_vencimento < hoje) return 'atrasado'
+  const emCincoDias = new Date()
+  emCincoDias.setDate(emCincoDias.getDate() + 5)
+  const emCincoDiasStr = emCincoDias.toISOString().split('T')[0]
+  if (m.data_vencimento <= emCincoDiasStr) return 'vencendo'
+  return 'pendente'
 }
 
 function primeiroNome(nome) {
@@ -137,6 +142,15 @@ function AlunoHome() {
           <div className="flex items-center gap-2 bg-brick text-white text-sm font-semibold rounded-xl px-4 py-3 mb-4 hover:brightness-95 active:scale-[0.99] transition-all cursor-pointer">
             <AlertTriangle size={18} className="shrink-0" />
             Sua mensalidade está atrasada. Toque aqui para regularizar.
+          </div>
+        </Link>
+      )}
+
+      {statusMensalidade === 'vencendo' && (
+        <Link to="/mensalidade">
+          <div className="flex items-center gap-2 bg-amber-light text-amber text-sm font-semibold rounded-xl px-4 py-3 mb-4 hover:brightness-95 active:scale-[0.99] transition-all cursor-pointer">
+            <AlertTriangle size={18} className="shrink-0" />
+            Você tem uma mensalidade próxima do vencimento, evite atrasos.
           </div>
         </Link>
       )}

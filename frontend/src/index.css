@@ -47,6 +47,11 @@
   color-scheme: dark;
 }
 
+:root.dark select option {
+  background-color: var(--color-surface);
+  color: var(--color-ink);
+}
+
 body {
   background-color: var(--color-cream);
   color: var(--color-ink);

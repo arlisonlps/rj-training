@@ -48,7 +48,12 @@ function ultimosTresMeses() {
 function statusCalculado(m) {
   if (m.status === 'pago') return 'pago'
   const hoje = new Date().toISOString().split('T')[0]
-  return m.data_vencimento < hoje ? 'atrasado' : 'pendente'
+  if (m.data_vencimento < hoje) return 'atrasado'
+  const emCincoDias = new Date()
+  emCincoDias.setDate(emCincoDias.getDate() + 5)
+  const emCincoDiasStr = emCincoDias.toISOString().split('T')[0]
+  if (m.data_vencimento <= emCincoDiasStr) return 'vencendo'
+  return 'pendente'
 }
 
 function AlunoMensalidade() {

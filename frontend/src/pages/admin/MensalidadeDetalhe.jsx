@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
-import { ArrowLeft, MessageCircle, Check } from 'lucide-react'
+import { ArrowLeft, MessageCircle, Check, Pencil, X } from 'lucide-react'
 import { supabase } from '../../lib/supabaseClient'
 import { formatarData } from '../../lib/data'
 import Loading from '../../components/Loading'
@@ -27,6 +27,7 @@ function borda(status) {
 const OPCOES_STATUS = [
   { valor: 'pendente', label: 'Pendente' },
   { valor: 'pago', label: 'Pago' },
+  { valor: 'vencendo', label: 'Vencendo' },
   { valor: 'atrasado', label: 'Atrasado' },
 ]
 
@@ -35,6 +36,9 @@ function MensalidadeDetalhe() {
   const [mensalidades, setMensalidades] = useState([])
   const [filtroStatus, setFiltroStatus] = useState('pendente')
   const [carregando, setCarregando] = useState(true)
+  const [editandoId, setEditandoId] = useState(null)
+  const [novaData, setNovaData] = useState('')
+  const [salvandoData, setSalvandoData] = useState(false)
 
   useEffect(() => {
     buscarMensalidades()
@@ -56,6 +60,31 @@ function MensalidadeDetalhe() {
     setCarregando(false)
   }
 
+  function iniciarEdicaoData(m) {
+    setEditandoId(m.id)
+    setNovaData(m.data_vencimento)
+  }
+
+  async function salvarNovaData(id) {
+    if (!novaData) return
+
+    setSalvandoData(true)
+    const { error } = await supabase
+      .from('mensalidade')
+      .update({ data_vencimento: novaData })
+      .eq('id', id)
+
+    setSalvandoData(false)
+
+    if (error) {
+      alert('Erro ao atualizar data de vencimento: ' + error.message)
+      return
+    }
+
+    setEditandoId(null)
+    buscarMensalidades()
+  }
+
   async function marcarComoPago(id) {
     const hoje = new Date().toISOString().split('T')[0]
     const { error } = await supabase
@@ -73,11 +102,18 @@ function MensalidadeDetalhe() {
   function statusCalculado(m) {
     if (m.status === 'pago') return 'pago'
     const hoje = new Date().toISOString().split('T')[0]
-    return m.data_vencimento < hoje ? 'atrasado' : 'pendente'
+    if (m.data_vencimento < hoje) return 'atrasado'
+    const emCincoDias = new Date()
+    emCincoDias.setDate(emCincoDias.getDate() + 5)
+    const emCincoDiasStr = emCincoDias.toISOString().split('T')[0]
+    if (m.data_vencimento <= emCincoDiasStr) return 'vencendo'
+    return 'pendente'
   }
 
-  function linkWhatsapp(m) {
-    const mensagem = `Fala ${m.aluno.nome}, Verifiquei que sua mensalidade está em atraso. Vamos regulzarizar o pagamento?`
+  function linkWhatsapp(m, status) {
+    const mensagem = status === 'vencendo'
+      ? `Olá ${m.aluno.nome}, sua mensalidade vence dia ${formatarData(m.data_vencimento)}, faça o pagamento para evitar atrasos!`
+      : `Fala ${m.aluno.nome}, Verifiquei que sua mensalidade está em atraso. Vamos regulzarizar o pagamento?`
     return `https://wa.me/${m.aluno.telefone}?text=${encodeURIComponent(mensagem)}`
   }
 
@@ -118,7 +154,45 @@ function MensalidadeDetalhe() {
             >
               <div>
                 <div className="font-semibold text-sm">{m.aluno?.nome}</div>
-                <div className="text-xs text-ink/50 mt-0.5">R$ {m.valor} — vence {formatarData(m.data_vencimento)}</div>
+                {editandoId === m.id ? (
+                  <div className="flex items-center gap-2 mt-1">
+                    <span className="text-xs text-ink/50">R$ {m.valor} — vence</span>
+                    <input
+                      type="date"
+                      value={novaData}
+                      onChange={(e) => setNovaData(e.target.value)}
+                      className="px-2 py-1 rounded-lg border border-border-strong text-xs focus:outline-none focus:ring-2 focus:ring-campo/30 focus:border-campo"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => salvarNovaData(m.id)}
+                      disabled={salvandoData}
+                      className="text-xs font-semibold text-campo-dark hover:underline disabled:opacity-60"
+                    >
+                      {salvandoData ? 'Salvando...' : 'Salvar'}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setEditandoId(null)}
+                      className="text-ink/40 hover:text-ink/60"
+                      title="Cancelar"
+                    >
+                      <X size={14} />
+                    </button>
+                  </div>
+                ) : (
+                  <div className="text-xs text-ink/50 mt-0.5 flex items-center gap-1.5">
+                    R$ {m.valor} — vence {formatarData(m.data_vencimento)}
+                    <button
+                      type="button"
+                      onClick={() => iniciarEdicaoData(m)}
+                      className="text-ink/30 hover:text-campo-dark"
+                      title="Editar data de vencimento"
+                    >
+                      <Pencil size={12} />
+                    </button>
+                  </div>
+                )}
                 <span className={`inline-block text-[10px] font-bold px-2 py-0.5 rounded mt-1.5 ${selo(status)}`}>
                   {status.toUpperCase()}
                 </span>
@@ -133,8 +207,8 @@ function MensalidadeDetalhe() {
                     Marcar pago
                   </button>
                 )}
-                {status === 'atrasado' && (
-                  <a href={linkWhatsapp(m)} target="_blank" rel="noreferrer">
+                {(status === 'atrasado' || status === 'vencendo') && (
+                  <a href={linkWhatsapp(m, status)} target="_blank" rel="noreferrer">
                     <button className="flex items-center gap-1.5 bg-[#25D366] text-white text-xs font-semibold px-3 py-2 rounded-lg hover:opacity-90 transition-opacity">
                       <MessageCircle size={14} />
                       Cobrar

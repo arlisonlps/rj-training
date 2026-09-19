@@ -31,11 +31,18 @@ function borda(status) {
 function statusCalculado(m) {
   if (m.status === 'pago') return 'pago'
   const hoje = new Date().toISOString().split('T')[0]
-  return m.data_vencimento < hoje ? 'atrasado' : 'pendente'
+  if (m.data_vencimento < hoje) return 'atrasado'
+  const emCincoDias = new Date()
+  emCincoDias.setDate(emCincoDias.getDate() + 5)
+  const emCincoDiasStr = emCincoDias.toISOString().split('T')[0]
+  if (m.data_vencimento <= emCincoDiasStr) return 'vencendo'
+  return 'pendente'
 }
 
-function linkWhatsapp(m) {
-  const mensagem = `Olá ${m.aluno.nome}, sua mensalidade está em atraso. Poderia regularizar o pagamento?`
+function linkWhatsapp(m, status) {
+  const mensagem = status === 'vencendo'
+    ? `Olá ${m.aluno.nome}, sua mensalidade vence dia ${formatarData(m.data_vencimento)}, faça o pagamento para evitar atrasos!`
+    : `Olá ${m.aluno.nome}, sua mensalidade está em atraso. Poderia regularizar o pagamento?`
   return `https://wa.me/${m.aluno.telefone}?text=${encodeURIComponent(mensagem)}`
 }
 
@@ -193,8 +200,8 @@ function MensalidadesMeses() {
                       Marcar pago
                     </button>
                   )}
-                  {status === 'atrasado' && (
-                    <a href={linkWhatsapp(m)} target="_blank" rel="noreferrer">
+                  {(status === 'atrasado' || status === 'vencendo') && (
+                    <a href={linkWhatsapp(m, status)} target="_blank" rel="noreferrer">
                       <button className="flex items-center gap-1.5 bg-[#25D366] text-white text-xs font-semibold px-3 py-2 rounded-lg hover:opacity-90 transition-opacity">
                         <MessageCircle size={14} />
                         Cobrar
