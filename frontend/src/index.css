@@ -47,7 +47,15 @@
   color-scheme: dark;
 }
 
-:root.dark select option {
+/* Forca a lista suspensa nativa a usar sempre o tema claro (fundo branco,
+   texto escuro): alguns navegadores mobile ignoram a cor de fundo custom
+   de <option> no modo escuro, deixando o texto ilegivel. O tema claro
+   nativo sempre tem contraste garantido, em qualquer navegador. */
+select {
+  color-scheme: light;
+}
+
+:root.dark select {
   background-color: var(--color-surface);
   color: var(--color-ink);
 }
