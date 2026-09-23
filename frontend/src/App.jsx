@@ -17,10 +17,14 @@ import TreinoHorario from './pages/admin/TreinoHorario'
 import MensalidadesMeses from './pages/admin/MensalidadesMeses'
 import MensalidadeDetalhe from './pages/admin/MensalidadeDetalhe'
 import Aprovacoes from './pages/admin/Aprovacoes'
+import Eventos from './pages/admin/Eventos'
+import EventoForm from './pages/admin/EventoForm'
+import EventoDetalhe from './pages/admin/EventoDetalhe'
 import AlunoHome from './pages/aluno/AlunoHome'
 import AlunoHorario from './pages/aluno/AlunoHorario'
 import AlunoMensalidade from './pages/aluno/AlunoMensalidade'
 import AlunoPeso from './pages/aluno/AlunoPeso'
+import AlunoEventos from './pages/aluno/AlunoEventos'
 
 function extrairDadosPendentes() {
   const pendenteStr = localStorage.getItem('cadastro_pendente')
@@ -179,6 +183,7 @@ function App() {
                 <Route path="/horario" element={<AlunoHorario />} />
                 <Route path="/mensalidade" element={<AlunoMensalidade />} />
                 <Route path="/peso" element={<AlunoPeso />} />
+                <Route path="/eventos" element={<AlunoEventos />} />
                 <Route path="*" element={<Navigate to="/" />} />
               </Routes>
             </AlunoLayout>
@@ -205,8 +210,12 @@ function App() {
               <Route path="/treinos/:dia" element={<TreinoHorario />} />
               <Route path="/mensalidades" element={<MensalidadesMeses />} />
               <Route path="/mensalidades/:mes" element={<MensalidadeDetalhe />} />
-              <Route path="*" element={<Navigate to="/" />} />
               <Route path="/aprovacoes" element={<Aprovacoes />} />
+              <Route path="/eventos" element={<Eventos />} />
+              <Route path="/eventos/novo" element={<EventoForm />} />
+              <Route path="/eventos/:id" element={<EventoDetalhe />} />
+              <Route path="/eventos/:id/editar" element={<EventoForm />} />
+              <Route path="*" element={<Navigate to="/" />} />
 
             </Routes>
           </Layout>

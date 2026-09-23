@@ -169,70 +169,72 @@ function AlunoHome() {
         </Link>
       )}
 
-      <div className="mb-4">
-        <Link to="/mensalidade">
-          <div className="bg-surface border border-border rounded-xl p-5 shadow-sm hover:shadow-md transition-all active:scale-[0.98] cursor-pointer">
-            <div className="flex items-center gap-2 mb-3 text-campo">
-              <Wallet size={18} />
-              <span className="text-xs font-semibold uppercase tracking-wide">Mensalidade do mês</span>
-            </div>
-            {mensalidade ? (
-              <>
-                <div className="text-lg font-bold mb-1">R$ {mensalidade.valor}</div>
-                <span className={`inline-block text-[10px] font-bold px-2 py-0.5 rounded transition-all duration-300 ${selo(statusMensalidade)}`}>
-                  {statusMensalidade.toUpperCase()}
-                </span>
-                {statusMensalidade !== 'pago' && (
-                  <>
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.preventDefault()
-                        e.stopPropagation()
-                        copiarPix()
-                      }}
-                      className="mt-3 w-full flex items-center justify-center gap-1.5 bg-campo text-white text-xs font-semibold px-3 py-2 rounded-lg hover:bg-campo-dark active:scale-95 transition-all"
-                    >
-                      <span ref={pixBotaoRef} className="flex items-center gap-1.5">
-                        {pixCopiado ? <Check size={14} key="check" /> : <Copy size={14} key="copy" />}
-                        <span key={pixCopiado ? 'copiado' : 'copiar'}>
-                          {pixCopiado ? 'Chave copiada!' : `Copiar PIX (${PIX_BANCO})`}
+      <div className={`grid grid-cols-1 gap-4 mb-4 ${statusMensalidade === 'atrasado' ? '' : 'sm:grid-cols-2'}`}>
+        {statusMensalidade !== 'atrasado' && (
+          <Link to="/mensalidade">
+            <div className="bg-surface border border-border rounded-xl p-5 shadow-sm hover:shadow-md transition-all active:scale-[0.98] cursor-pointer h-full">
+              <div className="flex items-center gap-2 mb-3 text-campo">
+                <Wallet size={18} />
+                <span className="text-xs font-semibold uppercase tracking-wide">Mensalidade do mês</span>
+              </div>
+              {mensalidade ? (
+                <>
+                  <div className="text-lg font-bold mb-1">R$ {mensalidade.valor}</div>
+                  <span className={`inline-block text-[10px] font-bold px-2 py-0.5 rounded transition-all duration-300 ${selo(statusMensalidade)}`}>
+                    {statusMensalidade.toUpperCase()}
+                  </span>
+                  {statusMensalidade !== 'pago' && (
+                    <>
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.preventDefault()
+                          e.stopPropagation()
+                          copiarPix()
+                        }}
+                        className="mt-3 w-full flex items-center justify-center gap-1.5 bg-campo text-white text-xs font-semibold px-3 py-2 rounded-lg hover:bg-campo-dark active:scale-95 transition-all"
+                      >
+                        <span ref={pixBotaoRef} className="flex items-center gap-1.5">
+                          {pixCopiado ? <Check size={14} key="check" /> : <Copy size={14} key="copy" />}
+                          <span key={pixCopiado ? 'copiado' : 'copiar'}>
+                            {pixCopiado ? 'Chave copiada!' : `Copiar PIX (${PIX_BANCO})`}
+                          </span>
                         </span>
-                      </span>
-                    </button>
-                    <p className="text-[10px] text-ink/40 mt-1.5">Recebedor: {PIX_NOME}</p>
-                  </>
+                      </button>
+                      <p className="text-[10px] text-ink/40 mt-1.5">Recebedor: {PIX_NOME}</p>
+                    </>
+                  )}
+                </>
+              ) : (
+                <p className="text-sm text-ink/50">Nenhuma mensalidade gerada ainda.</p>
+              )}
+            </div>
+          </Link>
+        )}
+
+        <Link to="/peso">
+          <div className="bg-surface border border-border rounded-xl p-5 shadow-sm hover:shadow-md transition-all active:scale-[0.98] cursor-pointer h-full">
+            <div className="flex items-center gap-2 mb-2 text-campo">
+              <Scale size={18} />
+              <span className="text-xs font-semibold uppercase tracking-wide">Meu peso</span>
+            </div>
+            {ultimoPeso ? (
+              <div>
+                <div className="text-2xl font-bold text-campo-dark">{ultimoPeso.peso} kg</div>
+                {variacaoPeso !== null && (
+                  <div className={`text-xs font-semibold mt-1 ${variacaoPeso < 0 ? 'text-campo-dark' : variacaoPeso > 0 ? 'text-brick' : 'text-ink/50'}`}>
+                    {variacaoPeso === 0
+                      ? 'Sem variação desde o último registro'
+                      : `${variacaoPeso > 0 ? '+' : ''}${variacaoPeso.toFixed(1)} kg desde o último registro`}
+                  </div>
                 )}
-              </>
+              </div>
             ) : (
-              <p className="text-sm text-ink/50">Nenhuma mensalidade gerada ainda.</p>
+              <p className="text-sm text-ink/50">Nenhum registro ainda. Fale com o professor para registrar seu peso.</p>
             )}
           </div>
         </Link>
       </div>
-
-      <Link to="/peso">
-        <div className="bg-surface border border-border rounded-xl p-5 shadow-sm hover:shadow-md transition-all active:scale-[0.98] cursor-pointer">
-          <div className="flex items-center gap-2 mb-2 text-campo">
-            <Scale size={18} />
-            <span className="text-xs font-semibold uppercase tracking-wide">Meu peso</span>
-          </div>
-          {ultimoPeso ? (
-            <div>
-              <div className="text-2xl font-bold text-campo-dark">{ultimoPeso.peso} kg</div>
-              {variacaoPeso !== null && (
-                <div className={`text-xs font-semibold mt-1 ${variacaoPeso < 0 ? 'text-campo-dark' : variacaoPeso > 0 ? 'text-brick' : 'text-ink/50'}`}>
-                  {variacaoPeso === 0
-                    ? 'Sem variação desde o último registro'
-                    : `${variacaoPeso > 0 ? '+' : ''}${variacaoPeso.toFixed(1)} kg desde o último registro`}
-                </div>
-              )}
-            </div>
-          ) : (
-            <p className="text-sm text-ink/50">Nenhum registro ainda. Fale com o professor para registrar seu peso.</p>
-          )}
-        </div>
-      </Link>
     </div>
   )
 }

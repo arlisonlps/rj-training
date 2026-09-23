@@ -1,16 +1,21 @@
 import { NavLink, useNavigate } from 'react-router-dom'
-import { Home, Users, CalendarDays, Wallet, UserCheck, LogOut } from 'lucide-react'
+import { Home, Users, CalendarDays, Wallet, UserCheck, LogOut, PartyPopper } from 'lucide-react'
 import { supabase } from '../lib/supabaseClient'
 import logo from '../assets/logo.png'
 import SeletorTema from '../components/SeletorTema'
 import Rodape from '../components/Rodape'
+import MenuMais from '../components/MenuMais'
 
-const itens = [
+const itensPrincipais = [
   { to: '/', label: 'Home', icon: Home, end: true },
   { to: '/alunos', label: 'Alunos', icon: Users },
   { to: '/treinos', label: 'Treinos', icon: CalendarDays },
+]
+
+const itensMais = [
   { to: '/mensalidades', label: 'Mensal.', icon: Wallet },
   { to: '/aprovacoes', label: 'Aprovar', icon: UserCheck },
+  { to: '/eventos', label: 'Eventos', icon: PartyPopper },
 ]
 
 function Layout({ children }) {
@@ -41,7 +46,7 @@ function Layout({ children }) {
 
       <nav className="fixed bottom-0 left-0 right-0 bg-surface border-t border-border-strong z-20">
         <div className="max-w-md mx-auto flex justify-around py-2">
-          {itens.map(({ to, label, icon: Icon, end }) => (
+          {itensPrincipais.map(({ to, label, icon: Icon, end }) => (
             <NavLink
               key={to}
               to={to}
@@ -55,6 +60,7 @@ function Layout({ children }) {
               {label}
             </NavLink>
           ))}
+          <MenuMais itens={itensMais} />
         </div>
       </nav>
     </div>
