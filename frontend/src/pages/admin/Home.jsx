@@ -56,19 +56,20 @@ function Home() {
 
     const { data: mensalidadesAtrasadas } = await supabase
       .from('mensalidade')
-      .select('id')
+      .select('aluno_id')
       .neq('status', 'pago')
       .lt('data_vencimento', hojeStr)
 
     setTotalAtrasados(mensalidadesAtrasadas?.length || 0)
+    const idsAtrasados = new Set((mensalidadesAtrasadas || []).map((m) => m.aluno_id))
 
-    await calcularDestaques(ano, mes)
-    await calcularFrequencia(ano, mes)
+    await calcularDestaques(ano, mes, idsAtrasados)
+    await calcularFrequencia(ano, mes, idsAtrasados)
 
     setCarregando(false)
   }
 
-  async function calcularDestaques(ano, mes) {
+  async function calcularDestaques(ano, mes, idsAtrasados) {
     const inicioMesAtual = new Date(ano, mes, 1)
     const inicioMesAnterior = new Date(ano, mes - 1, 1)
 
@@ -91,6 +92,8 @@ function Home() {
     const resultado = []
 
     for (const alunoId in porAluno) {
+      if (idsAtrasados.has(alunoId)) continue
+
       const registros = porAluno[alunoId]
 
       const doMesAnterior = registros.filter((r) => {
@@ -117,7 +120,7 @@ function Home() {
     setDestaques(resultado.slice(0, 3))
   }
 
-  async function calcularFrequencia(ano, mes) {
+  async function calcularFrequencia(ano, mes, idsAtrasados) {
     const inicioMes = new Date(ano, mes, 1)
     const inicioProximoMes = new Date(ano, mes + 1, 1)
 
@@ -134,6 +137,7 @@ function Home() {
 
     const porAluno = {}
     for (const r of registros) {
+      if (idsAtrasados.has(r.aluno_id)) continue
       if (!porAluno[r.aluno_id]) {
         porAluno[r.aluno_id] = { nome: r.aluno?.nome || 'Aluno', total: 0, presentes: 0 }
       }
