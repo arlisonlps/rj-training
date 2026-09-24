@@ -261,7 +261,7 @@ function AlunoHorario() {
           </div>
 
           {!podeEscolherPrimeiraVez && (
-            <div className="bg-campo text-white rounded-2xl px-6 py-6 mb-6 flex flex-col items-center text-center gap-1.5 shadow-sm">
+            <div className="bg-campo-dark text-white rounded-2xl px-6 py-6 mb-6 flex flex-col items-center text-center gap-1.5 shadow-sm">
               <Timer size={22} className="opacity-90 mb-1" />
               <span className="text-xs font-semibold uppercase tracking-wide opacity-80">Faltam</span>
               <span className="text-3xl font-bold tabular-nums">{formatarContagem(msAteAbrirEscolha)}</span>
