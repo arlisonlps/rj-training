@@ -232,6 +232,9 @@ function AlunoHorario() {
 
   if (consultando) return null
 
+  const meusHorariosOrdenados = [...(meusHorarios || [])].sort(
+    (a, b) => OFFSET_DIA[a.dia_semana] - OFFSET_DIA[b.dia_semana]
+  )
   const diasComHorario = new Set((meusHorarios || []).map((h) => h.dia_semana))
   const aindaNaoEscolheuNada = diasComHorario.size === 0
   const diasFaltando = dias.map((d) => d.valor).filter((v) => !diasComHorario.has(v))
@@ -276,7 +279,7 @@ function AlunoHorario() {
           {erroConsulta && <p className="text-brick text-sm mb-3">{erroConsulta}</p>}
 
           <ul className="flex flex-col gap-2">
-            {meusHorarios.map((h) => {
+            {meusHorariosOrdenados.map((h) => {
               const status = statusAgendamento(h)
               return (
                 <li

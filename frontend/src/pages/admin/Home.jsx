@@ -19,11 +19,16 @@ function Home() {
   const [aniversariantes, setAniversariantes] = useState([])
   const [destaques, setDestaques] = useState([])
   const [rankingFrequencia, setRankingFrequencia] = useState([])
-  const [listaPesagemRef] = useAutoAnimate()
-  const [listaFrequenciaRef] = useAutoAnimate()
+  const [slideAtual, setSlideAtual] = useState(0)
+  const [carrosselRef] = useAutoAnimate()
 
   useEffect(() => {
     carregarTudo()
+  }, [])
+
+  useEffect(() => {
+    const intervalo = setInterval(() => setSlideAtual((atual) => atual + 1), 5000)
+    return () => clearInterval(intervalo)
   }, [])
 
   async function carregarTudo() {
@@ -35,11 +40,13 @@ function Home() {
     setTotalAtivos(alunos?.length || 0)
 
     const mesAtual = new Date().getMonth() + 1
-    const nascidosNoMes = (alunos || []).filter((a) => {
-      if (!a.nascimento) return false
-      const mesNascimento = Number(a.nascimento.split('-')[1])
-      return mesNascimento === mesAtual
-    })
+    const nascidosNoMes = (alunos || [])
+      .filter((a) => {
+        if (!a.nascimento) return false
+        const mesNascimento = Number(a.nascimento.split('-')[1])
+        return mesNascimento === mesAtual
+      })
+      .sort((a, b) => Number(a.nascimento.split('-')[2]) - Number(b.nascimento.split('-')[2]))
     setAniversariantes(nascidosNoMes)
 
     const hoje = new Date()
@@ -143,6 +150,71 @@ function Home() {
 
   if (carregando) return <Loading />
 
+  const slides = [
+    destaques.length > 0 && {
+      chave: 'pesagem',
+      titulo: 'Ranking de pesagem do mês atual',
+      Icone: Trophy,
+      conteudo: (
+        <ul className="space-y-2">
+          {destaques.map((d, i) => (
+            <li key={d.nome + i} className="flex items-center justify-between text-sm">
+              <span className="flex items-center gap-2">
+                <span
+                  className={`w-5 h-5 flex items-center justify-center rounded-full text-[10px] font-bold ${CORES_POSICAO[i] || 'bg-hover text-ink/50'
+                    }`}
+                >
+                  {i + 1}
+                </span>
+                <span className="font-medium">{d.nome}</span>
+              </span>
+              <span className="text-campo-dark font-bold">-{d.perda} kg</span>
+            </li>
+          ))}
+        </ul>
+      ),
+    },
+    rankingFrequencia.length > 0 && {
+      chave: 'frequencia',
+      titulo: 'Ranking de frequência do mês atual',
+      Icone: CalendarCheck,
+      conteudo: (
+        <ul className="space-y-2">
+          {rankingFrequencia.map((r, i) => (
+            <li key={r.nome + i} className="flex items-center justify-between text-sm">
+              <span className="flex items-center gap-2">
+                <span
+                  className={`w-5 h-5 flex items-center justify-center rounded-full text-[10px] font-bold ${CORES_POSICAO[i] || 'bg-hover text-ink/50'
+                    }`}
+                >
+                  {i + 1}
+                </span>
+                <span className="font-medium">{r.nome}</span>
+              </span>
+              <span className="text-campo-dark font-bold">{r.percentual}%</span>
+            </li>
+          ))}
+        </ul>
+      ),
+    },
+    aniversariantes.length > 0 && {
+      chave: 'aniversariantes',
+      titulo: 'Aniversariantes do mês',
+      Icone: Cake,
+      conteudo: (
+        <ul className="space-y-1">
+          {aniversariantes.map((a) => (
+            <li key={a.id} className="text-sm text-ink/70">
+              {a.nome} --- dia {a.nascimento.split('-')[2]}
+            </li>
+          ))}
+        </ul>
+      ),
+    },
+  ].filter(Boolean)
+
+  const slideAtivo = slides[slideAtual % slides.length]
+
   return (
     <div>
       <h2 className="text-2xl font-bold text-campo-dark mb-2">Home</h2>
@@ -170,69 +242,29 @@ function Home() {
         </Link>
       </div>
 
-      {destaques.length > 0 && (
-        <div className="bg-surface border border-border rounded-xl p-5 shadow-sm mb-6">
-          <div className="flex items-center gap-2 mb-3 text-campo-dark">
-            <Trophy size={18} />
-            <span className="text-sm font-bold">Ranking de pesagem do mês atual</span>
-          </div>
-          <ul ref={listaPesagemRef} className="space-y-2">
-            {destaques.map((d, i) => (
-              <li key={d.nome + i} className="flex items-center justify-between text-sm">
-                <span className="flex items-center gap-2">
-                  <span
-                    className={`w-5 h-5 flex items-center justify-center rounded-full text-[10px] font-bold ${CORES_POSICAO[i] || 'bg-hover text-ink/50'
-                      }`}
-                  >
-                    {i + 1}
-                  </span>
-                  <span className="font-medium">{d.nome}</span>
-                </span>
-                <span className="text-campo-dark font-bold">-{d.perda} kg</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-
-      {rankingFrequencia.length > 0 && (
-        <div className="bg-surface border border-border rounded-xl p-5 shadow-sm mb-6">
-          <div className="flex items-center gap-2 mb-3 text-campo-dark">
-            <CalendarCheck size={18} />
-            <span className="text-sm font-bold">Ranking de frequência do mês atual</span>
-          </div>
-          <ul ref={listaFrequenciaRef} className="space-y-2">
-            {rankingFrequencia.map((r, i) => (
-              <li key={r.nome + i} className="flex items-center justify-between text-sm">
-                <span className="flex items-center gap-2">
-                  <span
-                    className={`w-5 h-5 flex items-center justify-center rounded-full text-[10px] font-bold ${CORES_POSICAO[i] || 'bg-hover text-ink/50'
-                      }`}
-                  >
-                    {i + 1}
-                  </span>
-                  <span className="font-medium">{r.nome}</span>
-                </span>
-                <span className="text-campo-dark font-bold">{r.percentual}%</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-
-      {aniversariantes.length > 0 && (
+      {slides.length > 0 && (
         <div className="bg-surface border border-border rounded-xl p-5 shadow-sm">
-          <div className="flex items-center gap-2 mb-3 text-campo-dark">
-            <Cake size={18} />
-            <span className="text-sm font-bold">Aniversariantes do mês</span>
+          <div ref={carrosselRef}>
+            <div key={slideAtivo.chave}>
+              <div className="flex items-center gap-2 mb-3 text-campo-dark">
+                <slideAtivo.Icone size={18} />
+                <span className="text-sm font-bold">{slideAtivo.titulo}</span>
+              </div>
+              {slideAtivo.conteudo}
+            </div>
           </div>
-          <ul className="space-y-1">
-            {aniversariantes.map((a) => (
-              <li key={a.id} className="text-sm text-ink/70">
-                {a.nome} --- dia {a.nascimento.split('-')[2]}
-              </li>
-            ))}
-          </ul>
+
+          {slides.length > 1 && (
+            <div className="flex items-center justify-center gap-1.5 mt-4 pt-4 border-t border-border">
+              {slides.map((s, i) => (
+                <span
+                  key={s.chave}
+                  className={`w-1.5 h-1.5 rounded-full transition-colors ${i === slideAtual % slides.length ? 'bg-campo' : 'bg-hover'
+                    }`}
+                />
+              ))}
+            </div>
+          )}
         </div>
       )}
     </div>
