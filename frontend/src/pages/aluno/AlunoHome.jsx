@@ -157,17 +157,6 @@ function AlunoHome() {
         </div>
       )}
 
-      <Link to="/horario">
-        <div className="flex items-center gap-2 bg-campo-light text-campo-dark text-sm font-semibold rounded-xl px-4 py-3 mb-4 hover:brightness-95 active:scale-[0.99] transition-all cursor-pointer">
-          <CalendarDays size={18} className="shrink-0" />
-          {proximo
-            ? proximo.hoje
-              ? `Seu treino é hoje às ${proximo.horario}!`
-              : `Seu próximo treino é ${NOMES_DIAS[proximo.dia_semana]} às ${proximo.horario}`
-            : 'Você não tem um treino agendado, clique aqui para agendar!'}
-        </div>
-      </Link>
-
       {statusMensalidade === 'atrasado' && (
         <Link to="/mensalidade">
           <div className="flex items-center gap-3 bg-brick text-white rounded-2xl px-5 py-5 mb-4 shadow-sm hover:brightness-95 active:scale-[0.99] transition-all cursor-pointer">
@@ -180,14 +169,27 @@ function AlunoHome() {
         </Link>
       )}
 
-      {statusMensalidade === 'vencendo' && (
-        <Link to="/mensalidade">
-          <div className="flex items-center gap-2 bg-amber-light text-amber text-sm font-semibold rounded-xl px-4 py-3 mb-4 hover:brightness-95 active:scale-[0.99] transition-all cursor-pointer">
-            <AlertTriangle size={18} className="shrink-0" />
-            Você tem uma mensalidade próxima do vencimento, evite atrasos.
+      <div className="flex flex-wrap gap-2 mb-4">
+        <Link to="/horario">
+          <div className="flex items-center gap-1.5 bg-campo-light text-campo-dark text-xs font-semibold rounded-full pl-2.5 pr-3 py-1.5 hover:brightness-95 active:scale-[0.97] transition-all cursor-pointer">
+            <CalendarDays size={14} className="shrink-0" />
+            {proximo
+              ? proximo.hoje
+                ? `Treino hoje às ${proximo.horario}`
+                : `Próximo treino: ${NOMES_DIAS[proximo.dia_semana]} ${proximo.horario}`
+              : 'Sem treino agendado, toque para agendar'}
           </div>
         </Link>
-      )}
+
+        {statusMensalidade === 'vencendo' && (
+          <Link to="/mensalidade">
+            <div className="flex items-center gap-1.5 bg-amber-light text-amber text-xs font-semibold rounded-full pl-2.5 pr-3 py-1.5 hover:brightness-95 active:scale-[0.97] transition-all cursor-pointer">
+              <AlertTriangle size={14} className="shrink-0" />
+              Mensalidade vence em breve
+            </div>
+          </Link>
+        )}
+      </div>
 
       <div className={`grid grid-cols-1 gap-4 mb-4 ${statusMensalidade === 'atrasado' ? '' : 'sm:grid-cols-2'}`}>
         {statusMensalidade !== 'atrasado' && (
