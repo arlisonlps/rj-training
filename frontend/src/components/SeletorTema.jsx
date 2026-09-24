@@ -10,23 +10,19 @@ const OPCOES = [
 function SeletorTema({ className = '' }) {
   const [tema, setTema] = useTema()
 
+  const indiceAtual = OPCOES.findIndex((o) => o.valor === tema)
+  const atual = OPCOES[indiceAtual] || OPCOES[2]
+  const proximo = OPCOES[(indiceAtual + 1) % OPCOES.length]
+
   return (
-    <div className={`inline-flex rounded-lg border border-border bg-surface p-1 ${className}`}>
-      {OPCOES.map(({ valor, label, Icon }) => (
-        <button
-          key={valor}
-          type="button"
-          onClick={() => setTema(valor)}
-          title={label}
-          className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-semibold transition-colors ${
-            tema === valor ? 'bg-campo text-white' : 'text-ink/60 hover:bg-hover'
-          }`}
-        >
-          <Icon size={14} />
-          <span className="hidden sm:inline">{label}</span>
-        </button>
-      ))}
-    </div>
+    <button
+      type="button"
+      onClick={() => setTema(proximo.valor)}
+      title={`Tema: ${atual.label} (toque para mudar para ${proximo.label})`}
+      className={`p-2 rounded-lg transition-colors ${className}`}
+    >
+      <atual.Icon size={18} strokeWidth={2} />
+    </button>
   )
 }
 

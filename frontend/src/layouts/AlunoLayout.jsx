@@ -30,7 +30,7 @@ function AlunoLayout({ children }) {
       <div className="flex items-center justify-between bg-header text-white px-4 md:px-8 py-3 sticky top-0 z-20">
         <img src={logo} alt="RJ Training" className="h-10 w-auto" />
         <div className="flex items-center gap-2">
-          <SeletorTema />
+          <SeletorTema className="text-white hover:bg-white/10" />
           <button onClick={sair} className="flex items-center gap-2 p-2 rounded-lg hover:bg-white/10 text-sm font-medium">
             <LogOut size={18} />
             <span className="hidden sm:inline">Sair</span>

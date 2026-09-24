@@ -1,5 +1,5 @@
 import { NavLink, useNavigate } from 'react-router-dom'
-import { Home, Users, CalendarDays, Wallet, UserCheck, LogOut, PartyPopper } from 'lucide-react'
+import { Home, Users, CalendarDays, Wallet, UserCheck, LogOut, PartyPopper, Megaphone } from 'lucide-react'
 import { supabase } from '../lib/supabaseClient'
 import logo from '../assets/logo.png'
 import SeletorTema from '../components/SeletorTema'
@@ -16,6 +16,7 @@ const itensMais = [
   { to: '/mensalidades', label: 'Mensal.', icon: Wallet },
   { to: '/aprovacoes', label: 'Aprovar', icon: UserCheck },
   { to: '/eventos', label: 'Eventos', icon: PartyPopper },
+  { to: '/avisos', label: 'Avisos', icon: Megaphone },
 ]
 
 function Layout({ children }) {
@@ -31,7 +32,7 @@ function Layout({ children }) {
       <div className="flex items-center justify-between bg-header text-white px-4 md:px-8 py-3 sticky top-0 z-20">
         <img src={logo} alt="RJ Training" className="h-10 w-auto" />
         <div className="flex items-center gap-2">
-          <SeletorTema />
+          <SeletorTema className="text-white hover:bg-white/10" />
           <button onClick={sair} className="flex items-center gap-2 p-2 rounded-lg hover:bg-white/10 text-sm font-medium">
             <LogOut size={18} />
             <span className="hidden sm:inline">Sair</span>

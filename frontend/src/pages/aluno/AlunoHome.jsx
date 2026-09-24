@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useAutoAnimate } from '@formkit/auto-animate/react'
-import { CalendarDays, Wallet, Scale, Copy, Check, AlertTriangle } from 'lucide-react'
+import { CalendarDays, Wallet, Scale, Copy, Check, AlertTriangle, Megaphone } from 'lucide-react'
 import { supabase } from '../../lib/supabaseClient'
 import { PIX_CHAVE, PIX_NOME, PIX_BANCO } from '../../lib/pix'
 
@@ -63,6 +63,7 @@ function primeiroNome(nome) {
 
 function AlunoHome() {
   const [aluno, setAluno] = useState(null)
+  const [avisoAtivo, setAvisoAtivo] = useState(null)
   const [horarios, setHorarios] = useState([])
   const [mensalidade, setMensalidade] = useState(null)
   const [historicoPesoRecente, setHistoricoPesoRecente] = useState([])
@@ -75,6 +76,15 @@ function AlunoHome() {
   }, [])
 
   async function carregar() {
+    const { data: avisoData } = await supabase
+      .from('aviso')
+      .select('*')
+      .eq('ativo', true)
+      .order('criado_em', { ascending: false })
+      .limit(1)
+      .maybeSingle()
+    setAvisoAtivo(avisoData || null)
+
     const { data: userData } = await supabase.auth.getUser()
     const { data: perfil } = await supabase
       .from('perfil_usuario')
@@ -136,6 +146,16 @@ function AlunoHome() {
     <div>
       <h2 className="text-2xl font-bold text-campo-dark mb-2">Olá, {aluno ? primeiroNome(aluno.nome) : '...'}!</h2>
       <p className="text-ink/70 mb-6">Bem-vindo ao seu painel do RJ Training.</p>
+
+      {avisoAtivo && (
+        <div className="bg-campo-dark text-white rounded-2xl px-5 py-5 mb-4 shadow-sm">
+          <div className="flex items-center gap-2 mb-2 opacity-80">
+            <Megaphone size={16} className="shrink-0" />
+            <span className="text-xs font-bold uppercase tracking-wide">Aviso do professor</span>
+          </div>
+          <p className="text-sm font-semibold leading-relaxed">{avisoAtivo.mensagem}</p>
+        </div>
+      )}
 
       <Link to="/horario">
         <div className="flex items-center gap-2 bg-campo-light text-campo-dark text-sm font-semibold rounded-xl px-4 py-3 mb-4 hover:brightness-95 active:scale-[0.99] transition-all cursor-pointer">

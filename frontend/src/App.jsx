@@ -20,6 +20,7 @@ import Aprovacoes from './pages/admin/Aprovacoes'
 import Eventos from './pages/admin/Eventos'
 import EventoForm from './pages/admin/EventoForm'
 import EventoDetalhe from './pages/admin/EventoDetalhe'
+import Avisos from './pages/admin/Avisos'
 import AlunoHome from './pages/aluno/AlunoHome'
 import AlunoHorario from './pages/aluno/AlunoHorario'
 import AlunoMensalidade from './pages/aluno/AlunoMensalidade'
@@ -215,6 +216,7 @@ function App() {
               <Route path="/eventos/novo" element={<EventoForm />} />
               <Route path="/eventos/:id" element={<EventoDetalhe />} />
               <Route path="/eventos/:id/editar" element={<EventoForm />} />
+              <Route path="/avisos" element={<Avisos />} />
               <Route path="*" element={<Navigate to="/" />} />
 
             </Routes>

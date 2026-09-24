@@ -19,7 +19,7 @@ function AguardandoAprovacao({ tipo, erro, onTentarNovamente }) {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-cream px-4">
-      <SeletorTema className="fixed top-4 right-4" />
+      <SeletorTema className="fixed top-4 right-4 text-ink/70 hover:bg-hover" />
       <div className="w-full max-w-sm text-center">
         <img src={logo} alt="RJ Training" className="h-28 w-auto mx-auto mb-6" />
         <div className="bg-surface rounded-2xl shadow-sm border border-border p-8">

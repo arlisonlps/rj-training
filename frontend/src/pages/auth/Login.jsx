@@ -14,7 +14,7 @@ function Login() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-cream px-4">
-      <SeletorTema className="fixed top-4 right-4" />
+      <SeletorTema className="fixed top-4 right-4 text-ink/70 hover:bg-hover" />
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
           <img src={logo} alt="RJ Training" className="h-28 w-auto mx-auto" />
