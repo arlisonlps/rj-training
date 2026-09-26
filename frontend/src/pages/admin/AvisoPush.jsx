@@ -3,6 +3,9 @@ import { BellRing } from 'lucide-react'
 import { supabase } from '../../lib/supabaseClient'
 import AtivarNotificacoes from '../../components/AtivarNotificacoes'
 
+// O painel do Supabase gerou este endereço para a função enviar-push
+const FUNCAO_ENVIAR_PUSH = 'hyper-service'
+
 function AvisoPush() {
   const [titulo, setTitulo] = useState('RJ Training')
   const [corpo, setCorpo] = useState('')
@@ -19,7 +22,7 @@ function AvisoPush() {
     setResultado('')
     setErro('')
 
-    const { data, error } = await supabase.functions.invoke('enviar-push', {
+    const { data, error } = await supabase.functions.invoke(FUNCAO_ENVIAR_PUSH, {
       body: { titulo: titulo.trim() || 'RJ Training', corpo: corpo.trim() },
     })
 
