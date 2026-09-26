@@ -22,17 +22,22 @@ Deno.serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,
     )
 
-    const token = (req.headers.get('Authorization') ?? '').replace('Bearer ', '')
-    const { data: { user } } = await supabase.auth.getUser(token)
-    if (!user) return resposta({ erro: 'Não autenticado.' }, 401)
+    const segredoCron = req.headers.get('x-cron-secret')
+    const chamadoPeloCron = Boolean(segredoCron) && segredoCron === Deno.env.get('CRON_SECRET')
 
-    const { data: perfil } = await supabase
-      .from('perfil_usuario')
-      .select('papel')
-      .eq('user_id', user.id)
-      .maybeSingle()
-    if (perfil?.papel !== 'admin') {
-      return resposta({ erro: 'Somente o professor pode enviar notificações.' }, 403)
+    if (!chamadoPeloCron) {
+      const token = (req.headers.get('Authorization') ?? '').replace('Bearer ', '')
+      const { data: { user } } = await supabase.auth.getUser(token)
+      if (!user) return resposta({ erro: 'Não autenticado.' }, 401)
+
+      const { data: perfil } = await supabase
+        .from('perfil_usuario')
+        .select('papel')
+        .eq('user_id', user.id)
+        .maybeSingle()
+      if (perfil?.papel !== 'admin') {
+        return resposta({ erro: 'Somente o professor pode enviar notificações.' }, 403)
+      }
     }
 
     const { titulo, corpo, url } = await req.json()
