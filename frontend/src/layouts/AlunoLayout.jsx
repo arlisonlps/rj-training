@@ -6,6 +6,7 @@ import SeletorTema from '../components/SeletorTema'
 import Rodape from '../components/Rodape'
 import MenuMais from '../components/MenuMais'
 import ModalNotificacoes from '../components/ModalNotificacoes'
+import ModalAviso from '../components/ModalAviso'
 
 const itensPrincipais = [
   { to: '/', label: 'Início', icon: Home, end: true },
@@ -28,6 +29,7 @@ function AlunoLayout({ children }) {
 
   return (
     <div className="min-h-screen flex flex-col">
+      <ModalAviso />
       <ModalNotificacoes />
       <div className="flex items-center justify-between bg-header text-white px-4 md:px-8 py-3 sticky top-0 z-20">
         <img src={logo} alt="RJ Training" className="h-10 w-auto" />
