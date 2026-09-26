@@ -5,6 +5,14 @@ import { AlertTriangle, Users, Cake, Trophy, CalendarCheck } from 'lucide-react'
 import { supabase } from '../../lib/supabaseClient'
 import Loading from '../../components/Loading'
 
+const OFFSET_DIA = { terca: 1, quarta: 2, quinta: 3 }
+
+function chaveDia(data) {
+  const mes = String(data.getMonth() + 1).padStart(2, '0')
+  const dia = String(data.getDate()).padStart(2, '0')
+  return `${data.getFullYear()}-${mes}-${dia}`
+}
+
 const CORES_POSICAO = [
   'bg-amber-light text-amber',
   'bg-gray-300 text-gray-700',
@@ -64,7 +72,7 @@ function Home() {
     const idsAtrasados = new Set((mensalidadesAtrasadas || []).map((m) => m.aluno_id))
 
     await calcularDestaques(ano, mes, idsAtrasados)
-    await calcularFrequencia(ano, mes, idsAtrasados)
+    await calcularFrequencia(ano, mes, idsAtrasados, alunos || [])
 
     setCarregando(false)
   }
@@ -120,34 +128,52 @@ function Home() {
     setDestaques(resultado.slice(0, 3))
   }
 
-  async function calcularFrequencia(ano, mes, idsAtrasados) {
-    const inicioMes = new Date(ano, mes, 1)
-    const inicioProximoMes = new Date(ano, mes + 1, 1)
+  async function calcularFrequencia(ano, mes, idsAtrasados, alunosAtivos) {
+    const inicioHoje = new Date()
+    inicioHoje.setHours(0, 0, 0, 0)
+
+    const diasEsperados = new Set()
+    for (let d = new Date(ano, mes, 1); d.getMonth() === mes && d < inicioHoje; d.setDate(d.getDate() + 1)) {
+      if (d.getDay() >= 2 && d.getDay() <= 4) diasEsperados.add(chaveDia(d))
+    }
+
+    if (diasEsperados.size === 0) {
+      setRankingFrequencia([])
+      return
+    }
+
+    const limiteInferior = new Date(ano, mes, 1)
+    limiteInferior.setDate(limiteInferior.getDate() - 7)
+    const limiteSuperior = new Date(ano, mes + 1, 0)
 
     const { data: registros, error } = await supabase
       .from('presenca')
-      .select('aluno_id, presente, registrado_em, aluno(nome)')
-      .gte('registrado_em', inicioMes.toISOString())
-      .lt('registrado_em', inicioProximoMes.toISOString())
+      .select('aluno_id, dia_semana, semana_referencia')
+      .eq('presente', true)
+      .gte('semana_referencia', chaveDia(limiteInferior))
+      .lte('semana_referencia', chaveDia(limiteSuperior))
 
     if (error || !registros) {
       setRankingFrequencia([])
       return
     }
 
-    const porAluno = {}
+    const presentesPorAluno = {}
     for (const r of registros) {
-      if (idsAtrasados.has(r.aluno_id)) continue
-      if (!porAluno[r.aluno_id]) {
-        porAluno[r.aluno_id] = { nome: r.aluno?.nome || 'Aluno', total: 0, presentes: 0 }
-      }
-      porAluno[r.aluno_id].total++
-      if (r.presente) porAluno[r.aluno_id].presentes++
+      const [a, m, dia] = r.semana_referencia.split('-').map(Number)
+      const data = new Date(a, m - 1, dia + (OFFSET_DIA[r.dia_semana] || 0))
+      if (!diasEsperados.has(chaveDia(data))) continue
+      presentesPorAluno[r.aluno_id] = (presentesPorAluno[r.aluno_id] || 0) + 1
     }
 
-    const resultado = Object.values(porAluno)
-      .map((a) => ({ nome: a.nome, percentual: Math.round((a.presentes / a.total) * 100) }))
-      .sort((a, b) => b.percentual - a.percentual)
+    const resultado = alunosAtivos
+      .filter((a) => !idsAtrasados.has(a.id))
+      .map((a) => ({
+        nome: a.nome,
+        percentual: Math.round(((presentesPorAluno[a.id] || 0) / diasEsperados.size) * 100),
+      }))
+      .filter((a) => a.percentual > 0)
+      .sort((a, b) => b.percentual - a.percentual || a.nome.localeCompare(b.nome))
 
     setRankingFrequencia(resultado.slice(0, 5))
   }
