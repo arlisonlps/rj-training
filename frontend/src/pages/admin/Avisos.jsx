@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react'
-import { Megaphone, Send, Ban, MessageCircle, BellRing } from 'lucide-react'
+import { Megaphone, Send, Ban, BellRing } from 'lucide-react'
 import { supabase } from '../../lib/supabaseClient'
 import Loading from '../../components/Loading'
-import AvisoWhatsapp from './AvisoWhatsapp'
 import AvisoPush from './AvisoPush'
 
 function formatarDataHora(dataHora) {
@@ -147,18 +146,6 @@ function Avisos() {
           </button>
           {erro && <p className="text-brick text-sm">{erro}</p>}
         </form>
-      </div>
-
-      <div className="mt-10 pt-8 border-t border-border">
-        <div className="mb-3">
-          <h3 className="flex items-center gap-2 text-base font-bold text-campo-dark">
-            <MessageCircle size={18} />
-            Aviso para WhatsApp
-          </h3>
-          <p className="text-xs text-ink/50 mt-0.5">Envia a mensagem para todos os alunos ativos, um por vez.</p>
-        </div>
-
-        <AvisoWhatsapp />
       </div>
 
       <div className="mt-10 pt-8 border-t border-border">
