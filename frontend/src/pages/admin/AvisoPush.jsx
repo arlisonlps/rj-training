@@ -26,12 +26,21 @@ function AvisoPush() {
     setEnviando(false)
 
     if (error) {
-      let mensagem = 'Não foi possível chamar a função enviar-push. Confira se ela foi publicada no Supabase.'
-      try {
-        const corpoErro = await error.context.json()
-        if (corpoErro?.erro) mensagem = corpoErro.erro
-      } catch {
-        // resposta sem corpo legível: mantém a mensagem padrão
+      console.error('Erro ao chamar enviar-push:', error)
+      let mensagem = `${error.name}: ${error.message}`
+      if (error.context instanceof Response) {
+        const texto = await error.context.text()
+        let detalhe = texto
+        try {
+          const json = JSON.parse(texto)
+          detalhe = json.erro || json.message || json.msg || texto
+        } catch {
+          // resposta que não é JSON: mostra o texto cru
+        }
+        mensagem = `Erro ${error.context.status}: ${detalhe || error.message}`
+      } else if (error.name === 'FunctionsFetchError') {
+        mensagem +=
+          ' (a função não respondeu: pode não estar publicada com o nome enviar-push, ou falhou ao iniciar. Veja os Logs dela no Supabase.)'
       }
       setErro(mensagem)
       return
