@@ -4,7 +4,6 @@ import { useAutoAnimate } from '@formkit/auto-animate/react'
 import { CalendarDays, Wallet, Scale, Copy, Check, AlertTriangle, Megaphone } from 'lucide-react'
 import { supabase } from '../../lib/supabaseClient'
 import { PIX_CHAVE, PIX_NOME, PIX_BANCO } from '../../lib/pix'
-import AtivarNotificacoes from '../../components/AtivarNotificacoes'
 
 const NOMES_DIAS = { terca: 'Terça', quarta: 'Quarta', quinta: 'Quinta' }
 const ORDEM_DIAS = { terca: 1, quarta: 2, quinta: 3 }
@@ -190,8 +189,6 @@ function AlunoHome() {
             </div>
           </Link>
         )}
-
-        <AtivarNotificacoes />
       </div>
 
       <div className={`grid grid-cols-1 gap-4 mb-4 ${statusMensalidade === 'atrasado' ? '' : 'sm:grid-cols-2'}`}>

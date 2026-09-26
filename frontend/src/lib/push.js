@@ -30,15 +30,21 @@ export async function estadoNotificacoes() {
   if (!pushSuportado()) return iosSemInstalar() ? 'ios-sem-instalar' : 'nao-suportado'
   if (Notification.permission === 'denied') return 'bloqueado'
 
-  const inscricao = await buscarInscricao()
+  const registro = await navigator.serviceWorker.getRegistration()
+  if (!registro) return 'sem-service-worker'
+
+  const inscricao = await registro.pushManager.getSubscription()
   if (inscricao && Notification.permission === 'granted') return 'ativo'
   return 'inativo'
 }
 
 export async function ativarNotificacoes() {
   const permissao = await Notification.requestPermission()
-  if (permissao !== 'granted') {
+  if (permissao === 'denied') {
     throw new Error('Permissão de notificações negada. Libere nas configurações do navegador.')
+  }
+  if (permissao !== 'granted') {
+    throw new Error('A autorização não foi concluída. Toque em Ativar notificações e escolha Permitir.')
   }
 
   const existente = await navigator.serviceWorker.getRegistration()
