@@ -158,22 +158,29 @@ function Home() {
       return
     }
 
-    const presentesPorAluno = {}
+    const diasPresentesPorAluno = {}
     for (const r of registros) {
       const [a, m, dia] = r.semana_referencia.split('-').map(Number)
-      const data = new Date(a, m - 1, dia + (OFFSET_DIA[r.dia_semana] || 0))
-      if (!diasEsperados.has(chaveDia(data))) continue
-      presentesPorAluno[r.aluno_id] = (presentesPorAluno[r.aluno_id] || 0) + 1
+      const chave = chaveDia(new Date(a, m - 1, dia + (OFFSET_DIA[r.dia_semana] || 0)))
+      if (!diasEsperados.has(chave)) continue
+      if (!diasPresentesPorAluno[r.aluno_id]) diasPresentesPorAluno[r.aluno_id] = new Set()
+      diasPresentesPorAluno[r.aluno_id].add(chave)
     }
+
+    const ultimosTreinos = [...diasEsperados].sort().slice(-3)
 
     const resultado = alunosAtivos
       .filter((a) => !idsAtrasados.has(a.id))
-      .map((a) => ({
-        nome: a.nome,
-        percentual: Math.round(((presentesPorAluno[a.id] || 0) / diasEsperados.size) * 100),
-      }))
+      .map((a) => {
+        const presentes = diasPresentesPorAluno[a.id]
+        return {
+          nome: a.nome,
+          percentual: Math.round(((presentes?.size || 0) / diasEsperados.size) * 100),
+          recentes: ultimosTreinos.filter((dia) => presentes?.has(dia)).length,
+        }
+      })
       .filter((a) => a.percentual > 0)
-      .sort((a, b) => b.percentual - a.percentual || a.nome.localeCompare(b.nome))
+      .sort((a, b) => b.percentual - a.percentual || b.recentes - a.recentes || a.nome.localeCompare(b.nome))
 
     setRankingFrequencia(resultado.slice(0, 5))
   }
