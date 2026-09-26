@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react'
-import { Megaphone, Send, Ban } from 'lucide-react'
+import { Megaphone, Send, Ban, MessageCircle, BellRing } from 'lucide-react'
 import { supabase } from '../../lib/supabaseClient'
 import Loading from '../../components/Loading'
+import AvisoWhatsapp from './AvisoWhatsapp'
+import AvisoPush from './AvisoPush'
 
 function formatarDataHora(dataHora) {
   const data = new Date(dataHora)
@@ -92,6 +94,14 @@ function Avisos() {
     <div>
       <h2 className="text-2xl font-bold text-campo-dark mb-6">Avisos</h2>
 
+      <div className="mb-3">
+        <h3 className="flex items-center gap-2 text-base font-bold text-campo-dark">
+          <Megaphone size={18} />
+          Aviso no app
+        </h3>
+        <p className="text-xs text-ink/50 mt-0.5">Aparece em destaque na tela inicial dos alunos.</p>
+      </div>
+
       {avisoAtivo && (
         <div className="bg-campo-dark text-white rounded-2xl px-6 py-5 mb-6 shadow-sm">
           <div className="flex items-center gap-2 mb-2 opacity-80">
@@ -137,6 +147,32 @@ function Avisos() {
           </button>
           {erro && <p className="text-brick text-sm">{erro}</p>}
         </form>
+      </div>
+
+      <div className="mt-10 pt-8 border-t border-border">
+        <div className="mb-3">
+          <h3 className="flex items-center gap-2 text-base font-bold text-campo-dark">
+            <MessageCircle size={18} />
+            Aviso para WhatsApp
+          </h3>
+          <p className="text-xs text-ink/50 mt-0.5">Envia a mensagem para todos os alunos ativos, um por vez.</p>
+        </div>
+
+        <AvisoWhatsapp />
+      </div>
+
+      <div className="mt-10 pt-8 border-t border-border">
+        <div className="mb-3">
+          <h3 className="flex items-center gap-2 text-base font-bold text-campo-dark">
+            <BellRing size={18} />
+            Notificação no celular
+          </h3>
+          <p className="text-xs text-ink/50 mt-0.5">
+            Chega na tela do celular de quem ativou as notificações, mesmo com o app fechado.
+          </p>
+        </div>
+
+        <AvisoPush />
       </div>
     </div>
   )
