@@ -22,6 +22,7 @@ function AlunoForm() {
   const [altura, setAltura] = useState('')
   const [telefone, setTelefone] = useState('')
   const [diaVencimento, setDiaVencimento] = useState('')
+  const [diaVencimentoOriginal, setDiaVencimentoOriginal] = useState('')
   const [valorMensalidade, setValorMensalidade] = useState('')
   const [mensalidadeBloqueada, setMensalidadeBloqueada] = useState(false)
   const [carregando, setCarregando] = useState(editando)
@@ -46,9 +47,32 @@ function AlunoForm() {
     setAltura(data.altura || '')
     setTelefone(data.telefone || '')
     setDiaVencimento(data.dia_vencimento || '')
+    setDiaVencimentoOriginal(data.dia_vencimento || '')
     setValorMensalidade(data.valor_mensalidade || '')
     setMensalidadeBloqueada(Boolean(data.mensalidade_bloqueada))
     setCarregando(false)
+  }
+
+  async function atualizarVencimentoExistentes(alunoId, novoDia) {
+    const { data: pendentes, error: erroBusca } = await supabase
+      .from('mensalidade')
+      .select('id, data_vencimento')
+      .eq('aluno_id', alunoId)
+      .neq('status', 'pago')
+
+    if (erroBusca || !pendentes || pendentes.length === 0) return
+
+    const confirmar = window.confirm(
+      `Atualizar o dia de vencimento também em ${pendentes.length} mensalidade${pendentes.length > 1 ? 's' : ''} pendente${pendentes.length > 1 ? 's' : ''} já gerada${pendentes.length > 1 ? 's' : ''}, para o dia ${novoDia}?`
+    )
+    if (!confirmar) return
+
+    for (const m of pendentes) {
+      const [ano, mes] = m.data_vencimento.split('-')
+      const novaData = `${ano}-${mes}-${String(novoDia).padStart(2, '0')}`
+      if (novaData === m.data_vencimento) continue
+      await supabase.from('mensalidade').update({ data_vencimento: novaData }).eq('id', m.id)
+    }
   }
 
   async function salvar(e) {
@@ -95,6 +119,10 @@ function AlunoForm() {
         alert('Erro ao salvar aluno: ' + error.message)
       }
       return
+    }
+
+    if (editando && !mensalidadeBloqueada && dados.dia_vencimento && Number(diaVencimentoOriginal) !== dados.dia_vencimento) {
+      await atualizarVencimentoExistentes(id, dados.dia_vencimento)
     }
 
     navigate('/alunos')
