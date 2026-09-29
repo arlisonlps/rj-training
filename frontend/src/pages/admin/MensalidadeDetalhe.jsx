@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom'
 import { ArrowLeft, MessageCircle, Check, Pencil, X } from 'lucide-react'
 import { supabase } from '../../lib/supabaseClient'
 import { formatarData } from '../../lib/data'
+import { valorComJuro } from '../../lib/mensalidade'
 import Loading from '../../components/Loading'
 
 function nomeDoMes(mesReferencia) {
@@ -85,12 +86,15 @@ function MensalidadeDetalhe() {
     buscarMensalidades()
   }
 
-  async function marcarComoPago(id) {
+  async function marcarComoPago(m, status) {
     const hoje = new Date().toISOString().split('T')[0]
+    const dados = { status: 'pago', data_pagamento: hoje }
+    if (status === 'atrasado') dados.valor = valorComJuro(m, status)
+
     const { error } = await supabase
       .from('mensalidade')
-      .update({ status: 'pago', data_pagamento: hoje })
-      .eq('id', id)
+      .update(dados)
+      .eq('id', m.id)
 
     if (error) {
       alert('Erro ao marcar como pago: ' + error.message)
@@ -113,7 +117,7 @@ function MensalidadeDetalhe() {
   function linkWhatsapp(m, status) {
     const mensagem = status === 'vencendo'
       ? `Fala ${m.aluno.nome}, sua mensalidade vence dia ${formatarData(m.data_vencimento)}, faça o pagamento para evitar atrasos!`
-      : `Fala ${m.aluno.nome}, Verifiquei que sua mensalidade está em atraso. Vamos regulzarizar o pagamento?`
+      : `Fala ${m.aluno.nome}, Verifiquei que sua mensalidade está em atraso e já inclui juro. Valor atualizado: R$ ${valorComJuro(m, status)}. Vamos regularizar o pagamento?`
     return `https://wa.me/${m.aluno.telefone}?text=${encodeURIComponent(mensagem)}`
   }
 
@@ -182,7 +186,7 @@ function MensalidadeDetalhe() {
                   </div>
                 ) : (
                   <div className="text-xs text-ink/50 mt-0.5 flex items-center gap-1.5">
-                    R$ {m.valor} — vence {formatarData(m.data_vencimento)}
+                    R$ {valorComJuro(m, status)}{status === 'atrasado' ? ' (com juro)' : ''} — vence {formatarData(m.data_vencimento)}
                     <button
                       type="button"
                       onClick={() => iniciarEdicaoData(m)}
@@ -200,7 +204,7 @@ function MensalidadeDetalhe() {
               <div className="flex items-center gap-2">
                 {status !== 'pago' && (
                   <button
-                    onClick={() => marcarComoPago(m.id)}
+                    onClick={() => marcarComoPago(m, status)}
                     className="flex items-center gap-1.5 bg-campo text-white text-xs font-semibold px-3 py-2 rounded-lg hover:bg-campo-dark transition-colors"
                   >
                     <Check size={14} />

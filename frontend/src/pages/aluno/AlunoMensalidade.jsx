@@ -4,6 +4,7 @@ import { Copy, Check } from 'lucide-react'
 import { supabase } from '../../lib/supabaseClient'
 import { formatarData } from '../../lib/data'
 import { PIX_CHAVE, PIX_NOME, PIX_BANCO } from '../../lib/pix'
+import { valorComJuro } from '../../lib/mensalidade'
 
 function BotaoPix({ copiado, onClick }) {
   const [ref] = useAutoAnimate()
@@ -118,7 +119,10 @@ function AlunoMensalidade() {
                 {nomeDoMes(m.mes_referencia)}
               </div>
               <div className="text-sm text-ink/50 mb-1">Vencimento: {formatarData(m.data_vencimento)}</div>
-              <div className="text-lg font-bold mb-3">R$ {m.valor}</div>
+              <div className="text-lg font-bold mb-1">R$ {valorComJuro(m, status)}</div>
+              {status === 'atrasado' && (
+                <p className="text-[11px] text-brick font-medium mb-2">Inclui juro por atraso</p>
+              )}
               <span className={`inline-block text-xs font-bold px-2.5 py-1 rounded transition-all duration-300 ${selo(status)}`}>
                 {status.toUpperCase()}
               </span>

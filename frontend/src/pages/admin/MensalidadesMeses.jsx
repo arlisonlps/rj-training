@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import { Calendar, Search, MessageCircle, Check } from 'lucide-react'
 import { supabase } from '../../lib/supabaseClient'
-import { gerarMensalidadesDoMesAtual } from '../../lib/mensalidade'
+import { gerarMensalidadesDoMesAtual, valorComJuro } from '../../lib/mensalidade'
 import { formatarData } from '../../lib/data'
 import Loading from '../../components/Loading'
 
@@ -42,7 +42,7 @@ function statusCalculado(m) {
 function linkWhatsapp(m, status) {
   const mensagem = status === 'vencendo'
     ? `Olá ${m.aluno.nome}, sua mensalidade vence dia ${formatarData(m.data_vencimento)}, faça o pagamento para evitar atrasos!`
-    : `Olá ${m.aluno.nome}, sua mensalidade está em atraso. Poderia regularizar o pagamento?`
+    : `Olá ${m.aluno.nome}, sua mensalidade está em atraso e já inclui juro. Valor atualizado: R$ ${valorComJuro(m, status)}. Poderia regularizar o pagamento?`
   return `https://wa.me/${m.aluno.telefone}?text=${encodeURIComponent(mensagem)}`
 }
 
@@ -89,12 +89,15 @@ function MensalidadesMeses() {
     setCarregando(false)
   }
 
-  async function marcarComoPago(id) {
+  async function marcarComoPago(m, status) {
     const hoje = new Date().toISOString().split('T')[0]
+    const dados = { status: 'pago', data_pagamento: hoje }
+    if (status === 'atrasado') dados.valor = valorComJuro(m, status)
+
     const { error } = await supabase
       .from('mensalidade')
-      .update({ status: 'pago', data_pagamento: hoje })
-      .eq('id', id)
+      .update(dados)
+      .eq('id', m.id)
 
     if (error) {
       alert('Erro ao marcar como pago: ' + error.message)
@@ -184,7 +187,7 @@ function MensalidadesMeses() {
                 <div>
                   <div className="font-semibold text-sm">{m.aluno?.nome}</div>
                   <div className="text-xs text-ink/50 mt-0.5">
-                    {nomeDoMes(m.mes_referencia)} — R$ {m.valor} — vence {formatarData(m.data_vencimento)}
+                    {nomeDoMes(m.mes_referencia)} — R$ {valorComJuro(m, status)}{status === 'atrasado' ? ' (com juro)' : ''} — vence {formatarData(m.data_vencimento)}
                   </div>
                   <span className={`inline-block text-[10px] font-bold px-2 py-0.5 rounded mt-1.5 ${selo(status)}`}>
                     {status.toUpperCase()}
@@ -193,7 +196,7 @@ function MensalidadesMeses() {
                 <div className="flex items-center gap-2">
                   {status !== 'pago' && (
                     <button
-                      onClick={() => marcarComoPago(m.id)}
+                      onClick={() => marcarComoPago(m, status)}
                       className="flex items-center gap-1.5 bg-campo text-white text-xs font-semibold px-3 py-2 rounded-lg hover:bg-campo-dark transition-colors"
                     >
                       <Check size={14} />

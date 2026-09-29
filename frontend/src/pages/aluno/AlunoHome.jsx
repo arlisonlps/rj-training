@@ -4,6 +4,7 @@ import { useAutoAnimate } from '@formkit/auto-animate/react'
 import { CalendarDays, Wallet, Scale, Copy, Check, AlertTriangle } from 'lucide-react'
 import { supabase } from '../../lib/supabaseClient'
 import { PIX_CHAVE, PIX_NOME, PIX_BANCO } from '../../lib/pix'
+import { valorComJuro } from '../../lib/mensalidade'
 
 const NOMES_DIAS = { terca: 'Terça', quarta: 'Quarta', quinta: 'Quinta' }
 const ORDEM_DIAS = { terca: 1, quarta: 2, quinta: 3 }
@@ -181,7 +182,10 @@ function AlunoHome() {
               </div>
               {mensalidade ? (
                 <>
-                  <div className="text-lg font-bold mb-1">R$ {mensalidade.valor}</div>
+                  <div className="text-lg font-bold mb-1">R$ {valorComJuro(mensalidade, statusMensalidade)}</div>
+                  {statusMensalidade === 'atrasado' && (
+                    <p className="text-[11px] text-brick font-medium mb-1">Inclui juro por atraso</p>
+                  )}
                   <span className={`inline-block text-[10px] font-bold px-2 py-0.5 rounded transition-all duration-300 ${selo(statusMensalidade)}`}>
                     {statusMensalidade.toUpperCase()}
                   </span>

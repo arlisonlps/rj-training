@@ -69,7 +69,9 @@ function AlunoForm() {
 
     for (const m of pendentes) {
       const [ano, mes] = m.data_vencimento.split('-')
-      const novaData = `${ano}-${mes}-${String(novoDia).padStart(2, '0')}`
+      const ultimoDia = new Date(Number(ano), Number(mes), 0).getDate()
+      const diaAjustado = Math.min(novoDia, ultimoDia)
+      const novaData = `${ano}-${mes}-${String(diaAjustado).padStart(2, '0')}`
       if (novaData === m.data_vencimento) continue
       await supabase.from('mensalidade').update({ data_vencimento: novaData }).eq('id', m.id)
     }
