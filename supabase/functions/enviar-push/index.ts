@@ -68,15 +68,26 @@ async function enviarPara(
   return resultado
 }
 
+// Manter igual a JURO_ATRASO_MENSAL em frontend/src/lib/mensalidade.js
+const JURO_ATRASO_MENSAL = 15
+const DIAS_DE_LEMBRETE_ATRASO = [1, 3, 7]
+
+function valorComJuro(valor: number, diasAtraso: number): number {
+  return Number(valor) + JURO_ATRASO_MENSAL * Math.ceil(diasAtraso / 30)
+}
+
 async function avisarVencimentos(supabase: SupabaseClient, webpush: WebPush, simular: boolean) {
   const hoje = hojeEmBelem()
   const emCincoDias = somarDias(hoje, 5)
+  const diasAtrasoPorData = new Map(
+    DIAS_DE_LEMBRETE_ATRASO.map((dias) => [somarDias(hoje, -dias), dias]),
+  )
 
   const { data: mensalidades, error } = await supabase
     .from('mensalidade')
     .select('aluno_id, valor, data_vencimento, aluno(nome, ativo)')
     .neq('status', 'pago')
-    .in('data_vencimento', [hoje, emCincoDias])
+    .in('data_vencimento', [hoje, emCincoDias, ...diasAtrasoPorData.keys()])
   if (error) throw new Error(`Erro ao ler mensalidades: ${error.message}`)
 
   const avisos = (mensalidades ?? [])
@@ -109,6 +120,7 @@ async function avisarVencimentos(supabase: SupabaseClient, webpush: WebPush, sim
     simulacao: simular,
     avisosCincoDias: 0,
     avisosNoDia: 0,
+    avisosAtraso: 0,
     semAparelho: 0,
     enviados: 0,
     removidos: 0,
@@ -118,18 +130,29 @@ async function avisarVencimentos(supabase: SupabaseClient, webpush: WebPush, sim
   }
 
   for (const m of avisos) {
+    const diasAtraso = diasAtrasoPorData.get(m.data_vencimento)
     const noDia = m.data_vencimento === hoje
     const valor = formatarValor(m.valor)
-    const corpo = noDia
-      ? `Sua mensalidade de ${valor} vence hoje. Faça o pagamento para evitar atrasos!`
-      : `Sua mensalidade de ${valor} vence dia ${formatarDiaMes(m.data_vencimento)}. Faça o pagamento para evitar atrasos!`
 
-    if (noDia) resumo.avisosNoDia++
-    else resumo.avisosCincoDias++
+    let corpo: string
+    let tipo: string
+    if (diasAtraso) {
+      corpo = `Sua mensalidade está atrasada há ${diasAtraso} ${diasAtraso === 1 ? 'dia' : 'dias'}. Valor atualizado com juro: ${formatarValor(valorComJuro(m.valor, diasAtraso))}.`
+      tipo = `${diasAtraso} ${diasAtraso === 1 ? 'dia' : 'dias'} de atraso`
+      resumo.avisosAtraso++
+    } else if (noDia) {
+      corpo = `Sua mensalidade de ${valor} vence hoje. Faça o pagamento para evitar atrasos!`
+      tipo = 'no dia'
+      resumo.avisosNoDia++
+    } else {
+      corpo = `Sua mensalidade de ${valor} vence dia ${formatarDiaMes(m.data_vencimento)}. Faça o pagamento para evitar atrasos!`
+      tipo = '5 dias antes'
+      resumo.avisosCincoDias++
+    }
 
     const usuarioId = usuarioPorAluno.get(m.aluno_id)
     const aparelhos = usuarioId ? aparelhosPorUsuario.get(usuarioId) ?? [] : []
-    resumo.alunos.push({ nome: m.nome, tipo: noDia ? 'no dia' : '5 dias antes', aparelhos: aparelhos.length })
+    resumo.alunos.push({ nome: m.nome, tipo, aparelhos: aparelhos.length })
 
     if (aparelhos.length === 0) {
       resumo.semAparelho++

@@ -5,6 +5,8 @@ import logo from '../assets/logo.png'
 import SeletorTema from '../components/SeletorTema'
 import Rodape from '../components/Rodape'
 import MenuMais from '../components/MenuMais'
+import ModalAprovacoesPendentes from '../components/ModalAprovacoesPendentes'
+import ModalAniversariantes from '../components/ModalAniversariantes'
 
 const itensPrincipais = [
   { to: '/', label: 'Home', icon: Home, end: true },
@@ -29,6 +31,8 @@ function Layout({ children }) {
 
   return (
     <div className="min-h-screen flex flex-col">
+      <ModalAprovacoesPendentes />
+      <ModalAniversariantes />
       <div className="flex items-center justify-between bg-header text-white px-4 md:px-8 py-3 sticky top-0 z-20">
         <img src={logo} alt="RJ Training" className="h-10 w-auto" />
         <div className="flex items-center gap-2">
