@@ -1,3 +1,4 @@
+// @ts-nocheck - roda no Deno (Supabase), o verificador do VS Code nao entende imports npm:
 import { createClient, type SupabaseClient } from 'npm:@supabase/supabase-js@2'
 
 const cabecalhosCors = {
