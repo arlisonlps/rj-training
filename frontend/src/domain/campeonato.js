@@ -133,6 +133,29 @@ export function vencedorDoJogo(jogo) {
   return jogo.penaltis_a > jogo.penaltis_b ? jogo.equipe_a_id : jogo.equipe_b_id
 }
 
+export function calcularAvancos(jogos) {
+  const porId = Object.fromEntries(jogos.map((j) => [j.id, j]))
+  const mudancas = []
+
+  for (const jogo of jogos) {
+    const proximo = porId[jogo.proximo_jogo_id]
+    if (!proximo) continue
+
+    const campo = jogo.proximo_lado === 'a' ? 'equipe_a_id' : 'equipe_b_id'
+    const vencedor = vencedorDoJogo(jogo)
+    if ((proximo[campo] ?? null) !== (vencedor ?? null)) {
+      mudancas.push({ jogoId: proximo.id, campo, equipeId: vencedor ?? null, bloqueado: Boolean(proximo.encerrado) })
+    }
+  }
+
+  return mudancas
+}
+
+export function campeaoDoCampeonato(jogos) {
+  const final = jogos.find((j) => j.fase === 'final')
+  return final ? vencedorDoJogo(final) : null
+}
+
 function proximaPotenciaDeDois(n) {
   let potencia = 2
   while (potencia < n) potencia *= 2

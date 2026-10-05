@@ -20,7 +20,7 @@ function GruposCampeonato({ campeonato, equipes, grupos, jogos, aoMudar }) {
 
   const jogosDeGrupo = jogos.filter((j) => j.fase === 'grupo')
   const temJogos = jogosDeGrupo.length > 0
-  const algumEncerrado = jogosDeGrupo.some((j) => j.encerrado)
+  const algumEncerrado = jogosDeGrupo.some((j) => j.encerrado) || jogos.some((j) => j.fase !== 'grupo')
   const gruposOrdenados = [...grupos].sort((a, b) => a.nome.localeCompare(b.nome))
 
   const problemas = []
@@ -169,7 +169,7 @@ function GruposCampeonato({ campeonato, equipes, grupos, jogos, aoMudar }) {
             Os {jogosDeGrupo.length} jogos da fase de grupos já foram gerados. Ajuste data, horário e local na aba Jogos.
           </p>
           {algumEncerrado ? (
-            <p className="text-xs text-ink/50">Já existem jogos com resultado, então não é possível apagar e refazer.</p>
+            <p className="text-xs text-ink/50">Já existem jogos com resultado ou o mata-mata já foi gerado, então não é possível apagar e refazer.</p>
           ) : (
             <button
               type="button"

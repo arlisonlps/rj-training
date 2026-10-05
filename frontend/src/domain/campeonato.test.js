@@ -5,6 +5,8 @@ import {
   gerarJogosGrupo,
   gerarMataMata,
   vencedorDoJogo,
+  calcularAvancos,
+  campeaoDoCampeonato,
   situacaoDisciplinar,
   rankingsEstatisticas,
   conferirPlacar,
@@ -197,6 +199,47 @@ test('vencedorDoJogo usa pênaltis quando empata', () => {
   assert.equal(vencedorDoJogo({ ...base, gols_a: 1, gols_b: 1, penaltis_a: 3, penaltis_b: 4 }), 'B')
   assert.equal(vencedorDoJogo({ ...base, gols_a: 1, gols_b: 1 }), null)
   assert.equal(vencedorDoJogo({ ...base, encerrado: false, gols_a: 1, gols_b: 0 }), null)
+})
+
+function chaveamentoPronto() {
+  return [
+    { id: 's1', fase: 'semifinal', equipe_a_id: 'A', equipe_b_id: 'B', proximo_jogo_id: 'f', proximo_lado: 'a', encerrado: false },
+    { id: 's2', fase: 'semifinal', equipe_a_id: 'C', equipe_b_id: 'D', proximo_jogo_id: 'f', proximo_lado: 'b', encerrado: false },
+    { id: 'f', fase: 'final', equipe_a_id: null, equipe_b_id: null, proximo_jogo_id: null, proximo_lado: null, encerrado: false },
+  ]
+}
+
+test('vencedor da semifinal avança para o lado certo da final', () => {
+  const jogos = chaveamentoPronto()
+  Object.assign(jogos[0], { encerrado: true, gols_a: 2, gols_b: 0 })
+  Object.assign(jogos[1], { encerrado: true, gols_a: 1, gols_b: 1, penaltis_a: 2, penaltis_b: 4 })
+
+  const mudancas = calcularAvancos(jogos)
+  assert.deepEqual(mudancas.map((m) => [m.jogoId, m.campo, m.equipeId]), [
+    ['f', 'equipe_a_id', 'A'],
+    ['f', 'equipe_b_id', 'D'],
+  ])
+})
+
+test('jogo sem decisão não leva ninguém para a próxima fase', () => {
+  assert.deepEqual(calcularAvancos(chaveamentoPronto()), [])
+})
+
+test('reabrir semifinal remove o time da final, mas avisa se a final já foi encerrada', () => {
+  const jogos = chaveamentoPronto()
+  Object.assign(jogos[2], { equipe_a_id: 'A', equipe_b_id: 'D' })
+  const [mudanca] = calcularAvancos(jogos)
+  assert.deepEqual([mudanca.campo, mudanca.equipeId, mudanca.bloqueado], ['equipe_a_id', null, false])
+
+  Object.assign(jogos[2], { encerrado: true })
+  assert.equal(calcularAvancos(jogos)[0].bloqueado, true)
+})
+
+test('campeão é o vencedor da final', () => {
+  const jogos = chaveamentoPronto()
+  assert.equal(campeaoDoCampeonato(jogos), null)
+  Object.assign(jogos[2], { equipe_a_id: 'A', equipe_b_id: 'D', encerrado: true, gols_a: 0, gols_b: 1 })
+  assert.equal(campeaoDoCampeonato(jogos), 'D')
 })
 
 function cenarioDisciplina(fases) {

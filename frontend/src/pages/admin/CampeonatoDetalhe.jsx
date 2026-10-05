@@ -7,6 +7,7 @@ import Loading from '../../components/Loading'
 import NovoTimeModal from './NovoTimeModal'
 import GruposCampeonato from './GruposCampeonato'
 import JogosCampeonato from './JogosCampeonato'
+import MataMataCampeonato from './MataMataCampeonato'
 import ClassificacaoCampeonato from '../../components/campeonato/ClassificacaoCampeonato'
 import RankingsCampeonato from '../../components/campeonato/RankingsCampeonato'
 
@@ -17,6 +18,7 @@ const ABAS = [
   { valor: 'grupos', rotulo: 'Grupos' },
   { valor: 'jogos', rotulo: 'Jogos' },
   { valor: 'classificacao', rotulo: 'Classificação' },
+  { valor: 'mata_mata', rotulo: 'Mata-mata' },
   { valor: 'craques', rotulo: 'Craques' },
 ]
 
@@ -198,6 +200,18 @@ function CampeonatoDetalhe() {
 
       {aba === 'classificacao' && (
         <ClassificacaoCampeonato campeonato={campeonato} equipes={equipes} grupos={grupos} jogos={jogos} editavel aoMudar={carregar} />
+      )}
+
+      {aba === 'mata_mata' && (
+        <MataMataCampeonato
+          campeonato={campeonato}
+          equipes={equipes}
+          grupos={grupos}
+          jogos={jogos}
+          membros={membros}
+          eventos={eventos}
+          aoMudar={carregar}
+        />
       )}
 
       {aba === 'craques' && (
