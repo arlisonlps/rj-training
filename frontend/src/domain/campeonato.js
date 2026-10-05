@@ -65,6 +65,7 @@ function agruparPor(ids, chave) {
 export function classificacaoGrupo(equipes, jogos) {
   const ids = equipes.map((e) => e.id)
   const nomes = Object.fromEntries(equipes.map((e) => [e.id, e.nome ?? '']))
+  const manual = Object.fromEntries(equipes.map((e) => [e.id, e.desempate_manual ?? null]))
   const encerrados = jogos.filter(
     (j) => j.fase === 'grupo' && j.encerrado && ids.includes(j.equipe_a_id) && ids.includes(j.equipe_b_id)
   )
@@ -83,8 +84,14 @@ export function classificacaoGrupo(equipes, jogos) {
     return porSaldo.flatMap((mesmoSaldo) => {
       const porGolsPro = agruparPor(mesmoSaldo, (id) => geral[id].golsPro)
       return porGolsPro.flatMap((iguais) => {
-        if (iguais.length > 1) iguais.forEach((id) => naoResolvidos.add(id))
-        return [...iguais].sort((x, y) => nomes[x].localeCompare(nomes[y]))
+        if (iguais.length > 1) {
+          const ordens = iguais.map((id) => manual[id])
+          const definidoPeloProfessor = ordens.every((o) => o != null) && new Set(ordens).size === ordens.length
+          if (!definidoPeloProfessor) iguais.forEach((id) => naoResolvidos.add(id))
+        }
+        return [...iguais].sort(
+          (x, y) => (manual[x] ?? Infinity) - (manual[y] ?? Infinity) || nomes[x].localeCompare(nomes[y])
+        )
       })
     })
   }

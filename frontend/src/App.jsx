@@ -21,6 +21,10 @@ import Eventos from './pages/admin/Eventos'
 import EventoForm from './pages/admin/EventoForm'
 import EventoDetalhe from './pages/admin/EventoDetalhe'
 import Avisos from './pages/admin/Avisos'
+import Campeonatos from './pages/admin/Campeonatos'
+import CampeonatoForm from './pages/admin/CampeonatoForm'
+import CampeonatoDetalhe from './pages/admin/CampeonatoDetalhe'
+import EquipeDetalhe from './pages/admin/EquipeDetalhe'
 import AlunoHome from './pages/aluno/AlunoHome'
 import AlunoHorario from './pages/aluno/AlunoHorario'
 import AlunoMensalidade from './pages/aluno/AlunoMensalidade'
@@ -217,6 +221,11 @@ function App() {
               <Route path="/eventos/:id" element={<EventoDetalhe />} />
               <Route path="/eventos/:id/editar" element={<EventoForm />} />
               <Route path="/avisos" element={<Avisos />} />
+              <Route path="/campeonatos" element={<Campeonatos />} />
+              <Route path="/campeonatos/novo" element={<CampeonatoForm />} />
+              <Route path="/campeonatos/:id" element={<CampeonatoDetalhe />} />
+              <Route path="/campeonatos/:id/editar" element={<CampeonatoForm />} />
+              <Route path="/campeonatos/:id/times/:equipeId" element={<EquipeDetalhe />} />
               <Route path="*" element={<Navigate to="/" />} />
 
             </Routes>

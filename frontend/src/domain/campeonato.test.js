@@ -91,6 +91,29 @@ test('empate total sinaliza que o professor precisa decidir', () => {
   assert.ok(tabela.every((l) => l.empateNaoResolvido))
 })
 
+test('desempate manual do professor resolve o empate total', () => {
+  const jogos = [jogoDeGrupo('A', 'B', 1, 1)]
+  const comOrdem = [
+    { id: 'A', nome: 'A', desempate_manual: 2 },
+    { id: 'B', nome: 'B', desempate_manual: 1 },
+  ]
+  const tabela = classificacaoGrupo(comOrdem, jogos)
+  assert.deepEqual(ordem(tabela), ['B', 'A'])
+  assert.ok(tabela.every((l) => !l.empateNaoResolvido))
+})
+
+test('desempate manual incompleto ou repetido continua sinalizado', () => {
+  const jogos = [jogoDeGrupo('A', 'B', 1, 1)]
+  const incompleto = [{ id: 'A', nome: 'A', desempate_manual: 1 }, { id: 'B', nome: 'B' }]
+  assert.ok(classificacaoGrupo(incompleto, jogos).every((l) => l.empateNaoResolvido))
+
+  const repetido = [
+    { id: 'A', nome: 'A', desempate_manual: 1 },
+    { id: 'B', nome: 'B', desempate_manual: 1 },
+  ]
+  assert.ok(classificacaoGrupo(repetido, jogos).every((l) => l.empateNaoResolvido))
+})
+
 test('gerarJogosGrupo: todos contra todos uma vez, sem repetir time na rodada', () => {
   for (const quantidade of [2, 3, 4, 5, 6]) {
     const ids = Array.from({ length: quantidade }, (_, i) => `T${i}`)
