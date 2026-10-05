@@ -30,6 +30,8 @@ import AlunoHorario from './pages/aluno/AlunoHorario'
 import AlunoMensalidade from './pages/aluno/AlunoMensalidade'
 import AlunoPeso from './pages/aluno/AlunoPeso'
 import AlunoEventos from './pages/aluno/AlunoEventos'
+import AlunoCampeonatos from './pages/aluno/AlunoCampeonatos'
+import AlunoCampeonatoDetalhe from './pages/aluno/AlunoCampeonatoDetalhe'
 
 function extrairDadosPendentes() {
   const pendenteStr = localStorage.getItem('cadastro_pendente')
@@ -189,6 +191,8 @@ function App() {
                 <Route path="/mensalidade" element={<AlunoMensalidade />} />
                 <Route path="/peso" element={<AlunoPeso />} />
                 <Route path="/eventos" element={<AlunoEventos />} />
+                <Route path="/campeonatos" element={<AlunoCampeonatos />} />
+                <Route path="/campeonatos/:id" element={<AlunoCampeonatoDetalhe />} />
                 <Route path="*" element={<Navigate to="/" />} />
               </Routes>
             </AlunoLayout>

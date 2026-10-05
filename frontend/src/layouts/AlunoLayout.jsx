@@ -1,5 +1,5 @@
 import { NavLink, useNavigate } from 'react-router-dom'
-import { Home, CalendarDays, Wallet, Scale, LogOut, PartyPopper } from 'lucide-react'
+import { Home, CalendarDays, Wallet, Scale, LogOut, PartyPopper, Trophy } from 'lucide-react'
 import { supabase } from '../lib/supabaseClient'
 import logo from '../assets/logo.png'
 import SeletorTema from '../components/SeletorTema'
@@ -17,6 +17,7 @@ const itensPrincipais = [
 const itensMais = [
   { to: '/peso', label: 'Peso', icon: Scale },
   { to: '/eventos', label: 'Eventos', icon: PartyPopper },
+  { to: '/campeonatos', label: 'Campeonato', icon: Trophy },
 ]
 
 function AlunoLayout({ children }) {

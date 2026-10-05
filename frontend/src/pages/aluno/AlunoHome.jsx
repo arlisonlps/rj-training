@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useAutoAnimate } from '@formkit/auto-animate/react'
-import { CalendarDays, Wallet, Scale, Copy, Check, AlertTriangle } from 'lucide-react'
+import { CalendarDays, Wallet, Scale, Copy, Check, AlertTriangle, Trophy } from 'lucide-react'
 import { supabase } from '../../lib/supabaseClient'
 import { PIX_CHAVE, PIX_NOME, PIX_BANCO } from '../../lib/pix'
 import { valorComJuro } from '../../lib/mensalidade'
+import { formatarDataHoraCurta } from '../../lib/data'
+import { buscarMeuCampeonato } from '../../lib/campeonatoDados'
 
 const NOMES_DIAS = { terca: 'Terça', quarta: 'Quarta', quinta: 'Quinta' }
 const ORDEM_DIAS = { terca: 1, quarta: 2, quinta: 3 }
@@ -67,6 +69,7 @@ function AlunoHome() {
   const [horarios, setHorarios] = useState([])
   const [mensalidade, setMensalidade] = useState(null)
   const [historicoPesoRecente, setHistoricoPesoRecente] = useState([])
+  const [meuCampeonato, setMeuCampeonato] = useState(null)
   const [carregando, setCarregando] = useState(true)
   const [pixCopiado, setPixCopiado] = useState(false)
   const [pixBotaoRef] = useAutoAnimate()
@@ -111,6 +114,8 @@ function AlunoHome() {
         .order('registrado_em', { ascending: false })
         .limit(2)
       setHistoricoPesoRecente(pesoData || [])
+
+      setMeuCampeonato(await buscarMeuCampeonato(perfil.aluno_id).catch(() => null))
     }
 
     setCarregando(false)
@@ -171,6 +176,26 @@ function AlunoHome() {
           </Link>
         )}
       </div>
+
+      {meuCampeonato && (
+        <Link to={`/campeonatos/${meuCampeonato.campeonato.id}`}>
+          <div className="bg-surface border border-border rounded-xl p-5 shadow-sm hover:shadow-md transition-all active:scale-[0.98] cursor-pointer mb-4">
+            <div className="flex items-center gap-2 mb-2 text-campo">
+              <Trophy size={18} />
+              <span className="text-xs font-semibold uppercase tracking-wide">{meuCampeonato.campeonato.nome}</span>
+            </div>
+            <div className="flex items-center gap-2 text-base font-bold text-campo-dark">
+              <span className="w-3 h-3 rounded-full" style={{ backgroundColor: meuCampeonato.equipe.cor || '#9CA3AF' }} />
+              {meuCampeonato.equipe.nome}
+            </div>
+            <div className="text-xs text-ink/60 mt-1.5">
+              {meuCampeonato.proximoJogo
+                ? `Próximo jogo: contra ${meuCampeonato.adversario?.nome ?? 'time a definir'} — ${meuCampeonato.proximoJogo.data_hora ? formatarDataHoraCurta(meuCampeonato.proximoJogo.data_hora) : 'data a definir'}`
+                : 'Nenhum jogo marcado no momento.'}
+            </div>
+          </div>
+        </Link>
+      )}
 
       <div className={`grid grid-cols-1 gap-4 mb-4 ${statusMensalidade === 'atrasado' ? '' : 'sm:grid-cols-2'}`}>
         {statusMensalidade !== 'atrasado' && (
