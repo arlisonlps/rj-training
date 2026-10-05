@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { PartyPopper, Plus, MapPin, Users } from 'lucide-react'
-import { supabase } from '../../lib/supabaseClient'
-import Loading from '../../components/Loading'
+import { supabase } from '../../../lib/supabaseClient'
+import Loading from '../../../components/Loading'
 
 function formatarDataHora(dataHora) {
   const data = new Date(dataHora)

@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { X, Minus, Plus } from 'lucide-react'
-import { supabase } from '../../lib/supabaseClient'
-import { conferirPlacar, situacaoDisciplinar } from '../../domain/campeonato'
+import { supabase } from '../../../lib/supabaseClient'
+import { conferirPlacar, situacaoDisciplinar } from '../../../domain/campeonato'
 
 const campoBase =
   'px-3 py-2 rounded-lg border border-border-strong text-base focus:outline-none focus:ring-2 focus:ring-campo/30 focus:border-campo'

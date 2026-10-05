@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import { ArrowLeft, MapPin, Users, UserPlus, UserMinus, Pencil, Ban, Trash2 } from 'lucide-react'
-import { supabase } from '../../lib/supabaseClient'
-import Loading from '../../components/Loading'
+import { supabase } from '../../../lib/supabaseClient'
+import Loading from '../../../components/Loading'
 
 function formatarDataHora(dataHora) {
   const data = new Date(dataHora)

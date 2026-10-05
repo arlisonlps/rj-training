@@ -1,10 +1,10 @@
 import { useState, useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import { Calendar, Search, MessageCircle, Check } from 'lucide-react'
-import { supabase } from '../../lib/supabaseClient'
-import { gerarMensalidadesDoMesAtual, valorComJuro } from '../../lib/mensalidade'
-import { formatarData } from '../../lib/data'
-import Loading from '../../components/Loading'
+import { supabase } from '../../../lib/supabaseClient'
+import { gerarMensalidadesDoMesAtual, valorComJuro } from '../../../lib/mensalidade'
+import { formatarData } from '../../../lib/data'
+import Loading from '../../../components/Loading'
 
 const NOMES_MESES = [
   'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',

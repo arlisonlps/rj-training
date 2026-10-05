@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Megaphone, Send, Ban, BellRing } from 'lucide-react'
-import { supabase } from '../../lib/supabaseClient'
-import Loading from '../../components/Loading'
+import { supabase } from '../../../lib/supabaseClient'
+import Loading from '../../../components/Loading'
 import AvisoPush from './AvisoPush'
 
 function formatarDataHora(dataHora) {

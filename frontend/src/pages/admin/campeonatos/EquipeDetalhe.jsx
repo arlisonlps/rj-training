@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import { ArrowLeft, Pencil, Trash2, X, Check, UserPlus } from 'lucide-react'
-import { supabase } from '../../lib/supabaseClient'
-import Loading from '../../components/Loading'
-import Janela from '../../components/Janela'
+import { supabase } from '../../../lib/supabaseClient'
+import Loading from '../../../components/Loading'
+import Janela from '../../../components/Janela'
 
 const LIMITE_LISTAS = 500
 const campoBase =

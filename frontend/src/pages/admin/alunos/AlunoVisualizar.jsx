@@ -2,9 +2,9 @@ import { useState, useEffect } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import { ArrowLeft, Scale, Pencil, UserX, UserCheck, Trash2 } from 'lucide-react'
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
-import { supabase } from '../../lib/supabaseClient'
-import { formatarData } from '../../lib/data'
-import Loading from '../../components/Loading'
+import { supabase } from '../../../lib/supabaseClient'
+import { formatarData } from '../../../lib/data'
+import Loading from '../../../components/Loading'
 
 function iniciais(nome) {
   return nome

@@ -1,15 +1,15 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import { ArrowLeft, Pencil, Trash2, Plus } from 'lucide-react'
-import { supabase } from '../../lib/supabaseClient'
-import { STATUS_CAMPEONATO } from '../../lib/campeonatoStatus'
-import Loading from '../../components/Loading'
+import { supabase } from '../../../lib/supabaseClient'
+import { STATUS_CAMPEONATO } from '../../../lib/campeonatoStatus'
+import Loading from '../../../components/Loading'
 import NovoTimeModal from './NovoTimeModal'
 import GruposCampeonato from './GruposCampeonato'
 import JogosCampeonato from './JogosCampeonato'
 import MataMataCampeonato from './MataMataCampeonato'
-import ClassificacaoCampeonato from '../../components/campeonato/ClassificacaoCampeonato'
-import RankingsCampeonato from '../../components/campeonato/RankingsCampeonato'
+import ClassificacaoCampeonato from '../../../components/campeonato/ClassificacaoCampeonato'
+import RankingsCampeonato from '../../../components/campeonato/RankingsCampeonato'
 
 const LIMITE_LISTAS = 500
 const LIMITE_EVENTOS = 5000

@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { BellRing } from 'lucide-react'
-import { supabase } from '../../lib/supabaseClient'
-import AtivarNotificacoes from '../../components/AtivarNotificacoes'
+import { supabase } from '../../../lib/supabaseClient'
+import AtivarNotificacoes from '../../../components/AtivarNotificacoes'
 
 // O painel do Supabase gerou este endereço para a função enviar-push
 const FUNCAO_ENVIAR_PUSH = 'hyper-service'

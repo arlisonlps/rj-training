@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import { supabase } from '../../lib/supabaseClient'
-import Janela from '../../components/Janela'
+import { supabase } from '../../../lib/supabaseClient'
+import Janela from '../../../components/Janela'
 
 const campoBase =
   'px-3.5 py-2.5 rounded-lg border border-border-strong text-base focus:outline-none focus:ring-2 focus:ring-campo/30 focus:border-campo'

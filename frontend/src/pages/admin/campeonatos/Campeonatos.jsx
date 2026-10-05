@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { Trophy, Plus, Users } from 'lucide-react'
-import { supabase } from '../../lib/supabaseClient'
-import { STATUS_CAMPEONATO } from '../../lib/campeonatoStatus'
-import Loading from '../../components/Loading'
+import { supabase } from '../../../lib/supabaseClient'
+import { STATUS_CAMPEONATO } from '../../../lib/campeonatoStatus'
+import Loading from '../../../components/Loading'
 
 function Campeonatos() {
   const [campeonatos, setCampeonatos] = useState([])

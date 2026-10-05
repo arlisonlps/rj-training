@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import { ArrowLeft, Shield } from 'lucide-react'
-import { STATUS_CAMPEONATO } from '../../lib/campeonatoStatus'
-import { formatarDataHoraCurta } from '../../lib/data'
-import { carregarCampeonatoCompleto, buscarMeuAlunoId, proximoJogoDaEquipe } from '../../lib/campeonatoDados'
-import ClassificacaoCampeonato from '../../components/campeonato/ClassificacaoCampeonato'
-import RankingsCampeonato from '../../components/campeonato/RankingsCampeonato'
-import JogosLeitura from '../../components/campeonato/JogosLeitura'
+import { STATUS_CAMPEONATO } from '../../../lib/campeonatoStatus'
+import { formatarDataHoraCurta } from '../../../lib/data'
+import { carregarCampeonatoCompleto, buscarMeuAlunoId, proximoJogoDaEquipe } from '../../../lib/campeonatoDados'
+import ClassificacaoCampeonato from '../../../components/campeonato/ClassificacaoCampeonato'
+import RankingsCampeonato from '../../../components/campeonato/RankingsCampeonato'
+import JogosLeitura from '../../../components/campeonato/JogosLeitura'
 
 const ABAS = [
   { valor: 'jogos', rotulo: 'Jogos' },

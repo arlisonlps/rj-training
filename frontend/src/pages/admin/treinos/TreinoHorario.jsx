@@ -2,8 +2,8 @@ import { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { useAutoAnimate } from '@formkit/auto-animate/react'
 import { ArrowLeft, CheckCircle2, XCircle, UserPlus, UserMinus } from 'lucide-react'
-import { supabase } from '../../lib/supabaseClient'
-import Loading from '../../components/Loading'
+import { supabase } from '../../../lib/supabaseClient'
+import Loading from '../../../components/Loading'
 
 const OFFSET_DIA = { terca: 1, quarta: 2, quinta: 3 }
 

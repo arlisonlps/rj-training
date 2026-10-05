@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react'
 import { Link, Navigate } from 'react-router-dom'
 import { Trophy } from 'lucide-react'
-import { supabase } from '../../lib/supabaseClient'
-import { STATUS_CAMPEONATO } from '../../lib/campeonatoStatus'
+import { supabase } from '../../../lib/supabaseClient'
+import { STATUS_CAMPEONATO } from '../../../lib/campeonatoStatus'
 
 function AlunoCampeonatos() {
   const [campeonatos, setCampeonatos] = useState([])

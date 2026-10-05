@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Swords, RotateCcw, Trophy } from 'lucide-react'
-import { supabase } from '../../lib/supabaseClient'
-import { classificacaoGrupo, gerarMataMata, calcularAvancos, campeaoDoCampeonato } from '../../domain/campeonato'
+import { supabase } from '../../../lib/supabaseClient'
+import { classificacaoGrupo, gerarMataMata, calcularAvancos, campeaoDoCampeonato } from '../../../domain/campeonato'
 import JogoLinha from './JogoLinha'
 import ResultadoJogo from './ResultadoJogo'
 

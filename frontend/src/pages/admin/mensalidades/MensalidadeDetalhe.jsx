@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { ArrowLeft, MessageCircle, Check, Pencil, X } from 'lucide-react'
-import { supabase } from '../../lib/supabaseClient'
-import { formatarData } from '../../lib/data'
-import { valorComJuro } from '../../lib/mensalidade'
-import Loading from '../../components/Loading'
+import { supabase } from '../../../lib/supabaseClient'
+import { formatarData } from '../../../lib/data'
+import { valorComJuro } from '../../../lib/mensalidade'
+import Loading from '../../../components/Loading'
 
 function nomeDoMes(mesReferencia) {
   const [ano, mes] = mesReferencia.split('-')
