@@ -10,6 +10,7 @@ async function buscarAvisoAtivo() {
     .from('aviso')
     .select('id, mensagem')
     .eq('ativo', true)
+    .or(`expira_em.is.null,expira_em.gt.${new Date().toISOString()}`)
     .order('criado_em', { ascending: false })
     .limit(1)
     .maybeSingle()

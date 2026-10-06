@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Megaphone, Send, Ban, BellRing } from 'lucide-react'
 import { supabase } from '../../../lib/supabaseClient'
+import { deInputDataHora, formatarDataHoraCurta } from '../../../lib/data'
 import Loading from '../../../components/Loading'
 import AvisoPush from './AvisoPush'
 
@@ -17,6 +18,7 @@ function formatarDataHora(dataHora) {
 function Avisos() {
   const [avisoAtivo, setAvisoAtivo] = useState(null)
   const [mensagem, setMensagem] = useState('')
+  const [validade, setValidade] = useState('')
   const [carregando, setCarregando] = useState(true)
   const [publicando, setPublicando] = useState(false)
   const [desativando, setDesativando] = useState(false)
@@ -32,6 +34,7 @@ function Avisos() {
       .from('aviso')
       .select('*')
       .eq('ativo', true)
+      .or(`expira_em.is.null,expira_em.gt.${new Date().toISOString()}`)
       .order('criado_em', { ascending: false })
       .limit(1)
       .maybeSingle()
@@ -47,19 +50,24 @@ function Avisos() {
     e.preventDefault()
     if (!mensagem.trim()) return
 
+    if (validade && new Date(validade) <= new Date()) {
+      setErro('A validade precisa ser uma data e horário no futuro.')
+      return
+    }
+
     setPublicando(true)
     setErro('')
 
-    if (avisoAtivo) {
-      const { error } = await supabase.from('aviso').update({ ativo: false }).eq('id', avisoAtivo.id)
-      if (error) {
-        setErro('Erro ao substituir aviso anterior: ' + error.message)
-        setPublicando(false)
-        return
-      }
+    const { error: erroSubstituir } = await supabase.from('aviso').update({ ativo: false }).eq('ativo', true)
+    if (erroSubstituir) {
+      setErro('Erro ao substituir aviso anterior: ' + erroSubstituir.message)
+      setPublicando(false)
+      return
     }
 
-    const { error } = await supabase.from('aviso').insert({ mensagem: mensagem.trim(), ativo: true })
+    const { error } = await supabase
+      .from('aviso')
+      .insert({ mensagem: mensagem.trim(), ativo: true, expira_em: deInputDataHora(validade) })
 
     setPublicando(false)
 
@@ -69,6 +77,7 @@ function Avisos() {
     }
 
     setMensagem('')
+    setValidade('')
     buscarAvisoAtivo()
   }
 
@@ -109,7 +118,12 @@ function Avisos() {
           </div>
           <p className="text-sm font-medium mb-3">{avisoAtivo.mensagem}</p>
           <div className="flex items-center justify-between">
-            <span className="text-[11px] opacity-70">Publicado em {formatarDataHora(avisoAtivo.criado_em)}</span>
+            <span className="text-[11px] opacity-70">
+              Publicado em {formatarDataHora(avisoAtivo.criado_em)}
+              {avisoAtivo.expira_em
+                ? ` · some ${formatarDataHoraCurta(avisoAtivo.expira_em)}`
+                : ' · fica até você desativar'}
+            </span>
             <button
               type="button"
               onClick={desativarAviso}
@@ -136,6 +150,30 @@ function Avisos() {
             className="px-3.5 py-2.5 rounded-lg border border-border-strong text-sm min-h-24 resize-y focus:outline-none focus:ring-2 focus:ring-campo/30 focus:border-campo"
             required
           />
+
+          <div className="flex flex-col gap-1.5">
+            <label className="text-xs font-semibold text-ink/60" htmlFor="validade-aviso">
+              Válido até (opcional)
+            </label>
+            <div className="flex items-center gap-2 flex-wrap">
+              <input
+                id="validade-aviso"
+                type="datetime-local"
+                value={validade}
+                onChange={(e) => setValidade(e.target.value)}
+                className="px-3 py-2 rounded-lg border border-border-strong text-base focus:outline-none focus:ring-2 focus:ring-campo/30 focus:border-campo"
+              />
+              {validade && (
+                <button type="button" onClick={() => setValidade('')} className="text-xs font-semibold text-ink/60 hover:underline">
+                  Sem validade
+                </button>
+              )}
+            </div>
+            <p className="text-[11px] text-ink/50">
+              {validade ? 'Depois desse horário o aviso some sozinho para os alunos.' : 'Sem data, o aviso fica até você desativar.'}
+            </p>
+          </div>
+
           <button
             type="submit"
             disabled={publicando || !mensagem.trim()}
