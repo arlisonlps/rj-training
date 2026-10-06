@@ -246,7 +246,7 @@ function EquipeDetalhe() {
             <span className="flex items-center gap-2 text-sm font-medium">
               {nomeDoJogador(m.jogador)}
               {!m.jogador.aluno_id && (
-                <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-hover text-ink/60">CONVIDADO</span>
+                <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-hover text-ink/60">Jogador Avulso</span>
               )}
             </span>
             <button type="button" onClick={() => removerJogador(m.id)} className="p-2 rounded-lg text-ink/40 hover:bg-hover" aria-label={`Remover ${m.jogador.nome} do time`}>

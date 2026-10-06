@@ -7,12 +7,11 @@ import { conferirPlacar, situacaoDisciplinar } from '../../../domain/campeonato'
 const campoBase =
   'px-3 py-2 rounded-lg border border-border-strong text-base focus:outline-none focus:ring-2 focus:ring-campo/30 focus:border-campo'
 
-const TIPOS = [
-  { tipo: 'gol', rotulo: 'Gols' },
-  { tipo: 'assistencia', rotulo: 'Assist.' },
-  { tipo: 'amarelo', rotulo: 'Amarelo' },
-  { tipo: 'vermelho', rotulo: 'Vermelho' },
-  { tipo: 'gol_contra', rotulo: 'Gol contra' },
+const COLUNAS = [
+  { tipo: 'gol', rotulo: 'Gol', cabecalho: 'Gol' },
+  { tipo: 'assistencia', rotulo: 'Assistência', cabecalho: 'Ass.' },
+  { tipo: 'amarelo', rotulo: 'Cartão amarelo', cabecalho: <span className="inline-block w-2.5 h-3.5 rounded-sm bg-amber" /> },
+  { tipo: 'vermelho', rotulo: 'Cartão vermelho', cabecalho: <span className="inline-block w-2.5 h-3.5 rounded-sm bg-brick" /> },
 ]
 
 function nomeDoJogador(jogador) {
@@ -23,20 +22,43 @@ function numeroOuNulo(texto) {
   return texto === '' ? null : Number(texto)
 }
 
-function Contador({ rotulo, valor, aoMais, aoMenos, ocupado }) {
+function Celula({ valor, rotulo, nome, ocupado, aoMais, aoMenos }) {
   return (
-    <div className="flex items-center justify-between gap-1 bg-cream rounded-lg px-2 py-1">
-      <span className="text-[11px] font-semibold text-ink/60">{rotulo}</span>
-      <div className="flex items-center gap-1">
-        <button type="button" onClick={aoMenos} disabled={valor === 0 || ocupado} className="p-1.5 rounded-md hover:bg-hover disabled:opacity-30" aria-label={`Remover ${rotulo}`}>
-          <Minus size={13} />
+    <td className="w-[62px] text-center py-1.5">
+      {valor === 0 ? (
+        <button
+          type="button"
+          onClick={aoMais}
+          disabled={ocupado}
+          className="w-8 h-8 inline-flex items-center justify-center rounded-lg bg-cream text-ink/50 hover:bg-hover disabled:opacity-50"
+          aria-label={`Adicionar ${rotulo} para ${nome}`}
+        >
+          <Plus size={14} />
         </button>
-        <span className="w-4 text-center text-sm font-bold">{valor}</span>
-        <button type="button" onClick={aoMais} disabled={ocupado} className="p-1.5 rounded-md bg-campo text-white hover:bg-campo-dark disabled:opacity-50" aria-label={`Adicionar ${rotulo}`}>
-          <Plus size={13} />
-        </button>
-      </div>
-    </div>
+      ) : (
+        <span className="inline-flex items-center">
+          <button
+            type="button"
+            onClick={aoMenos}
+            disabled={ocupado}
+            className="w-6 h-7 inline-flex items-center justify-center rounded-md text-ink/60 hover:bg-hover disabled:opacity-50"
+            aria-label={`Remover ${rotulo} de ${nome}`}
+          >
+            <Minus size={12} />
+          </button>
+          <span className="w-3.5 text-center text-sm font-bold">{valor}</span>
+          <button
+            type="button"
+            onClick={aoMais}
+            disabled={ocupado}
+            className="w-6 h-7 inline-flex items-center justify-center rounded-md bg-campo text-white hover:bg-campo-dark disabled:opacity-50"
+            aria-label={`Adicionar ${rotulo} para ${nome}`}
+          >
+            <Plus size={12} />
+          </button>
+        </span>
+      )}
+    </td>
   )
 }
 
@@ -57,8 +79,9 @@ function ResultadoJogo({ jogo, campeonato, nomeA, nomeB, jogos, membros, eventos
     return () => document.removeEventListener('keydown', aoApertarTecla)
   }, [aoFechar])
 
-  const jogadoresA = membros.filter((m) => m.equipe_id === jogo.equipe_a_id && m.jogador)
-  const jogadoresB = membros.filter((m) => m.equipe_id === jogo.equipe_b_id && m.jogador)
+  const jogadoresDoTime = (equipeId) => membros.filter((m) => m.equipe_id === equipeId && m.jogador).map((m) => m.jogador)
+  const jogadoresA = jogadoresDoTime(jogo.equipe_a_id)
+  const jogadoresB = jogadoresDoTime(jogo.equipe_b_id)
   const equipeJogadores = membros.filter((m) => m.jogador).map((m) => ({ jogador_id: m.jogador.id, equipe_id: m.equipe_id }))
 
   const eventosDoCampeonato = eventos.filter((e) => e.jogo_id !== jogo.id).concat(eventosDoJogo)
@@ -74,17 +97,23 @@ function ResultadoJogo({ jogo, campeonato, nomeA, nomeB, jogos, membros, eventos
     return eventosDoJogo.filter((e) => e.jogador_id === jogadorId && e.tipo === tipo).length
   }
 
-  async function adicionar(jogadorId, tipo) {
+  function situacaoNoJogo(jogadorId) {
     const situacao = disciplina.get(jogadorId)
-    const jogador = membros.find((m) => m.jogador?.id === jogadorId)?.jogador
-    if (!jogo.encerrado && situacao?.suspenso && situacao.proximoJogoId === jogo.id) {
+    return {
+      suspenso: !jogo.encerrado && Boolean(situacao?.suspenso) && situacao.proximoJogoId === jogo.id,
+      pendurado: !jogo.encerrado && Boolean(situacao?.pendurado),
+    }
+  }
+
+  async function adicionar(jogador, tipo) {
+    if (situacaoNoJogo(jogador.id).suspenso) {
       if (!window.confirm(`${nomeDoJogador(jogador)} está suspenso neste jogo. Lançar mesmo assim?`)) return
     }
 
     setOcupado(true)
     const { data, error } = await supabase
       .from('jogo_evento')
-      .insert({ jogo_id: jogo.id, jogador_id: jogadorId, tipo })
+      .insert({ jogo_id: jogo.id, jogador_id: jogador.id, tipo })
       .select('*')
       .single()
     setOcupado(false)
@@ -128,7 +157,7 @@ function ResultadoJogo({ jogo, campeonato, nomeA, nomeB, jogos, membros, eventos
         return
       }
       if (!conferencia.confere) {
-        const texto = `Os gols registrados (${conferencia.registradoA} x ${conferencia.registradoB}) não batem com o placar (${gA} x ${gB}). Encerrar mesmo assim?`
+        const texto = `Os gols lançados (${conferencia.registradoA} x ${conferencia.registradoB}) não batem com o placar (${gA} x ${gB}). Encerrar mesmo assim?`
         if (!window.confirm(texto)) return
       }
     }
@@ -154,40 +183,98 @@ function ResultadoJogo({ jogo, campeonato, nomeA, nomeB, jogos, membros, eventos
     aoFechar()
   }
 
-  function listaDoTime(nome, jogadores) {
+  function tabelaDoTime(nome, jogadores) {
     return (
       <section key={nome} className="mb-4">
-        <h4 className="text-sm font-bold text-campo-dark mb-2">{nome}</h4>
-        <ul className="space-y-2">
-          {jogadores.map(({ jogador }) => {
-            const situacao = disciplina.get(jogador.id)
-            const suspensoAqui = !jogo.encerrado && situacao?.suspenso && situacao.proximoJogoId === jogo.id
-            const penduradoAqui = !jogo.encerrado && situacao?.pendurado
-            return (
-              <li key={jogador.id} className="border border-border rounded-xl p-3">
-                <div className="flex items-center gap-2 mb-2">
-                  <span className="font-semibold text-sm">{nomeDoJogador(jogador)}</span>
-                  {suspensoAqui && <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-brick-light text-brick">SUSPENSO</span>}
-                  {penduradoAqui && <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-light text-amber">PENDURADO</span>}
-                </div>
-                <div className="grid grid-cols-2 gap-1.5">
-                  {TIPOS.map(({ tipo, rotulo }) => (
-                    <Contador
-                      key={tipo}
-                      rotulo={rotulo}
-                      valor={contar(jogador.id, tipo)}
-                      aoMais={() => adicionar(jogador.id, tipo)}
-                      aoMenos={() => remover(jogador.id, tipo)}
+        <table className="w-full">
+          <thead>
+            <tr className="border-b border-border">
+              <th className="text-left text-sm font-bold text-campo-dark pb-1.5">{nome}</th>
+              {COLUNAS.map((c) => (
+                <th key={c.tipo} className="w-[62px] text-center text-[11px] font-semibold text-ink/50 pb-1.5" aria-label={c.rotulo}>
+                  {c.cabecalho}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {jogadores.map((jogador) => {
+              const { suspenso, pendurado } = situacaoNoJogo(jogador.id)
+              return (
+                <tr key={jogador.id} className="border-b border-border last:border-b-0">
+                  <td className="py-1.5 pr-2">
+                    <div className="text-sm font-medium leading-tight">{nomeDoJogador(jogador)}</div>
+                    {(suspenso || pendurado) && (
+                      <div className="flex gap-1 mt-0.5">
+                        {suspenso && <span className="text-[9px] font-bold px-1 py-0.5 rounded bg-brick-light text-brick">SUSPENSO</span>}
+                        {pendurado && <span className="text-[9px] font-bold px-1 py-0.5 rounded bg-amber-light text-amber">PENDURADO</span>}
+                      </div>
+                    )}
+                  </td>
+                  {COLUNAS.map((c) => (
+                    <Celula
+                      key={c.tipo}
+                      valor={contar(jogador.id, c.tipo)}
+                      rotulo={c.rotulo}
+                      nome={nomeDoJogador(jogador)}
                       ocupado={ocupado}
+                      aoMais={() => adicionar(jogador, c.tipo)}
+                      aoMenos={() => remover(jogador.id, c.tipo)}
                     />
                   ))}
-                </div>
-              </li>
-            )
-          })}
-          {jogadores.length === 0 && <li className="text-xs text-ink/50">Este time ainda não tem jogadores.</li>}
-        </ul>
+                </tr>
+              )
+            })}
+            {jogadores.length === 0 && (
+              <tr>
+                <td colSpan={COLUNAS.length + 1} className="py-2 text-xs text-ink/50">Este time ainda não tem jogadores.</td>
+              </tr>
+            )}
+          </tbody>
+        </table>
       </section>
+    )
+  }
+
+  function golsContra() {
+    const doJogo = eventosDoJogo.filter((e) => e.tipo === 'gol_contra')
+    const todos = [...jogadoresA, ...jogadoresB]
+
+    return (
+      <div className="mb-4">
+        <label className="flex flex-col gap-1.5 text-xs font-semibold text-ink/60">
+          Gol contra (opcional)
+          <select
+            className={campoBase}
+            value=""
+            disabled={ocupado}
+            onChange={(e) => {
+              const jogador = todos.find((j) => j.id === e.target.value)
+              if (jogador) adicionar(jogador, 'gol_contra')
+            }}
+          >
+            <option value="">Quem fez o gol contra...</option>
+            {todos.map((jogador) => (
+              <option key={jogador.id} value={jogador.id}>{nomeDoJogador(jogador)}</option>
+            ))}
+          </select>
+        </label>
+        {doJogo.length > 0 && (
+          <ul className="flex flex-wrap gap-1.5 mt-2">
+            {doJogo.map((evento) => {
+              const jogador = todos.find((j) => j.id === evento.jogador_id)
+              return (
+                <li key={evento.id} className="flex items-center gap-1 bg-brick-light text-brick text-xs font-semibold rounded-full pl-2.5 pr-1 py-1">
+                  {jogador ? nomeDoJogador(jogador) : 'Jogador'}
+                  <button type="button" onClick={() => remover(evento.jogador_id, 'gol_contra')} className="p-0.5 rounded-full hover:bg-black/10" aria-label="Remover gol contra">
+                    <X size={12} />
+                  </button>
+                </li>
+              )
+            })}
+          </ul>
+        )}
+      </div>
     )
   }
 
@@ -224,21 +311,23 @@ function ResultadoJogo({ jogo, campeonato, nomeA, nomeB, jogos, membros, eventos
         )}
 
         {placarPreenchido && !conferencia.confere && (
-          <p className="text-xs text-amber font-medium text-center mb-3">
-            Gols lançados abaixo: {conferencia.registradoA} x {conferencia.registradoB}. Não bate com o placar, mas você pode salvar assim.
+          <p className="text-xs text-amber font-medium text-center mb-2">
+            Gols lançados: {conferencia.registradoA} x {conferencia.registradoB}. Não bate com o placar, mas você pode salvar assim.
           </p>
         )}
 
         <div className="mt-4">
-          {listaDoTime(nomeA, jogadoresA)}
-          {listaDoTime(nomeB, jogadoresB)}
+          {tabelaDoTime(nomeA, jogadoresA)}
+          {tabelaDoTime(nomeB, jogadoresB)}
         </div>
+
+        {golsContra()}
 
         <label className="flex flex-col gap-1.5 text-xs font-semibold text-ink/60 mb-5">
           Melhor jogador da partida
           <select className={campoBase} value={melhor} onChange={(e) => setMelhor(e.target.value)}>
             <option value="">Não definido</option>
-            {[...jogadoresA, ...jogadoresB].map(({ jogador }) => (
+            {[...jogadoresA, ...jogadoresB].map((jogador) => (
               <option key={jogador.id} value={jogador.id}>{nomeDoJogador(jogador)}</option>
             ))}
           </select>
