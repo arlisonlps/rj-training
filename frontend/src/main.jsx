@@ -4,6 +4,9 @@ import { BrowserRouter } from 'react-router-dom'
 import { registerSW } from 'virtual:pwa-register'
 import './index.css'
 import App from './App.jsx'
+import { iniciarCapturaDeInstalacao } from './lib/instalacao'
+
+iniciarCapturaDeInstalacao()
 
 registerSW({
   immediate: true,
