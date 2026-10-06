@@ -2,7 +2,8 @@ import { useState, useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import { Calendar, Search, MessageCircle, Check } from 'lucide-react'
 import { supabase } from '../../../lib/supabaseClient'
-import { gerarMensalidadesDoMesAtual, valorComJuro } from '../../../lib/mensalidade'
+import { gerarMensalidadesDoMesAtual } from '../../../lib/mensalidade'
+import { valorComJuro, statusDaMensalidade, hojeEmBelem } from '../../../domain/mensalidade'
 import { formatarData } from '../../../lib/data'
 import Loading from '../../../components/Loading'
 
@@ -26,17 +27,6 @@ function borda(status) {
   if (status === 'pago') return 'border-l-sucesso'
   if (status === 'atrasado') return 'border-l-brick'
   return 'border-l-amber'
-}
-
-function statusCalculado(m) {
-  if (m.status === 'pago') return 'pago'
-  const hoje = new Date().toISOString().split('T')[0]
-  if (m.data_vencimento < hoje) return 'atrasado'
-  const emCincoDias = new Date()
-  emCincoDias.setDate(emCincoDias.getDate() + 5)
-  const emCincoDiasStr = emCincoDias.toISOString().split('T')[0]
-  if (m.data_vencimento <= emCincoDiasStr) return 'vencendo'
-  return 'pendente'
 }
 
 function linkWhatsapp(m, status) {
@@ -90,8 +80,7 @@ function MensalidadesMeses() {
   }
 
   async function marcarComoPago(m, status) {
-    const hoje = new Date().toISOString().split('T')[0]
-    const dados = { status: 'pago', data_pagamento: hoje }
+    const dados = { status: 'pago', data_pagamento: hojeEmBelem() }
     if (status === 'atrasado') dados.valor = valorComJuro(m, status)
 
     const { error } = await supabase
@@ -127,7 +116,7 @@ function MensalidadesMeses() {
         agrupadoPorMes[m.mes_referencia] = { total: 0, pagas: 0, atrasadas: 0 }
       }
       agrupadoPorMes[m.mes_referencia].total++
-      const status = statusCalculado(m)
+      const status = statusDaMensalidade(m)
       if (status === 'pago') agrupadoPorMes[m.mes_referencia].pagas++
       if (status === 'atrasado') agrupadoPorMes[m.mes_referencia].atrasadas++
     }
@@ -178,7 +167,7 @@ function MensalidadesMeses() {
       {modoBusca ? (
         <ul className="space-y-2">
           {resultadosBusca.map((m) => {
-            const status = statusCalculado(m)
+            const status = statusDaMensalidade(m)
             return (
               <li
                 key={m.id}

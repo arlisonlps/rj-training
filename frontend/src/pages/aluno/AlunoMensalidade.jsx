@@ -4,7 +4,7 @@ import { Copy, Check } from 'lucide-react'
 import { supabase } from '../../lib/supabaseClient'
 import { formatarData } from '../../lib/data'
 import { PIX_CHAVE, PIX_NOME, PIX_BANCO } from '../../lib/pix'
-import { valorComJuro } from '../../lib/mensalidade'
+import { valorComJuro, statusDaMensalidade } from '../../domain/mensalidade'
 
 function BotaoPix({ copiado, onClick }) {
   const [ref] = useAutoAnimate()
@@ -44,17 +44,6 @@ function ultimosTresMeses() {
     const data = new Date(hoje.getFullYear(), hoje.getMonth() - offset, 1)
     return `${data.getFullYear()}-${String(data.getMonth() + 1).padStart(2, '0')}-01`
   })
-}
-
-function statusCalculado(m) {
-  if (m.status === 'pago') return 'pago'
-  const hoje = new Date().toISOString().split('T')[0]
-  if (m.data_vencimento < hoje) return 'atrasado'
-  const emCincoDias = new Date()
-  emCincoDias.setDate(emCincoDias.getDate() + 5)
-  const emCincoDiasStr = emCincoDias.toISOString().split('T')[0]
-  if (m.data_vencimento <= emCincoDiasStr) return 'vencendo'
-  return 'pendente'
 }
 
 function AlunoMensalidade() {
@@ -112,7 +101,7 @@ function AlunoMensalidade() {
 
       <div ref={listaRef} className="flex flex-col gap-3">
         {mensalidades.map((m) => {
-          const status = statusCalculado(m)
+          const status = statusDaMensalidade(m)
           return (
             <div key={m.id} className="bg-surface rounded-2xl shadow-sm border border-border p-6">
               <div className="text-xs font-semibold text-ink/50 uppercase tracking-wide mb-2">

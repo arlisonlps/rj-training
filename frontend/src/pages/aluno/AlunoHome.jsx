@@ -4,7 +4,7 @@ import { useAutoAnimate } from '@formkit/auto-animate/react'
 import { CalendarDays, Wallet, Scale, Copy, Check, AlertTriangle, Trophy } from 'lucide-react'
 import { supabase } from '../../lib/supabaseClient'
 import { PIX_CHAVE, PIX_NOME, PIX_BANCO } from '../../lib/pix'
-import { valorComJuro } from '../../lib/mensalidade'
+import { valorComJuro, statusDaMensalidade } from '../../domain/mensalidade'
 import { formatarDataHoraCurta } from '../../lib/data'
 import { buscarMeuCampeonato } from '../../lib/campeonatoDados'
 
@@ -47,17 +47,6 @@ function selo(status) {
   if (status === 'pago') return 'bg-sucesso-light text-sucesso'
   if (status === 'atrasado') return 'bg-brick-light text-brick'
   return 'bg-amber-light text-amber'
-}
-
-function statusCalculado(m) {
-  if (m.status === 'pago') return 'pago'
-  const hoje = new Date().toISOString().split('T')[0]
-  if (m.data_vencimento < hoje) return 'atrasado'
-  const emCincoDias = new Date()
-  emCincoDias.setDate(emCincoDias.getDate() + 5)
-  const emCincoDiasStr = emCincoDias.toISOString().split('T')[0]
-  if (m.data_vencimento <= emCincoDiasStr) return 'vencendo'
-  return 'pendente'
 }
 
 function primeiroNome(nome) {
@@ -136,7 +125,7 @@ function AlunoHome() {
   const [ultimoPeso, pesoAnterior] = historicoPesoRecente
   const variacaoPeso = ultimoPeso && pesoAnterior ? ultimoPeso.peso - pesoAnterior.peso : null
   const proximo = proximoTreino(horarios)
-  const statusMensalidade = mensalidade ? statusCalculado(mensalidade) : null
+  const statusMensalidade = mensalidade ? statusDaMensalidade(mensalidade) : null
 
   return (
     <div>

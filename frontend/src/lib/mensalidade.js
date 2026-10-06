@@ -1,23 +1,12 @@
 import { supabase } from './supabaseClient'
+import { hojeEmBelem } from '../domain/mensalidade'
 
-export const JURO_ATRASO_MENSAL = 15
-
-function mesesAtraso(dataVencimento) {
-  const hoje = new Date()
-  hoje.setHours(0, 0, 0, 0)
-  const vencimento = new Date(dataVencimento + 'T00:00:00')
-  const diasAtraso = Math.floor((hoje - vencimento) / (1000 * 60 * 60 * 24))
-  return diasAtraso <= 0 ? 0 : Math.ceil(diasAtraso / 30)
+function ultimoDiaDoMes(ano, mes) {
+  return new Date(ano, mes, 0).getDate()
 }
 
-export function valorComJuro(mensalidade, status) {
-  const valor = Number(mensalidade.valor)
-  if (status !== 'atrasado') return valor
-  return valor + JURO_ATRASO_MENSAL * mesesAtraso(mensalidade.data_vencimento)
-}
-
-function ultimoDiaDoMes(ano, mesIndex) {
-  return new Date(ano, mesIndex + 1, 0).getDate()
+function doisDigitos(n) {
+  return String(n).padStart(2, '0')
 }
 
 export async function gerarMensalidadesDoMesAtual() {
@@ -28,17 +17,14 @@ export async function gerarMensalidadesDoMesAtual() {
 
   if (error || !alunosAtivos) return
 
-  const hoje = new Date()
-  const ano = hoje.getFullYear()
-  const mes = hoje.getMonth()
-  const mesReferencia = `${ano}-${String(mes + 1).padStart(2, '0')}-01`
+  const [ano, mes] = hojeEmBelem().split('-').map(Number)
+  const mesReferencia = `${ano}-${doisDigitos(mes)}-01`
 
   for (const aluno of alunosAtivos) {
     if (!aluno.dia_vencimento || !aluno.valor_mensalidade) continue
 
     const dia = Math.min(aluno.dia_vencimento, ultimoDiaDoMes(ano, mes))
-    const dataVencimento = new Date(ano, mes, dia)
-    const dataVencimentoStr = dataVencimento.toISOString().split('T')[0]
+    const dataVencimentoStr = `${ano}-${doisDigitos(mes)}-${doisDigitos(dia)}`
 
     await supabase.from('mensalidade').upsert(
       {

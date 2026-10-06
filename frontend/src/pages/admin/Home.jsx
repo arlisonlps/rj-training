@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { useAutoAnimate } from '@formkit/auto-animate/react'
 import { AlertTriangle, Users, Cake, Trophy, CalendarCheck } from 'lucide-react'
 import { supabase } from '../../lib/supabaseClient'
+import { hojeEmBelem } from '../../domain/mensalidade'
 import Loading from '../../components/Loading'
 
 const OFFSET_DIA = { terca: 1, quarta: 2, quinta: 3 }
@@ -60,7 +61,7 @@ function Home() {
     const hoje = new Date()
     const ano = hoje.getFullYear()
     const mes = hoje.getMonth()
-    const hojeStr = hoje.toISOString().split('T')[0]
+    const hojeStr = hojeEmBelem()
 
     const { data: mensalidadesAtrasadas } = await supabase
       .from('mensalidade')

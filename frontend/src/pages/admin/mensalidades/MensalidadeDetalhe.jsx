@@ -3,7 +3,7 @@ import { useParams, Link } from 'react-router-dom'
 import { ArrowLeft, MessageCircle, Check, Pencil, X } from 'lucide-react'
 import { supabase } from '../../../lib/supabaseClient'
 import { formatarData } from '../../../lib/data'
-import { valorComJuro } from '../../../lib/mensalidade'
+import { valorComJuro, statusDaMensalidade, hojeEmBelem } from '../../../domain/mensalidade'
 import Loading from '../../../components/Loading'
 
 function nomeDoMes(mesReferencia) {
@@ -87,8 +87,7 @@ function MensalidadeDetalhe() {
   }
 
   async function marcarComoPago(m, status) {
-    const hoje = new Date().toISOString().split('T')[0]
-    const dados = { status: 'pago', data_pagamento: hoje }
+    const dados = { status: 'pago', data_pagamento: hojeEmBelem() }
     if (status === 'atrasado') dados.valor = valorComJuro(m, status)
 
     const { error } = await supabase
@@ -103,17 +102,6 @@ function MensalidadeDetalhe() {
     buscarMensalidades()
   }
 
-  function statusCalculado(m) {
-    if (m.status === 'pago') return 'pago'
-    const hoje = new Date().toISOString().split('T')[0]
-    if (m.data_vencimento < hoje) return 'atrasado'
-    const emCincoDias = new Date()
-    emCincoDias.setDate(emCincoDias.getDate() + 5)
-    const emCincoDiasStr = emCincoDias.toISOString().split('T')[0]
-    if (m.data_vencimento <= emCincoDiasStr) return 'vencendo'
-    return 'pendente'
-  }
-
   function linkWhatsapp(m, status) {
     const mensagem = status === 'vencendo'
       ? `Fala ${m.aluno.nome}, sua mensalidade vence dia ${formatarData(m.data_vencimento)}, faça o pagamento para evitar atrasos!`
@@ -123,7 +111,7 @@ function MensalidadeDetalhe() {
 
   if (carregando) return <Loading />
 
-  const mensalidadesFiltradas = mensalidades.filter((m) => statusCalculado(m) === filtroStatus)
+  const mensalidadesFiltradas = mensalidades.filter((m) => statusDaMensalidade(m) === filtroStatus)
 
   return (
     <div>
@@ -150,7 +138,7 @@ function MensalidadeDetalhe() {
 
       <ul className="space-y-2">
         {mensalidadesFiltradas.map((m) => {
-          const status = statusCalculado(m)
+          const status = statusDaMensalidade(m)
           return (
             <li
               key={m.id}

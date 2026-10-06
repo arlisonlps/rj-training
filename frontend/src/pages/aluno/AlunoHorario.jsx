@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { Timer, AlertTriangle } from 'lucide-react'
 import { supabase } from '../../lib/supabaseClient'
+import { statusDaMensalidade } from '../../domain/mensalidade'
 
 const dias = [
   { label: 'Terça', valor: 'terca' },
@@ -126,8 +127,7 @@ function AlunoHorario() {
 
     if (!mensalidade) return
 
-    const hojeStr = hoje.toISOString().split('T')[0]
-    setMensalidadeAtrasada(mensalidade.status !== 'pago' && mensalidade.data_vencimento < hojeStr)
+    setMensalidadeAtrasada(statusDaMensalidade(mensalidade) === 'atrasado')
   }
 
   async function consultarMeusHorarios() {
