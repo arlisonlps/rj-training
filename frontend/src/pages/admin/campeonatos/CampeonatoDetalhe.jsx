@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
-import { ArrowLeft, Pencil, Trash2, Plus, Link2, Copy, Check } from 'lucide-react'
+import { ArrowLeft, Pencil, Trash2, Plus, Share2, Copy, Check } from 'lucide-react'
 import { supabase } from '../../../lib/supabaseClient'
 import { STATUS_CAMPEONATO } from '../../../lib/campeonatoStatus'
 import Loading from '../../../components/Loading'
+import Janela from '../../../components/Janela'
 import NovoTimeModal from './NovoTimeModal'
 import GruposCampeonato from './GruposCampeonato'
 import JogosCampeonato from './JogosCampeonato'
@@ -39,6 +40,7 @@ function CampeonatoDetalhe() {
   const [token, setToken] = useState(null)
   const [linkCopiado, setLinkCopiado] = useState(false)
   const [alterandoLink, setAlterandoLink] = useState(false)
+  const [janelaLink, setJanelaLink] = useState(false)
 
   useEffect(() => {
     carregar()
@@ -113,6 +115,18 @@ function CampeonatoDetalhe() {
     setToken(null)
   }
 
+  async function compartilharLink() {
+    try {
+      await navigator.share({
+        title: campeonato.nome,
+        text: `Acompanhe o campeonato ${campeonato.nome}`,
+        url: `${window.location.origin}/campeonato/${token}`,
+      })
+    } catch {
+      // o professor fechou a janela de compartilhar
+    }
+  }
+
   async function copiarLink() {
     const endereco = `${window.location.origin}/campeonato/${token}`
     try {
@@ -147,63 +161,21 @@ function CampeonatoDetalhe() {
             <ArrowLeft size={18} />
           </Link>
           <div className="min-w-0">
-            <h2 className="text-2xl font-bold text-campo-dark truncate">{campeonato.nome}</h2>
+            <h2 className="text-2xl font-bold text-campo-dark line-clamp-2 break-words">{campeonato.nome}</h2>
             <span className={`inline-block text-[10px] font-bold px-1.5 py-0.5 rounded mt-1 ${status.classe}`}>{status.rotulo}</span>
           </div>
         </div>
         <div className="flex items-center gap-1 shrink-0">
+          <button type="button" onClick={() => setJanelaLink(true)} className="relative p-2 rounded-lg text-ink/50 hover:bg-hover" aria-label="Compartilhar campeonato">
+            <Share2 size={17} />
+            {token && <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-sucesso" />}
+          </button>
           <Link to={`/campeonatos/${id}/editar`} className="p-2 rounded-lg text-ink/50 hover:bg-hover" aria-label="Editar campeonato">
             <Pencil size={17} />
           </Link>
           <button type="button" onClick={excluirCampeonato} className="p-2 rounded-lg text-brick hover:bg-brick-light" aria-label="Excluir campeonato">
             <Trash2 size={17} />
           </button>
-        </div>
-      </div>
-
-      <div className="flex items-center justify-between gap-3 flex-wrap bg-surface border border-border rounded-xl px-4 py-3 mb-5">
-        <div className="flex items-center gap-2 text-sm min-w-0">
-          <Link2 size={16} className="text-campo shrink-0" />
-          <div className="min-w-0">
-            <div className="font-semibold text-campo-dark">Link público</div>
-            <div className="text-xs text-ink/50">
-              {token
-                ? 'Ativo: quem tiver o link vê jogos, tabela, chave e estatísticas, sem login.'
-                : 'Desativado. Ative para compartilhar o campeonato com quem não tem cadastro.'}
-            </div>
-          </div>
-        </div>
-        <div className="flex items-center gap-2">
-          {token ? (
-            <>
-              <button
-                type="button"
-                onClick={copiarLink}
-                className="flex items-center gap-1.5 bg-campo text-white text-xs font-semibold px-3 py-2 rounded-lg hover:bg-campo-dark transition-colors"
-              >
-                {linkCopiado ? <Check size={14} /> : <Copy size={14} />}
-                {linkCopiado ? 'Link copiado!' : 'Copiar link'}
-              </button>
-              <button
-                type="button"
-                onClick={desativarLink}
-                disabled={alterandoLink}
-                className="text-xs font-semibold text-brick hover:underline disabled:opacity-60"
-              >
-                Desativar
-              </button>
-            </>
-          ) : (
-            <button
-              type="button"
-              onClick={ativarLink}
-              disabled={alterandoLink}
-              className="flex items-center gap-1.5 bg-campo text-white text-xs font-semibold px-3 py-2 rounded-lg hover:bg-campo-dark transition-colors disabled:opacity-60"
-            >
-              <Link2 size={14} />
-              Ativar link público
-            </button>
-          )}
         </div>
       </div>
 
@@ -302,6 +274,68 @@ function CampeonatoDetalhe() {
 
       {aba === 'craques' && (
         <RankingsCampeonato campeonato={campeonato} equipes={equipes} jogos={jogos} membros={membros} eventos={eventos} />
+      )}
+
+      {janelaLink && (
+        <Janela titulo="Compartilhar campeonato" aoFechar={() => setJanelaLink(false)}>
+          {token ? (
+            <div className="flex flex-col gap-3">
+              <p className="text-sm text-ink/70">
+                Este link está ativo. Qualquer pessoa que receber acompanha o campeonato (jogos, tabela, chave e estatísticas)
+                sem precisar de cadastro. Para parar de compartilhar, desative o link.
+              </p>
+              <input
+                readOnly
+                value={`${window.location.origin}/campeonato/${token}`}
+                onFocus={(e) => e.target.select()}
+                className="px-3 py-2 rounded-lg border border-border-strong bg-cream text-xs text-ink/70 focus:outline-none"
+                aria-label="Endereço do link público"
+              />
+              {typeof navigator.share === 'function' && (
+                <button
+                  type="button"
+                  onClick={compartilharLink}
+                  className="w-full flex items-center justify-center gap-2 bg-campo text-white text-sm font-semibold rounded-lg py-2.5 hover:bg-campo-dark active:scale-[0.98] transition-all"
+                >
+                  <Share2 size={16} />
+                  Compartilhar
+                </button>
+              )}
+              <button
+                type="button"
+                onClick={copiarLink}
+                className={`w-full flex items-center justify-center gap-2 text-sm font-semibold rounded-lg py-2.5 active:scale-[0.98] transition-all ${typeof navigator.share === 'function' ? 'bg-campo-light text-campo-dark hover:brightness-95' : 'bg-campo text-white hover:bg-campo-dark'}`}
+              >
+                {linkCopiado ? <Check size={16} /> : <Copy size={16} />}
+                {linkCopiado ? 'Link copiado!' : 'Copiar link'}
+              </button>
+              <button
+                type="button"
+                onClick={desativarLink}
+                disabled={alterandoLink}
+                className="text-xs font-semibold text-brick hover:underline disabled:opacity-60"
+              >
+                Desativar link
+              </button>
+            </div>
+          ) : (
+            <div className="flex flex-col gap-3">
+              <p className="text-sm text-ink/70">
+                Crie um link para quem não tem cadastro acompanhar o campeonato: jogos, tabela, chave e estatísticas.
+                Quem abrir não precisa fazer login e só consegue visualizar. Você pode desativar quando quiser.
+              </p>
+              <button
+                type="button"
+                onClick={ativarLink}
+                disabled={alterandoLink}
+                className="w-full flex items-center justify-center gap-2 bg-campo text-white text-sm font-semibold rounded-lg py-2.5 hover:bg-campo-dark active:scale-[0.98] transition-all disabled:opacity-60"
+              >
+                <Share2 size={16} />
+                {alterandoLink ? 'Criando link...' : 'Criar link para compartilhar'}
+              </button>
+            </div>
+          )}
+        </Janela>
       )}
 
       {janelaTime && (
