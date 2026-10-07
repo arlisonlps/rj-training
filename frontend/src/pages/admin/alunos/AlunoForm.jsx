@@ -25,6 +25,7 @@ function AlunoForm() {
   const [diaVencimentoOriginal, setDiaVencimentoOriginal] = useState('')
   const [valorMensalidade, setValorMensalidade] = useState('')
   const [mensalidadeBloqueada, setMensalidadeBloqueada] = useState(false)
+  const [pesoBloqueado, setPesoBloqueado] = useState(false)
   const [carregando, setCarregando] = useState(editando)
 
   useEffect(() => {
@@ -44,6 +45,7 @@ function AlunoForm() {
     setNascimento(data.nascimento || '')
     setPosicao(data.posicao || '')
     setPeso(data.peso || '')
+    setPesoBloqueado(Boolean(data.peso))
     setAltura(data.altura || '')
     setTelefone(data.telefone || '')
     setDiaVencimento(data.dia_vencimento || '')
@@ -67,14 +69,17 @@ function AlunoForm() {
     )
     if (!confirmar) return
 
+    let falhas = 0
     for (const m of pendentes) {
       const [ano, mes] = m.data_vencimento.split('-')
       const ultimoDia = new Date(Number(ano), Number(mes), 0).getDate()
       const diaAjustado = Math.min(novoDia, ultimoDia)
       const novaData = `${ano}-${mes}-${String(diaAjustado).padStart(2, '0')}`
       if (novaData === m.data_vencimento) continue
-      await supabase.from('mensalidade').update({ data_vencimento: novaData }).eq('id', m.id)
+      const { error } = await supabase.from('mensalidade').update({ data_vencimento: novaData }).eq('id', m.id)
+      if (error) falhas++
     }
+    if (falhas > 0) alert(`${falhas} mensalidade(s) não puderam ser atualizadas. Confira o vencimento na tela de Mensalidades.`)
   }
 
   async function salvar(e) {
@@ -95,10 +100,11 @@ function AlunoForm() {
       cpf,
       nascimento: nascimento || null,
       posicao,
-      peso: peso ? Number(peso) : null,
       altura: alturaNumero,
       telefone,
     }
+
+    if (!pesoBloqueado) dados.peso = peso ? Number(peso) : null
 
     if (!mensalidadeBloqueada) {
       dados.dia_vencimento = diaVencimento ? Number(diaVencimento) : null
@@ -106,10 +112,13 @@ function AlunoForm() {
     }
 
     let error
+    let alunoId = id
     if (editando) {
       ; ({ error } = await supabase.from('aluno').update(dados).eq('id', id))
     } else {
-      ; ({ error } = await supabase.from('aluno').insert(dados))
+      const { data: criado, error: erroInsert } = await supabase.from('aluno').insert(dados).select('id').single()
+      error = erroInsert
+      alunoId = criado?.id
     }
 
     if (error) {
@@ -121,6 +130,11 @@ function AlunoForm() {
         alert('Erro ao salvar aluno: ' + error.message)
       }
       return
+    }
+
+    if (!pesoBloqueado && dados.peso) {
+      const { error: erroPeso } = await supabase.from('peso_historico').insert({ aluno_id: alunoId, peso: dados.peso })
+      if (erroPeso) alert('Aluno salvo, mas não foi possível registrar o peso no histórico: ' + erroPeso.message)
     }
 
     if (editando && !mensalidadeBloqueada && dados.dia_vencimento && Number(diaVencimentoOriginal) !== dados.dia_vencimento) {
@@ -176,7 +190,17 @@ function AlunoForm() {
         </label>
         <label className={rotuloBase}>
           Peso (kg)
-          <input className={campoBase} type="number" step="0.1" value={peso} onChange={(e) => setPeso(e.target.value)} />
+          <input
+            className={`${campoBase} disabled:opacity-50 disabled:cursor-not-allowed`}
+            type="number"
+            step="0.1"
+            value={peso}
+            onChange={(e) => setPeso(e.target.value)}
+            disabled={pesoBloqueado}
+          />
+          {pesoBloqueado && (
+            <span className="text-[10px] font-normal text-ink/50 normal-case">Para alterar, registre um novo peso na tela do aluno.</span>
+          )}
         </label>
         <label className={rotuloBase}>
           Altura (m)

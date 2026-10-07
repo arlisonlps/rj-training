@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
-import { ArrowLeft, Scale, Pencil, UserX, UserCheck, Trash2 } from 'lucide-react'
+import { ArrowLeft, Scale, Pencil, UserX, UserCheck, Trash2, Check, X } from 'lucide-react'
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
 import { supabase } from '../../../lib/supabaseClient'
 import { formatarData } from '../../../lib/data'
@@ -35,6 +35,8 @@ function AlunoVisualizar() {
   const [aluno, setAluno] = useState(null)
   const [historicoPeso, setHistoricoPeso] = useState([])
   const [novoPeso, setNovoPeso] = useState('')
+  const [editandoUltimo, setEditandoUltimo] = useState(false)
+  const [pesoCorrigido, setPesoCorrigido] = useState('')
 
   useEffect(() => {
     carregarAluno()
@@ -79,9 +81,52 @@ function AlunoVisualizar() {
       return
     }
 
-    await supabase.from('aluno').update({ peso: Number(novoPeso) }).eq('id', id)
+    const { error: erroAluno } = await supabase.from('aluno').update({ peso: Number(novoPeso) }).eq('id', id)
+    if (erroAluno) alert('Peso registrado no histórico, mas não foi possível atualizar o peso atual do aluno: ' + erroAluno.message)
 
     setNovoPeso('')
+    carregarHistorico()
+    carregarAluno()
+  }
+
+  async function corrigirUltimoPeso(e) {
+    e.preventDefault()
+    const ultimo = historicoPeso[historicoPeso.length - 1]
+    if (!ultimo || !pesoCorrigido) return
+
+    const valor = Number(pesoCorrigido)
+    const { error } = await supabase.from('peso_historico').update({ peso: valor }).eq('id', ultimo.id)
+    if (error) {
+      alert('Erro ao corrigir o peso: ' + error.message)
+      return
+    }
+
+    const { error: erroAluno } = await supabase.from('aluno').update({ peso: valor }).eq('id', id)
+    if (erroAluno) alert('Registro corrigido, mas não foi possível atualizar o peso atual do aluno: ' + erroAluno.message)
+
+    setEditandoUltimo(false)
+    carregarHistorico()
+    carregarAluno()
+  }
+
+  async function excluirUltimoPeso() {
+    const ultimo = historicoPeso[historicoPeso.length - 1]
+    if (!ultimo) return
+    if (!window.confirm(`Excluir o registro de ${ultimo.peso} kg de ${formatarData(ultimo.registrado_em)}?`)) return
+
+    const { error } = await supabase.from('peso_historico').delete().eq('id', ultimo.id)
+    if (error) {
+      alert('Erro ao excluir o registro: ' + error.message)
+      return
+    }
+
+    const anterior = historicoPeso[historicoPeso.length - 2]
+    const { error: erroAluno } = await supabase
+      .from('aluno')
+      .update({ peso: anterior ? anterior.peso : null })
+      .eq('id', id)
+    if (erroAluno) alert('Registro excluído, mas não foi possível atualizar o peso atual do aluno: ' + erroAluno.message)
+
     carregarHistorico()
     carregarAluno()
   }
@@ -212,13 +257,52 @@ function AlunoVisualizar() {
               <tr className="text-left text-xs font-semibold text-ink/50 border-b border-border">
                 <th className="pb-2">Data</th>
                 <th className="pb-2">Peso</th>
+                <th className="pb-2 w-24" />
               </tr>
             </thead>
             <tbody>
-              {historicoDecrescente.map((h) => (
+              {historicoDecrescente.map((h, indice) => (
                 <tr key={h.id} className="border-b border-border">
                   <td className="py-2">{formatarData(h.registrado_em)}</td>
-                  <td className="py-2 font-medium">{h.peso} kg</td>
+                  <td className="py-2 font-medium">
+                    {indice === 0 && editandoUltimo ? (
+                      <form onSubmit={corrigirUltimoPeso} className="flex items-center gap-1.5">
+                        <input
+                          type="number"
+                          step="0.1"
+                          value={pesoCorrigido}
+                          onChange={(e) => setPesoCorrigido(e.target.value)}
+                          className="w-24 px-2 py-1 rounded-md border border-border-strong text-base focus:outline-none focus:ring-2 focus:ring-campo/30"
+                          autoFocus
+                        />
+                        <button type="submit" className="p-1.5 rounded-md text-campo-dark hover:bg-hover" aria-label="Salvar correção">
+                          <Check size={15} />
+                        </button>
+                        <button type="button" onClick={() => setEditandoUltimo(false)} className="p-1.5 rounded-md text-ink/50 hover:bg-hover" aria-label="Cancelar">
+                          <X size={15} />
+                        </button>
+                      </form>
+                    ) : (
+                      `${h.peso} kg`
+                    )}
+                  </td>
+                  <td className="py-2 text-right">
+                    {indice === 0 && !editandoUltimo && (
+                      <span className="inline-flex items-center gap-1">
+                        <button
+                          type="button"
+                          onClick={() => { setPesoCorrigido(String(h.peso)); setEditandoUltimo(true) }}
+                          className="p-1.5 rounded-md text-ink/40 hover:bg-hover"
+                          aria-label="Corrigir último peso"
+                        >
+                          <Pencil size={14} />
+                        </button>
+                        <button type="button" onClick={excluirUltimoPeso} className="p-1.5 rounded-md text-brick hover:bg-brick-light" aria-label="Excluir último peso">
+                          <Trash2 size={14} />
+                        </button>
+                      </span>
+                    )}
+                  </td>
                 </tr>
               ))}
             </tbody>
