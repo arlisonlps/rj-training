@@ -12,6 +12,9 @@ export default defineConfig({
       injectRegister: false,
       workbox: {
         importScripts: ['push-handler.js'],
+        skipWaiting: true,
+        clientsClaim: true,
+        cleanupOutdatedCaches: true,
       },
       includeAssets: ['favicon.png', 'apple-touch-icon.png'],
       manifest: {
