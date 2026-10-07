@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
-import { ArrowLeft, Pencil, Trash2, Plus } from 'lucide-react'
+import { ArrowLeft, Pencil, Trash2, Plus, Link2, Copy, Check } from 'lucide-react'
 import { supabase } from '../../../lib/supabaseClient'
 import { STATUS_CAMPEONATO } from '../../../lib/campeonatoStatus'
 import Loading from '../../../components/Loading'
@@ -36,13 +36,16 @@ function CampeonatoDetalhe() {
   const [carregando, setCarregando] = useState(true)
   const [janelaTime, setJanelaTime] = useState(false)
   const [erroCarga, setErroCarga] = useState('')
+  const [token, setToken] = useState(null)
+  const [linkCopiado, setLinkCopiado] = useState(false)
+  const [alterandoLink, setAlterandoLink] = useState(false)
 
   useEffect(() => {
     carregar()
   }, [id])
 
   async function carregar() {
-    const [campeonatoRes, equipesRes, membrosRes, gruposRes, jogosRes] = await Promise.all([
+    const [campeonatoRes, equipesRes, membrosRes, gruposRes, jogosRes, linkRes] = await Promise.all([
       supabase.from('campeonato').select('*').eq('id', id).single(),
       supabase.from('equipe').select('id, nome, cor, grupo_id, desempate_manual').eq('campeonato_id', id).order('nome'),
       supabase
@@ -52,6 +55,7 @@ function CampeonatoDetalhe() {
         .limit(LIMITE_LISTAS),
       supabase.from('grupo').select('id, nome').eq('campeonato_id', id).order('nome'),
       supabase.from('jogo').select('*').eq('campeonato_id', id).order('rodada').limit(LIMITE_LISTAS),
+      supabase.from('campeonato_link').select('token').eq('campeonato_id', id).maybeSingle(),
     ])
 
     if (campeonatoRes.error) {
@@ -60,7 +64,7 @@ function CampeonatoDetalhe() {
       return
     }
 
-    const falha = [equipesRes, membrosRes, gruposRes, jogosRes].find((r) => r.error)
+    const falha = [equipesRes, membrosRes, gruposRes, jogosRes, linkRes].find((r) => r.error)
     if (falha) console.error('Erro ao carregar dados do campeonato:', falha.error)
     setErroCarga(falha ? falha.error.message : '')
 
@@ -76,12 +80,48 @@ function CampeonatoDetalhe() {
     }
 
     setCampeonato(campeonatoRes.data)
+    setToken(linkRes.data?.token ?? null)
     setEquipes(equipesRes.data || [])
     setMembros(membrosRes.data || [])
     setGrupos(gruposRes.data || [])
     setJogos(jogosCarregados)
     setEventos(eventosCarregados)
     setCarregando(false)
+  }
+
+  async function ativarLink() {
+    setAlterandoLink(true)
+    const novoToken = crypto.randomUUID().replaceAll('-', '') + crypto.randomUUID().replaceAll('-', '')
+    const { error } = await supabase.from('campeonato_link').insert({ campeonato_id: id, token: novoToken })
+    setAlterandoLink(false)
+    if (error) {
+      alert('Erro ao ativar o link: ' + error.message)
+      return
+    }
+    setToken(novoToken)
+  }
+
+  async function desativarLink() {
+    if (!window.confirm('Desativar o link público? Quem já recebeu o link deixa de conseguir abrir.')) return
+    setAlterandoLink(true)
+    const { error } = await supabase.from('campeonato_link').delete().eq('campeonato_id', id)
+    setAlterandoLink(false)
+    if (error) {
+      alert('Erro ao desativar o link: ' + error.message)
+      return
+    }
+    setToken(null)
+  }
+
+  async function copiarLink() {
+    const endereco = `${window.location.origin}/campeonato/${token}`
+    try {
+      await navigator.clipboard.writeText(endereco)
+      setLinkCopiado(true)
+      setTimeout(() => setLinkCopiado(false), 2000)
+    } catch {
+      alert(`Link: ${endereco}`)
+    }
   }
 
   async function excluirCampeonato() {
@@ -118,6 +158,52 @@ function CampeonatoDetalhe() {
           <button type="button" onClick={excluirCampeonato} className="p-2 rounded-lg text-brick hover:bg-brick-light" aria-label="Excluir campeonato">
             <Trash2 size={17} />
           </button>
+        </div>
+      </div>
+
+      <div className="flex items-center justify-between gap-3 flex-wrap bg-surface border border-border rounded-xl px-4 py-3 mb-5">
+        <div className="flex items-center gap-2 text-sm min-w-0">
+          <Link2 size={16} className="text-campo shrink-0" />
+          <div className="min-w-0">
+            <div className="font-semibold text-campo-dark">Link público</div>
+            <div className="text-xs text-ink/50">
+              {token
+                ? 'Ativo: quem tiver o link vê jogos, tabela, chave e estatísticas, sem login.'
+                : 'Desativado. Ative para compartilhar o campeonato com quem não tem cadastro.'}
+            </div>
+          </div>
+        </div>
+        <div className="flex items-center gap-2">
+          {token ? (
+            <>
+              <button
+                type="button"
+                onClick={copiarLink}
+                className="flex items-center gap-1.5 bg-campo text-white text-xs font-semibold px-3 py-2 rounded-lg hover:bg-campo-dark transition-colors"
+              >
+                {linkCopiado ? <Check size={14} /> : <Copy size={14} />}
+                {linkCopiado ? 'Link copiado!' : 'Copiar link'}
+              </button>
+              <button
+                type="button"
+                onClick={desativarLink}
+                disabled={alterandoLink}
+                className="text-xs font-semibold text-brick hover:underline disabled:opacity-60"
+              >
+                Desativar
+              </button>
+            </>
+          ) : (
+            <button
+              type="button"
+              onClick={ativarLink}
+              disabled={alterandoLink}
+              className="flex items-center gap-1.5 bg-campo text-white text-xs font-semibold px-3 py-2 rounded-lg hover:bg-campo-dark transition-colors disabled:opacity-60"
+            >
+              <Link2 size={14} />
+              Ativar link público
+            </button>
+          )}
         </div>
       </div>
 

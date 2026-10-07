@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Routes, Route, Navigate } from 'react-router-dom'
+import { Routes, Route, Navigate, matchPath, useLocation } from 'react-router-dom'
 import { supabase } from './lib/supabaseClient'
 import { gerarMensalidadesDoMesAtual } from './lib/mensalidade'
 import Loading from './components/Loading'
@@ -25,6 +25,7 @@ import Campeonatos from './pages/admin/campeonatos/Campeonatos'
 import CampeonatoForm from './pages/admin/campeonatos/CampeonatoForm'
 import CampeonatoDetalhe from './pages/admin/campeonatos/CampeonatoDetalhe'
 import EquipeDetalhe from './pages/admin/campeonatos/EquipeDetalhe'
+import CampeonatoPublico from './pages/publico/CampeonatoPublico'
 import AlunoHome from './pages/aluno/AlunoHome'
 import AlunoHorario from './pages/aluno/AlunoHorario'
 import AlunoMensalidade from './pages/aluno/AlunoMensalidade'
@@ -53,6 +54,7 @@ function App() {
   const [perfil, setPerfil] = useState(null)
   const [carregandoPerfil, setCarregandoPerfil] = useState(false)
   const [erroCadastro, setErroCadastro] = useState('')
+  const location = useLocation()
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -136,6 +138,9 @@ function App() {
     }
     setCarregandoPerfil(false)
   }
+
+  const linkPublico = matchPath('/campeonato/:token', location.pathname)
+  if (linkPublico) return <CampeonatoPublico token={linkPublico.params.token} />
 
   if (carregandoSessao || (session && carregandoPerfil)) {
     return <Loading />
