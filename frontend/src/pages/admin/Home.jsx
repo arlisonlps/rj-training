@@ -4,15 +4,9 @@ import { useAutoAnimate } from '@formkit/auto-animate/react'
 import { AlertTriangle, Users, Cake, Trophy, CalendarCheck } from 'lucide-react'
 import { supabase } from '../../lib/supabaseClient'
 import { hojeEmBelem } from '../../domain/mensalidade'
+import { calcularFrequenciaDoMes } from '../../domain/frequencia'
+import { buscarPresencasDoMes } from '../../lib/frequenciaDados'
 import Loading from '../../components/Loading'
-
-const OFFSET_DIA = { terca: 1, quarta: 2, quinta: 3 }
-
-function chaveDia(data) {
-  const mes = String(data.getMonth() + 1).padStart(2, '0')
-  const dia = String(data.getDate()).padStart(2, '0')
-  return `${data.getFullYear()}-${mes}-${dia}`
-}
 
 const CORES_POSICAO = [
   'bg-amber-light text-amber',
@@ -130,60 +124,26 @@ function Home() {
   }
 
   async function calcularFrequencia(ano, mes, idsAtrasados, alunosAtivos) {
-    const inicioHoje = new Date()
-    inicioHoje.setHours(0, 0, 0, 0)
-
-    const diasEsperados = new Set()
-    for (let d = new Date(ano, mes, 1); d.getMonth() === mes && d < inicioHoje; d.setDate(d.getDate() + 1)) {
-      if (d.getDay() >= 2 && d.getDay() <= 4) diasEsperados.add(chaveDia(d))
-    }
-
-    if (diasEsperados.size === 0) {
+    let registros
+    try {
+      registros = await buscarPresencasDoMes(ano, mes + 1)
+    } catch (erro) {
+      console.error('Erro ao buscar presenças:', erro)
       setRankingFrequencia([])
       return
     }
 
-    const limiteInferior = new Date(ano, mes, 1)
-    limiteInferior.setDate(limiteInferior.getDate() - 7)
-    const limiteSuperior = new Date(ano, mes + 1, 0)
+    const { linhas } = calcularFrequenciaDoMes({
+      ano,
+      mes: mes + 1,
+      hoje: hojeEmBelem(),
+      alunos: alunosAtivos.filter((a) => !idsAtrasados.has(a.id)),
+      registros,
+    })
 
-    const { data: registros, error } = await supabase
-      .from('presenca')
-      .select('aluno_id, dia_semana, semana_referencia')
-      .eq('presente', true)
-      .gte('semana_referencia', chaveDia(limiteInferior))
-      .lte('semana_referencia', chaveDia(limiteSuperior))
-
-    if (error || !registros) {
-      setRankingFrequencia([])
-      return
-    }
-
-    const diasPresentesPorAluno = {}
-    for (const r of registros) {
-      const [a, m, dia] = r.semana_referencia.split('-').map(Number)
-      const chave = chaveDia(new Date(a, m - 1, dia + (OFFSET_DIA[r.dia_semana] || 0)))
-      if (!diasEsperados.has(chave)) continue
-      if (!diasPresentesPorAluno[r.aluno_id]) diasPresentesPorAluno[r.aluno_id] = new Set()
-      diasPresentesPorAluno[r.aluno_id].add(chave)
-    }
-
-    const ultimosTreinos = [...diasEsperados].sort().slice(-3)
-
-    const resultado = alunosAtivos
-      .filter((a) => !idsAtrasados.has(a.id))
-      .map((a) => {
-        const presentes = diasPresentesPorAluno[a.id]
-        return {
-          nome: a.nome,
-          percentual: Math.round(((presentes?.size || 0) / diasEsperados.size) * 100),
-          recentes: ultimosTreinos.filter((dia) => presentes?.has(dia)).length,
-        }
-      })
-      .filter((a) => a.percentual > 0)
-      .sort((a, b) => b.percentual - a.percentual || b.recentes - a.recentes || a.nome.localeCompare(b.nome))
-
-    setRankingFrequencia(resultado.slice(0, 5))
+    setRankingFrequencia(
+      linhas.filter((l) => l.percentual > 0).slice(0, 5).map((l) => ({ nome: l.nome, percentual: l.percentual }))
+    )
   }
 
   if (carregando) return <Loading />

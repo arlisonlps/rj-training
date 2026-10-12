@@ -23,6 +23,7 @@ import EventoDetalhe from './pages/admin/eventos/EventoDetalhe'
 import Avisos from './pages/admin/avisos/Avisos'
 import Campeonatos from './pages/admin/campeonatos/Campeonatos'
 import CampeonatoForm from './pages/admin/campeonatos/CampeonatoForm'
+import Frequencia from './pages/admin/frequencia/Frequencia'
 import CampeonatoDetalhe from './pages/admin/campeonatos/CampeonatoDetalhe'
 import EquipeDetalhe from './pages/admin/campeonatos/EquipeDetalhe'
 import CampeonatoPublico from './pages/publico/CampeonatoPublico'
@@ -230,6 +231,7 @@ function App() {
               <Route path="/eventos/:id" element={<EventoDetalhe />} />
               <Route path="/eventos/:id/editar" element={<EventoForm />} />
               <Route path="/avisos" element={<Avisos />} />
+              <Route path="/frequencia" element={<Frequencia />} />
               <Route path="/campeonatos" element={<Campeonatos />} />
               <Route path="/campeonatos/novo" element={<CampeonatoForm />} />
               <Route path="/campeonatos/:id" element={<CampeonatoDetalhe />} />

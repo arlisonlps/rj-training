@@ -1,5 +1,5 @@
 import { NavLink, useNavigate } from 'react-router-dom'
-import { Home, Users, CalendarDays, Wallet, UserCheck, LogOut, PartyPopper, Megaphone, Trophy } from 'lucide-react'
+import { Home, Users, CalendarDays, Wallet, UserCheck, LogOut, PartyPopper, Megaphone, Trophy, CalendarCheck } from 'lucide-react'
 import { supabase } from '../lib/supabaseClient'
 import logo from '../assets/logo.png'
 import SeletorTema from '../components/SeletorTema'
@@ -20,6 +20,7 @@ const itensMais = [
   { to: '/eventos', label: 'Eventos', icon: PartyPopper },
   { to: '/avisos', label: 'Avisos', icon: Megaphone },
   { to: '/campeonatos', label: 'Campeonatos', icon: Trophy },
+  { to: '/frequencia', label: 'Frequência', icon: CalendarCheck },
 ]
 
 function Layout({ children }) {
