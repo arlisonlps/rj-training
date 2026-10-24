@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Routes, Route, Navigate, matchPath, useLocation } from 'react-router-dom'
+import { Routes, Route, Navigate } from 'react-router-dom'
 import { supabase } from './lib/supabaseClient'
 import { gerarMensalidadesDoMesAtual } from './lib/mensalidade'
 import Loading from './components/Loading'
@@ -21,19 +21,12 @@ import Eventos from './pages/admin/eventos/Eventos'
 import EventoForm from './pages/admin/eventos/EventoForm'
 import EventoDetalhe from './pages/admin/eventos/EventoDetalhe'
 import Avisos from './pages/admin/avisos/Avisos'
-import Campeonatos from './pages/admin/campeonatos/Campeonatos'
-import CampeonatoForm from './pages/admin/campeonatos/CampeonatoForm'
 import Frequencia from './pages/admin/frequencia/Frequencia'
-import CampeonatoDetalhe from './pages/admin/campeonatos/CampeonatoDetalhe'
-import EquipeDetalhe from './pages/admin/campeonatos/EquipeDetalhe'
-import CampeonatoPublico from './pages/publico/CampeonatoPublico'
 import AlunoHome from './pages/aluno/AlunoHome'
 import AlunoHorario from './pages/aluno/AlunoHorario'
 import AlunoMensalidade from './pages/aluno/AlunoMensalidade'
 import AlunoPeso from './pages/aluno/AlunoPeso'
 import AlunoEventos from './pages/aluno/AlunoEventos'
-import AlunoCampeonatos from './pages/aluno/campeonatos/AlunoCampeonatos'
-import AlunoCampeonatoDetalhe from './pages/aluno/campeonatos/AlunoCampeonatoDetalhe'
 
 function extrairDadosPendentes() {
   const pendenteStr = localStorage.getItem('cadastro_pendente')
@@ -55,7 +48,6 @@ function App() {
   const [perfil, setPerfil] = useState(null)
   const [carregandoPerfil, setCarregandoPerfil] = useState(false)
   const [erroCadastro, setErroCadastro] = useState('')
-  const location = useLocation()
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -140,9 +132,6 @@ function App() {
     setCarregandoPerfil(false)
   }
 
-  const linkPublico = matchPath('/campeonato/:token', location.pathname)
-  if (linkPublico) return <CampeonatoPublico token={linkPublico.params.token} />
-
   if (carregandoSessao || (session && carregandoPerfil)) {
     return <Loading />
   }
@@ -197,8 +186,6 @@ function App() {
                 <Route path="/mensalidade" element={<AlunoMensalidade />} />
                 <Route path="/peso" element={<AlunoPeso />} />
                 <Route path="/eventos" element={<AlunoEventos />} />
-                <Route path="/campeonatos" element={<AlunoCampeonatos />} />
-                <Route path="/campeonatos/:id" element={<AlunoCampeonatoDetalhe />} />
                 <Route path="*" element={<Navigate to="/" />} />
               </Routes>
             </AlunoLayout>
@@ -232,11 +219,6 @@ function App() {
               <Route path="/eventos/:id/editar" element={<EventoForm />} />
               <Route path="/avisos" element={<Avisos />} />
               <Route path="/frequencia" element={<Frequencia />} />
-              <Route path="/campeonatos" element={<Campeonatos />} />
-              <Route path="/campeonatos/novo" element={<CampeonatoForm />} />
-              <Route path="/campeonatos/:id" element={<CampeonatoDetalhe />} />
-              <Route path="/campeonatos/:id/editar" element={<CampeonatoForm />} />
-              <Route path="/campeonatos/:id/times/:equipeId" element={<EquipeDetalhe />} />
               <Route path="*" element={<Navigate to="/" />} />
 
             </Routes>
